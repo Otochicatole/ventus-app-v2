@@ -2,22 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-    Card,
-    CardContent,
-    Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Button,
-    Chip,
-    Box,
-    CircularProgress,
-} from "@mui/material";
-import ConfirmDialog from "../../components/ui/confirm-dialog";
+import Button from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Chip from "@/components/ui/chip";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 type Shift = {
     id: string;
@@ -116,121 +104,127 @@ export default function ShiftsPage() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <CircularProgress />
-            </Box>
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+            </div>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-                <Typography variant="h3" component="h1" fontWeight="bold">
-                    Turnos
-                </Typography>
-                <Button
-                    component={Link}
-                    href="/admin/cms/shifts/new"
-                    variant="contained"
-                >
-                    + Nuevo Turno
-                </Button>
-            </Box>
+        <div className="space-y-8 animate-fadeIn">
+            <div className="flex justify-between items-start flex-wrap gap-6">
+                <div>
+                    <h1 className="text-4xl font-bold text-white mb-3">Turnos</h1>
+                    <p className="text-neutral-400 text-lg">Gestión de reservas y confirmaciones</p>
+                </div>
+                <Link href="/admin/cms/shifts/new">
+                    <Button size="large" startIcon={
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                        </svg>
+                    }>
+                        Nuevo Turno
+                    </Button>
+                </Link>
+            </div>
 
             <Card>
-                <CardContent>
-                    <Typography variant="h6" component="h2" gutterBottom>
-                        Todos los Turnos
-                    </Typography>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Paciente</TableCell>
-                                    <TableCell>Contacto</TableCell>
-                                    <TableCell>Ubicación</TableCell>
-                                    <TableCell>Fecha/Hora</TableCell>
-                                    <TableCell>Estado</TableCell>
-                                    <TableCell align="right">Acciones</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {shifts.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                                            <Typography color="text.secondary">
-                                                No hay turnos registrados
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    shifts.map((shift) => (
-                                        <TableRow key={shift.id} hover>
-                                            <TableCell>
-                                                {shift.name} {shift.lastName}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="body2">{shift.email}</Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {shift.phone}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>{shift.location.name}</TableCell>
-                                            <TableCell>
-                                                <Typography variant="body2">
-                                                    {(() => {
-                                                        const dateStr = shift.date.split("T")[0];
-                                                        const [year, month, day] = dateStr.split("-");
-                                                        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                                        return date.toLocaleDateString("es-AR");
-                                                    })()}
-                                                </Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {shift.time}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
+                <CardHeader>
+                    <h2 className="text-2xl font-bold text-white mb-2">Todos los Turnos</h2>
+                    <p className="text-neutral-400">{shifts.length} registro(s) en total</p>
+                </CardHeader>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-neutral-900 border-b border-neutral-800">
+                            <tr>
+                                <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Paciente</th>
+                                <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Contacto</th>
+                                <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Ubicación</th>
+                                <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Fecha/Hora</th>
+                                <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Estado</th>
+                                <th className="text-right py-5 px-8 text-neutral-400 font-semibold text-sm">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-800">
+                            {shifts.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-12 text-center text-neutral-500">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <svg className="w-16 h-16 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                            </svg>
+                                            <p>No hay turnos registrados</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                shifts.map((shift) => {
+                                    const dateStr = shift.date.split("T")[0];
+                                    const [year, month, day] = dateStr.split("-");
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    return (
+                                        <tr key={shift.id} className="hover:bg-neutral-900/50 transition-colors">
+                                            <td className="py-5 px-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-black font-bold">
+                                                        {shift.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <span className="text-white font-medium">{shift.name} {shift.lastName}</span>
+                                                </div>
+                                            </td>
+                                            <td className="py-5 px-8">
+                                                <div className="space-y-1">
+                                                    <p className="text-neutral-300 text-sm">{shift.email}</p>
+                                                    <p className="text-neutral-500 text-sm">{shift.phone}</p>
+                                                </div>
+                                            </td>
+                                            <td className="py-5 px-8 text-neutral-300">{shift.location.name}</td>
+                                            <td className="py-5 px-8">
+                                                <div className="space-y-1">
+                                                    <p className="text-white font-medium">{date.toLocaleDateString("es-AR")}</p>
+                                                    <p className="text-neutral-400 text-sm">{shift.time}</p>
+                                                </div>
+                                            </td>
+                                            <td className="py-5 px-8">
                                                 <Chip
                                                     label={shift.confirmed ? "Confirmado" : "Pendiente"}
                                                     color={shift.confirmed ? "success" : "warning"}
-                                                    size="small"
+                                                    variant="soft"
                                                 />
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                                            </td>
+                                            <td className="py-5 px-8">
+                                                <div className="flex gap-2 justify-end">
                                                     <Button
+                                                        size="small"
+                                                        variant="outlined"
                                                         onClick={() => toggleConfirmed(shift.id, shift.confirmed)}
                                                         disabled={confirmingId === shift.id}
-                                                        variant="outlined"
-                                                        size="small"
                                                     >
                                                         {shift.confirmed ? "Desconfirmar" : "Confirmar"}
                                                     </Button>
+                                                    <Link href={`/admin/cms/shifts/${shift.id}`}>
+                                                        <Button size="small" variant="outlined" color="default">
+                                                            Ver
+                                                        </Button>
+                                                    </Link>
                                                     <Button
-                                                        component={Link}
-                                                        href={`/admin/cms/shifts/${shift.id}`}
-                                                        variant="outlined"
                                                         size="small"
-                                                    >
-                                                        Ver
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() => setDeleteId(shift.id)}
                                                         variant="outlined"
                                                         color="error"
-                                                        size="small"
+                                                        onClick={() => setDeleteId(shift.id)}
                                                     >
                                                         Eliminar
                                                     </Button>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </CardContent>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </Card>
 
             <ConfirmDialog
@@ -242,7 +236,6 @@ export default function ShiftsPage() {
                 confirmText="Eliminar"
                 loading={deleting}
             />
-        </Box>
+        </div>
     );
 }
-

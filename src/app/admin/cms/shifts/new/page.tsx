@@ -2,27 +2,15 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-    Card,
-    CardContent,
-    Typography,
-    TextField,
-    Button,
-    Box,
-    Alert,
-    Grid,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    FormControlLabel,
-    Checkbox,
-    CircularProgress,
-} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Location = {
     id: string;
@@ -149,45 +137,42 @@ export default function NewShiftPage() {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{ maxWidth: 900, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-                <Typography variant="h3" component="h1" fontWeight="bold" sx={{ mb: 4 }}>
-                    Nuevo Turno
-                </Typography>
+            <div className="max-w-4xl mx-auto space-y-6">
+                <h1 className="text-4xl font-bold text-white">Nuevo Turno</h1>
 
                 <Card>
-                    <CardContent>
-                        <Typography variant="h6" component="h2" gutterBottom>
+                    <CardContent className="p-6">
+                        <h2 className="text-xl font-bold text-white mb-6">
                             Información del Turno
-                        </Typography>
-                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        </h2>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             {error && (
-                                <Alert severity="error" sx={{ mb: 3 }}>
+                                <Alert severity="error">
                                     {error}
                                 </Alert>
                             )}
 
-                            <FormControl fullWidth sx={{ mb: 3 }} required>
-                                <InputLabel id="location-select-label">Ubicación</InputLabel>
-                                <Select
-                                    labelId="location-select-label"
-                                    value={formData.locationId}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            locationId: e.target.value,
-                                            time: "",
-                                        })
-                                    }
-                                    label="Ubicación"
-                                >
-                                    <MenuItem value="">Seleccionar ubicación</MenuItem>
-                                    {locations.map((loc) => (
-                                        <MenuItem key={loc.id} value={loc.id}>
-                                            {loc.name} - {loc.address}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Select
+                                label="Ubicación"
+                                value={formData.locationId}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        locationId: e.target.value,
+                                        time: "",
+                                    })
+                                }
+                                options={[
+                                    { value: "", label: "Seleccionar ubicación" },
+                                    ...locations.map((loc) => ({
+                                        value: loc.id,
+                                        label: `${loc.name} - ${loc.address}`,
+                                    })),
+                                ]}
+                                required
+                                fullWidth
+                            />
 
                             <DatePicker
                                 label="Fecha"
@@ -204,75 +189,114 @@ export default function NewShiftPage() {
                                     textField: {
                                         fullWidth: true,
                                         required: true,
-                                        sx: { mb: 3 },
+                                        sx: {
+                                            "& .MuiOutlinedInput-root": {
+                                                backgroundColor: "#171717",
+                                                "& fieldset": {
+                                                    borderColor: "#404040",
+                                                },
+                                                "&:hover fieldset": {
+                                                    borderColor: "#525252",
+                                                },
+                                                "&.Mui-focused fieldset": {
+                                                    borderColor: "#2563eb",
+                                                },
+                                            },
+                                            "& .MuiInputLabel-root": {
+                                                color: "#d4d4d4",
+                                            },
+                                            "& .MuiInputBase-input": {
+                                                color: "#ffffff",
+                                            },
+                                        },
+                                    },
+                                    desktopPaper: {
+                                        sx: {
+                                            backgroundColor: "#262626",
+                                            "& .MuiPickersDay-root": {
+                                                color: "#ffffff",
+                                            },
+                                            "& .MuiPickersCalendarHeader-label": {
+                                                color: "#ffffff",
+                                            },
+                                            "& .MuiPickersCalendarHeader-switchViewButton": {
+                                                color: "#ffffff",
+                                            },
+                                            "& .MuiPickersArrowSwitcher-button": {
+                                                color: "#ffffff",
+                                            },
+                                            "& .MuiDayCalendar-weekDayLabel": {
+                                                color: "#a3a3a3",
+                                            },
+                                            "& .Mui-selected": {
+                                                backgroundColor: "#2563eb !important",
+                                            },
+                                        },
                                     },
                                 }}
                             />
 
                             {formData.date && formData.locationId && (
-                                <Box sx={{ mb: 3 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                        Horario *
-                                    </Typography>
+                                <div>
+                                    <label className="block text-sm font-medium text-neutral-300 mb-3">
+                                        Horario <span className="text-red-500">*</span>
+                                    </label>
                                     {loadingSlots ? (
-                                        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                                            <CircularProgress size={24} />
-                                        </Box>
+                                        <div className="flex justify-center py-4">
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                        </div>
                                     ) : availableSlots.length > 0 ? (
-                                        <Grid container spacing={1}>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                             {availableSlots.map((slot) => (
-                                                <Grid item xs={6} sm={3} key={slot.id}>
-                                                    <Button
-                                                        fullWidth
-                                                        variant={formData.time === slot.time ? "contained" : "outlined"}
-                                                        onClick={() =>
-                                                            setFormData({ ...formData, time: slot.time })
-                                                        }
-                                                    >
-                                                        {slot.time}
-                                                    </Button>
-                                                </Grid>
+                                                <button
+                                                    key={slot.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setFormData({ ...formData, time: slot.time })
+                                                    }
+                                                    className={`px-4 py-2 rounded-md font-semibold transition-all ${
+                                                        formData.time === slot.time
+                                                            ? "bg-blue-600 text-white"
+                                                            : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 border-2 border-neutral-700"
+                                                    }`}
+                                                >
+                                                    {slot.time}
+                                                </button>
                                             ))}
-                                        </Grid>
+                                        </div>
                                     ) : (
-                                        <Typography color="text.secondary">
-                                            No hay horarios disponibles
-                                        </Typography>
+                                        <p className="text-neutral-500">No hay horarios disponibles</p>
                                     )}
-                                </Box>
+                                </div>
                             )}
 
-                            <Box sx={{ borderTop: 1, borderColor: "divider", pt: 3, mb: 3 }}>
-                                <Typography variant="h6" sx={{ mb: 2 }}>
+                            <div className="border-t border-neutral-700 pt-6 space-y-4">
+                                <h3 className="text-lg font-bold text-white">
                                     Datos del Paciente
-                                </Typography>
+                                </h3>
 
-                                <Grid container spacing={2} sx={{ mb: 2 }}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            label="Nombre"
-                                            value={formData.name}
-                                            onChange={(e) =>
-                                                setFormData({ ...formData, name: e.target.value })
-                                            }
-                                            required
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            label="Apellido"
-                                            value={formData.lastName}
-                                            onChange={(e) =>
-                                                setFormData({ ...formData, lastName: e.target.value })
-                                            }
-                                            required
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                </Grid>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Input
+                                        label="Nombre"
+                                        value={formData.name}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, name: e.target.value })
+                                        }
+                                        required
+                                        fullWidth
+                                    />
+                                    <Input
+                                        label="Apellido"
+                                        value={formData.lastName}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, lastName: e.target.value })
+                                        }
+                                        required
+                                        fullWidth
+                                    />
+                                </div>
 
-                                <TextField
+                                <Input
                                     label="Email"
                                     type="email"
                                     value={formData.email}
@@ -281,10 +305,9 @@ export default function NewShiftPage() {
                                     }
                                     required
                                     fullWidth
-                                    sx={{ mb: 2 }}
                                 />
 
-                                <TextField
+                                <Input
                                     label="Teléfono"
                                     type="tel"
                                     value={formData.phone}
@@ -294,55 +317,62 @@ export default function NewShiftPage() {
                                     required
                                     fullWidth
                                 />
-                            </Box>
+                            </div>
 
-                            <Box sx={{ borderTop: 1, borderColor: "divider", pt: 3, mb: 3 }}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={formData.confirmed}
-                                            onChange={(e) =>
-                                                setFormData({
-                                                    ...formData,
-                                                    confirmed: e.target.checked,
-                                                })
-                                            }
-                                        />
-                                    }
-                                    label="Marcar como confirmado"
-                                    sx={{ mb: 2 }}
-                                />
+                            <div className="border-t border-neutral-700 pt-6 space-y-4">
+                                <label className="flex items-center gap-2 text-neutral-300 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.confirmed}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                confirmed: e.target.checked,
+                                            })
+                                        }
+                                        className="w-5 h-5 rounded border-neutral-700 bg-neutral-900 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                                    />
+                                    <span className="font-medium">Marcar como confirmado</span>
+                                </label>
 
-                                <TextField
-                                    label="Notas (opcional)"
-                                    value={formData.notes}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, notes: e.target.value })
-                                    }
-                                    multiline
-                                    rows={3}
-                                    fullWidth
-                                    placeholder="Notas adicionales sobre el turno..."
-                                />
-                            </Box>
+                                <div>
+                                    <label className="block text-sm font-medium text-neutral-300 mb-2">
+                                        Notas (opcional)
+                                    </label>
+                                    <textarea
+                                        value={formData.notes}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, notes: e.target.value })
+                                        }
+                                        rows={3}
+                                        placeholder="Notas adicionales sobre el turno..."
+                                        className="w-full px-4 py-2.5 bg-neutral-900 border border-neutral-700 rounded-md text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
 
-                            <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
-                                <Button onClick={() => router.back()} disabled={loading}>
+                            <div className="flex gap-3 justify-end pt-4">
+                                <Button
+                                    type="button"
+                                    variant="outlined"
+                                    onClick={() => router.back()}
+                                    disabled={loading}
+                                >
                                     Cancelar
                                 </Button>
                                 <Button
                                     type="submit"
-                                    disabled={loading || !formData.time}
                                     variant="contained"
+                                    loading={loading}
+                                    disabled={loading || !formData.time}
                                 >
-                                    {loading ? <CircularProgress size={24} /> : "Crear Turno"}
+                                    {loading ? "Creando..." : "Crear Turno"}
                                 </Button>
-                            </Box>
-                        </Box>
+                            </div>
+                        </form>
                     </CardContent>
                 </Card>
-            </Box>
+            </div>
         </LocalizationProvider>
     );
 }
-

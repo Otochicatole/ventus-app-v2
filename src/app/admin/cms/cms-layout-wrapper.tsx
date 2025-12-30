@@ -1,6 +1,5 @@
 "use client";
 
-import { Box } from "@mui/material";
 import AdminNavbar from "../components/admin-navbar";
 import Sidebar from "../components/sidebar";
 
@@ -18,21 +17,16 @@ export default function CMSLayoutWrapper({
     children: React.ReactNode;
 }) {
     return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "#171717" }}>
+        <div className="min-h-screen bg-black">
             <AdminNavbar admin={admin} />
-            <Box sx={{ display: "flex" }}>
+            <div className="flex">
                 <Sidebar />
-                <Box
-                    component="main"
-                    sx={{
-                        flex: 1,
-                        minHeight: "calc(100vh - 64px)",
-                    }}
-                >
-                    {children}
-                </Box>
-            </Box>
-        </Box>
+                <main className="flex-1 p-8 md:p-10 lg:p-12 min-h-[calc(100vh-4rem)] overflow-auto">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </div>
     );
 }
-

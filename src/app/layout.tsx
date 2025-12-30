@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import MUIThemeProvider from "@/components/theme-provider";
+import ThemeProvider from "@/components/theme-provider";
 import LayoutWrapper from "@/components/layout-wrapper";
 
 export const metadata: Metadata = {
@@ -16,9 +16,9 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <MUIThemeProvider>
+        <ThemeProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
-        </MUIThemeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

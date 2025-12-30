@@ -2,16 +2,10 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import {
-    Card,
-    CardContent,
-    Typography,
-    TextField,
-    Button,
-    Box,
-    Alert,
-    Grid,
-} from "@mui/material";
+import Input from "@/components/ui/input";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function NewLocationPage() {
     const router = useRouter();
@@ -55,80 +49,82 @@ export default function NewLocationPage() {
     };
 
     return (
-        <Box sx={{ maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Typography variant="h3" component="h1" fontWeight="bold" sx={{ mb: 4 }}>
-                Nueva Ubicación
-            </Typography>
+        <div className="max-w-3xl mx-auto space-y-6">
+            <h1 className="text-4xl font-bold text-white">Nueva Ubicación</h1>
 
             <Card>
-                <CardContent>
-                    <Typography variant="h6" component="h2" gutterBottom>
+                <CardContent className="p-6">
+                    <h2 className="text-xl font-bold text-white mb-6">
                         Información de la Ubicación
-                    </Typography>
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    </h2>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
-                            <Alert severity="error" sx={{ mb: 3 }}>
+                            <Alert severity="error">
                                 {error}
                             </Alert>
                         )}
 
-                        <TextField
+                        <Input
                             label="Nombre"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required
                             fullWidth
                             placeholder="Ej: Hospital Central"
-                            sx={{ mb: 3 }}
                         />
 
-                        <TextField
+                        <Input
                             label="Dirección"
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             required
                             fullWidth
                             placeholder="Ej: Av. Libertador 1234, CABA"
-                            sx={{ mb: 3 }}
                         />
 
-                        <Grid container spacing={2} sx={{ mb: 3 }}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="Latitud (opcional)"
-                                    type="number"
-                                    inputProps={{ step: "any" }}
-                                    value={formData.latitude}
-                                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                                    fullWidth
-                                    placeholder="Ej: -34.603722"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="Longitud (opcional)"
-                                    type="number"
-                                    inputProps={{ step: "any" }}
-                                    value={formData.longitude}
-                                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                    fullWidth
-                                    placeholder="Ej: -58.381592"
-                                />
-                            </Grid>
-                        </Grid>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <Input
+                                label="Latitud (opcional)"
+                                type="number"
+                                step="any"
+                                value={formData.latitude}
+                                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                fullWidth
+                                placeholder="Ej: -34.603722"
+                            />
+                            <Input
+                                label="Longitud (opcional)"
+                                type="number"
+                                step="any"
+                                value={formData.longitude}
+                                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                                fullWidth
+                                placeholder="Ej: -58.381592"
+                            />
+                        </div>
 
-                        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
-                            <Button onClick={() => router.back()} disabled={loading}>
+                        <div className="flex gap-3 justify-end pt-4">
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                onClick={() => router.back()}
+                                disabled={loading}
+                            >
                                 Cancelar
                             </Button>
-                            <Button type="submit" disabled={loading} variant="contained">
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                loading={loading}
+                                disabled={loading}
+                            >
                                 {loading ? "Creando..." : "Crear Ubicación"}
                             </Button>
-                        </Box>
-                    </Box>
+                        </div>
+                    </form>
                 </CardContent>
             </Card>
-        </Box>
+        </div>
     );
 }
-

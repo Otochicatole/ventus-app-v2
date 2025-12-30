@@ -4,11 +4,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   reactStrictMode: true,
   experimental: {
-    optimizePackageImports: ["@mui/material", "@mui/icons-material"],
-  },
-  devIndicators: {
-    buildActivity: true,
-    buildActivityPosition: "bottom-right",
+    optimizePackageImports: ["@mui/material", "@mui/x-date-pickers"],
   },
 };
 

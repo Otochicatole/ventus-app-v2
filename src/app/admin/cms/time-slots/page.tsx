@@ -1,27 +1,12 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import {
-    Card,
-    CardContent,
-    Typography,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Box,
-    Grid,
-    IconButton,
-    CircularProgress,
-} from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
-import ConfirmDialog from "../../components/ui/confirm-dialog";
+import Select from "@/components/ui/select";
+import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Dialog, { DialogContent, DialogActions } from "@/components/ui/dialog";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 type Location = {
     id: string;
@@ -140,106 +125,108 @@ export default function TimeSlotsPage() {
     };
 
     return (
-        <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Typography variant="h3" component="h1" fontWeight="bold" sx={{ mb: 4 }}>
-                Gestión de Horarios
-            </Typography>
+        <div className="space-y-8 animate-fadeIn">
+            <div>
+                <h1 className="text-4xl font-bold text-white mb-3">Gestión de Horarios</h1>
+                <p className="text-neutral-400 text-lg">Configuración de horarios disponibles por ubicación</p>
+            </div>
 
-            <Card sx={{ mb: 3 }}>
+            <Card>
                 <CardContent>
-                    <FormControl fullWidth>
-                        <InputLabel id="location-select-label">Seleccionar Ubicación</InputLabel>
-                        <Select
-                            labelId="location-select-label"
-                            value={selectedLocationId}
-                            onChange={(e) => setSelectedLocationId(e.target.value)}
-                            label="Seleccionar Ubicación"
-                        >
-                            <MenuItem value="">Seleccionar ubicación</MenuItem>
-                            {locations.map((loc) => (
-                                <MenuItem key={loc.id} value={loc.id}>
-                                    {loc.name} - {loc.address}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <Select
+                        label="Seleccionar Ubicación"
+                        value={selectedLocationId}
+                        onChange={(e) => setSelectedLocationId(e.target.value)}
+                        options={[
+                            { value: "", label: "Seleccionar ubicación" },
+                            ...locations.map((loc) => ({
+                                value: loc.id,
+                                label: `${loc.name} - ${loc.address}`,
+                            })),
+                        ]}
+                        fullWidth
+                    />
                 </CardContent>
             </Card>
 
             {selectedLocationId && (
                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold text-white mb-2">Horarios Disponibles</h2>
+                            <p className="text-neutral-400">{timeSlots.length} horario(s) configurado(s)</p>
+                        </div>
+                        <Button onClick={() => setShowModal(true)} startIcon={
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                            </svg>
+                        }>
+                            Agregar Horario
+                        </Button>
+                    </CardHeader>
+
                     <CardContent>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-                            <Typography variant="h6" component="h2">
-                                Horarios Disponibles
-                            </Typography>
-                            <Button variant="contained" onClick={() => setShowModal(true)}>
-                                + Agregar Horario
-                            </Button>
-                        </Box>
                         {loading ? (
-                            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                                <CircularProgress />
-                            </Box>
-                        ) : timeSlots.length > 0 ? (
-                            <Grid container spacing={2}>
-                                {timeSlots.map((slot) => (
-                                    <Grid item xs={12} sm={6} md={3} key={slot.id}>
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "space-between",
-                                                p: 2,
-                                                border: 1,
-                                                borderColor: "divider",
-                                                borderRadius: 1,
-                                                bgcolor: "background.paper",
-                                            }}
-                                        >
-                                            <Typography fontWeight="medium">{slot.time}</Typography>
-                                            <IconButton
-                                                onClick={() => setDeleteId(slot.id)}
-                                                color="error"
-                                                size="small"
-                                            >
-                                                <CloseIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    </Grid>
-                                ))}
-                            </Grid>
+                            <div className="flex justify-center py-12">
+                                <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+                            </div>
+                        ) : timeSlots.length === 0 ? (
+                            <div className="py-12 text-center">
+                                <svg className="w-16 h-16 mx-auto mb-4 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-neutral-500">No hay horarios configurados para esta ubicación</p>
+                            </div>
                         ) : (
-                            <Box sx={{ textAlign: "center", py: 4 }}>
-                                <Typography color="text.secondary">
-                                    No hay horarios configurados para esta ubicación
-                                </Typography>
-                            </Box>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {timeSlots.map((slot) => (
+                                    <div
+                                        key={slot.id}
+                                        className="flex items-center justify-between px-5 py-4 bg-neutral-800/50 border border-neutral-700 rounded-lg hover:bg-neutral-800 transition-colors group cursor-pointer"
+                                    >
+                                        <span className="text-white font-medium text-lg">{slot.time}</span>
+                                        <button
+                                            onClick={() => setDeleteId(slot.id)}
+                                            className="text-neutral-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                                        >
+                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </CardContent>
                 </Card>
             )}
 
-            <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Agregar Horario</DialogTitle>
+            <Dialog open={showModal} onClose={() => setShowModal(false)} title="Agregar Horario" maxWidth="sm">
                 <form onSubmit={handleAddTimeSlot}>
                     <DialogContent>
-                        <TextField
-                            label="Horario (formato HH:MM)"
+                        <Input
+                            label="Horario"
                             type="time"
                             value={newTime}
                             onChange={(e) => setNewTime(e.target.value)}
                             required
                             fullWidth
-                            InputLabelProps={{ shrink: true }}
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setShowModal(false)} disabled={loading}>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setShowModal(false)}
+                            disabled={loading}
+                        >
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={loading} variant="contained">
-                            {loading ? <CircularProgress size={24} /> : "Agregar"}
+                        <Button
+                            type="submit"
+                            loading={loading}
+                            disabled={loading}
+                        >
+                            Agregar
                         </Button>
                     </DialogActions>
                 </form>
@@ -250,11 +237,10 @@ export default function TimeSlotsPage() {
                 onClose={() => setDeleteId(null)}
                 onConfirm={handleDelete}
                 title="Eliminar Horario"
-                message="¿Estás seguro de eliminar este horario? Los turnos existentes con este horario no se verán afectados."
+                message="¿Estás seguro de eliminar este horario?"
                 confirmText="Eliminar"
                 loading={deleting}
             />
-        </Box>
+        </div>
     );
 }
-

@@ -4,10 +4,15 @@ import { useState, useEffect } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Box, Container, Card, CardContent, Typography, TextField, Button, Alert, MenuItem, Grid, Chip, CircularProgress } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { TextField } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/es";
+import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
+import Chip from "@/components/ui/chip";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Location = {
     id: string;
@@ -164,26 +169,25 @@ export default function ShiftsPage() {
         formData.phone;
 
     return (
-        <Box sx={{ minHeight: "100vh", py: 8, px: 2 }}>
-            <Container maxWidth="md">
+        <div className="min-h-screen py-12 px-4 bg-neutral-950">
+            <div className="container mx-auto max-w-3xl">
                 <Card>
-                    <CardContent sx={{ p: 4 }}>
-                        <Typography variant="h4" component="h1" gutterBottom>
+                    <CardContent className="p-8">
+                        <h1 className="text-4xl font-bold text-white mb-2">
                             Reservar Turno
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                        </h1>
+                        <p className="text-neutral-400 mb-8">
                             Completá el formulario para reservar tu turno
-                        </Typography>
+                        </p>
 
                         {message && (
-                            <Alert severity={message.type} sx={{ mb: 3 }}>
+                            <Alert severity={message.type} className="mb-6">
                                 {message.text}
                             </Alert>
                         )}
 
-                        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                            <TextField
-                                select
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <Select
                                 label="Ubicación"
                                 value={selectedLocationId}
                                 onChange={(e) => {
@@ -192,19 +196,19 @@ export default function ShiftsPage() {
                                     setAvailableSlots([]);
                                     setFormData({ ...formData, time: "" });
                                 }}
+                                options={[
+                                    { value: "", label: "Seleccionar ubicación" },
+                                    ...locations.map((loc) => ({
+                                        value: loc.id,
+                                        label: `${loc.name} - ${loc.address}`,
+                                    })),
+                                ]}
                                 required
                                 fullWidth
-                            >
-                                <MenuItem value="">Seleccionar ubicación</MenuItem>
-                                {locations.map((location) => (
-                                    <MenuItem key={location.id} value={location.id}>
-                                        {location.name} - {location.address}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            />
 
                             {selectedLocationId && (
-                                <Box>
+                                <div>
                                     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
                                         <DatePicker
                                             label="Fecha"
@@ -215,17 +219,102 @@ export default function ShiftsPage() {
                                             }}
                                             shouldDisableDate={shouldDisableDate}
                                             minDate={dayjs()}
+                                            enableAccessibleFieldDOMStructure={false}
+                                            slots={{
+                                                textField: (params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        fullWidth
+                                                        required
+                                                        InputLabelProps={{
+                                                            ...params.InputLabelProps,
+                                                            style: { color: '#d4d4d4' },
+                                                        }}
+                                                        InputProps={{
+                                                            ...params.InputProps,
+                                                            style: { color: '#ffffff' },
+                                                        }}
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                backgroundColor: 'rgba(38, 38, 38, 0.5)',
+                                                                borderRadius: '8px',
+                                                                '& fieldset': {
+                                                                    borderColor: 'rgba(64, 64, 64, 0.5)',
+                                                                    borderWidth: '2px',
+                                                                },
+                                                                '&:hover fieldset': {
+                                                                    borderColor: 'rgba(82, 82, 82, 0.5)',
+                                                                },
+                                                                '&.Mui-focused fieldset': {
+                                                                    borderColor: '#ffffff',
+                                                                    borderWidth: '2px',
+                                                                },
+                                                                '& input': {
+                                                                    color: '#ffffff',
+                                                                },
+                                                            },
+                                                            '& .MuiIconButton-root': {
+                                                                color: '#ffffff',
+                                                            },
+                                                        }}
+                                                    />
+                                                ),
+                                            }}
                                             slotProps={{
-                                                textField: {
-                                                    fullWidth: true,
-                                                    required: true,
+                                                popper: {
+                                                    placement: 'bottom-start',
+                                                    modifiers: [
+                                                        {
+                                                            name: 'flip',
+                                                            enabled: false,
+                                                        },
+                                                        {
+                                                            name: 'preventOverflow',
+                                                            enabled: false,
+                                                        },
+                                                    ],
                                                 },
-                                                day: {
+                                                desktopPaper: {
                                                     sx: {
-                                                        "&.Mui-disabled": {
-                                                            color: "#525252 !important",
-                                                            backgroundColor: "#262626",
+                                                        backgroundColor: "#171717",
+                                                        border: "1px solid #262626",
+                                                        borderRadius: "12px",
+                                                        transition: 'none !important',
+                                                        transform: 'none !important',
+                                                        "& .MuiPickersDay-root": {
+                                                            color: "#ffffff",
+                                                            fontWeight: 500,
+                                                            transition: 'background-color 0.15s',
+                                                            "&:hover": {
+                                                                backgroundColor: "#262626",
+                                                            },
+                                                        },
+                                                        "& .MuiPickersDay-root.Mui-disabled": {
+                                                            color: "#737373 !important",
+                                                            backgroundColor: "transparent",
                                                             textDecoration: "line-through",
+                                                        },
+                                                        "& .MuiPickersCalendarHeader-label": {
+                                                            color: "#ffffff",
+                                                            fontWeight: 600,
+                                                        },
+                                                        "& .MuiPickersCalendarHeader-switchViewButton": {
+                                                            color: "#ffffff",
+                                                        },
+                                                        "& .MuiPickersArrowSwitcher-button": {
+                                                            color: "#ffffff",
+                                                        },
+                                                        "& .MuiDayCalendar-weekDayLabel": {
+                                                            color: "#a3a3a3",
+                                                            fontWeight: 600,
+                                                        },
+                                                        "& .Mui-selected": {
+                                                            backgroundColor: "#ffffff !important",
+                                                            color: "#000000 !important",
+                                                            fontWeight: 700,
+                                                            "&:hover": {
+                                                                backgroundColor: "#e5e5e5 !important",
+                                                            },
                                                         },
                                                     },
                                                 },
@@ -233,116 +322,117 @@ export default function ShiftsPage() {
                                         />
                                     </LocalizationProvider>
                                     {unavailableDates.length > 0 && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-                                            Las fechas en gris no están disponibles
-                                        </Typography>
+                                        <p className="text-sm text-neutral-500 mt-2">
+                                            Las fechas tachadas no están disponibles
+                                        </p>
                                     )}
-                                </Box>
+                                </div>
                             )}
 
                             {selectedDate && (
-                                <Box>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                <div>
+                                    <label className="block text-sm font-semibold text-neutral-300 mb-3">
                                         Horario
-                                    </Typography>
+                                    </label>
                                     {loadingSlots ? (
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 2 }}>
-                                            <CircularProgress size={24} />
-                                            <Typography variant="body2">Cargando horarios disponibles...</Typography>
-                                        </Box>
+                                        <div className="flex items-center gap-3 py-4">
+                                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                                            <p className="text-neutral-400">Cargando horarios disponibles...</p>
+                                        </div>
                                     ) : availableSlots.length > 0 ? (
-                                        <Grid container spacing={1.5}>
+                                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                                             {availableSlots.map((slot) => (
-                                                <Grid item xs={4} key={slot.id}>
-                                                    <Chip
-                                                        label={slot.time}
-                                                        onClick={() => setFormData({ ...formData, time: slot.time })}
-                                                        color={formData.time === slot.time ? "primary" : "default"}
-                                                        sx={{
-                                                            width: "100%",
-                                                            py: 2.5,
-                                                            fontSize: "0.95rem",
-                                                            fontWeight: formData.time === slot.time ? 600 : 400,
-                                                        }}
-                                                    />
-                                                </Grid>
+                                                <Chip
+                                                    key={slot.id}
+                                                    label={slot.time}
+                                                    onClick={() =>
+                                                        setFormData({ ...formData, time: slot.time })
+                                                    }
+                                                    color={formData.time === slot.time ? "primary" : "default"}
+                                                    variant={formData.time === slot.time ? "filled" : "outlined"}
+                                                    className="w-full justify-center cursor-pointer hover:bg-neutral-700 transition-colors"
+                                                />
                                             ))}
-                                        </Grid>
+                                        </div>
                                     ) : (
                                         <Alert severity="info">
                                             No hay horarios disponibles para esta fecha
                                         </Alert>
                                     )}
-                                </Box>
+                                </div>
                             )}
 
                             {formData.time && (
-                                <Box sx={{ borderTop: 1, borderColor: "divider", pt: 3 }}>
-                                    <Typography variant="h6" gutterBottom>
+                                <div className="space-y-6 pt-6 border-t border-neutral-800">
+                                    <h2 className="text-2xl font-bold text-white">
                                         Datos Personales
-                                    </Typography>
+                                    </h2>
 
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                label="Nombre"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                required
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                label="Apellido"
-                                                value={formData.lastName}
-                                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                                required
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                label="Email"
-                                                type="email"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                required
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                label="Teléfono"
-                                                type="tel"
-                                                value={formData.phone}
-                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                                required
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                    </Grid>
-
-                                    <Box sx={{ mt: 4 }}>
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            color="primary"
-                                            disabled={!isFormValid || loading}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <Input
+                                            label="Nombre"
+                                            value={formData.name}
+                                            onChange={(e) =>
+                                                setFormData({ ...formData, name: e.target.value })
+                                            }
+                                            required
                                             fullWidth
-                                            size="large"
-                                            startIcon={loading ? <CircularProgress size={20} /> : <CheckCircleIcon />}
-                                        >
-                                            {loading ? "Reservando..." : "Reservar Turno"}
-                                        </Button>
-                                    </Box>
-                                </Box>
+                                        />
+                                        <Input
+                                            label="Apellido"
+                                            value={formData.lastName}
+                                            onChange={(e) =>
+                                                setFormData({ ...formData, lastName: e.target.value })
+                                            }
+                                            required
+                                            fullWidth
+                                        />
+                                    </div>
+
+                                    <Input
+                                        label="Email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, email: e.target.value })
+                                        }
+                                        required
+                                        fullWidth
+                                    />
+
+                                    <Input
+                                        label="Teléfono"
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, phone: e.target.value })
+                                        }
+                                        required
+                                        fullWidth
+                                    />
+
+                                    <Button
+                                        type="submit"
+                                        disabled={!isFormValid || loading}
+                                        loading={loading}
+                                        size="large"
+                                        fullWidth
+                                        startIcon={
+                                            !loading && (
+                                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                            )
+                                        }
+                                    >
+                                        {loading ? "Reservando..." : "Reservar Turno"}
+                                    </Button>
+                                </div>
                             )}
-                        </Box>
+                        </form>
                     </CardContent>
                 </Card>
-            </Container>
-        </Box>
+            </div>
+        </div>
     );
 }
-

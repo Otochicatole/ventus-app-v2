@@ -2,8 +2,9 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { TextField, Button, Alert, CircularProgress, Box } from "@mui/material";
-import LoginIcon from "@mui/icons-material/Login";
+import Input from "@/components/ui/input";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -42,44 +43,50 @@ export default function LoginForm() {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-                <Alert severity="error" sx={{ mb: 1 }}>
+                <Alert severity="error">
                     {error}
                 </Alert>
             )}
 
-            <TextField
+            <Input
                 label="Email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                autoFocus
                 fullWidth
+                autoFocus
+                placeholder="admin@ventus.com"
             />
 
-            <TextField
+            <Input
                 label="Contraseña"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 fullWidth
+                placeholder="••••••••"
             />
 
             <Button
                 type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                fullWidth
                 size="large"
-                startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
+                fullWidth
+                loading={loading}
+                disabled={loading}
+                startIcon={
+                    !loading && (
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                    )
+                }
             >
                 {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </Button>
-        </Box>
+        </form>
     );
 }
-

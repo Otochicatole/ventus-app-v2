@@ -2,17 +2,10 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import {
-    Card,
-    CardContent,
-    Typography,
-    TextField,
-    Button,
-    Box,
-    Alert,
-    Grid,
-    CircularProgress,
-} from "@mui/material";
+import Input from "@/components/ui/input";
+import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Location = {
     id: string;
@@ -91,83 +84,85 @@ export default function EditLocationPage() {
 
     if (fetching) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <CircularProgress />
-            </Box>
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Typography variant="h3" component="h1" fontWeight="bold" sx={{ mb: 4 }}>
-                Editar Ubicación
-            </Typography>
+        <div className="max-w-3xl mx-auto space-y-6">
+            <h1 className="text-4xl font-bold text-white">Editar Ubicación</h1>
 
             <Card>
-                <CardContent>
-                    <Typography variant="h6" component="h2" gutterBottom>
+                <CardContent className="p-6">
+                    <h2 className="text-xl font-bold text-white mb-6">
                         Información de la Ubicación
-                    </Typography>
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    </h2>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
-                            <Alert severity="error" sx={{ mb: 3 }}>
+                            <Alert severity="error">
                                 {error}
                             </Alert>
                         )}
 
-                        <TextField
+                        <Input
                             label="Nombre"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required
                             fullWidth
-                            sx={{ mb: 3 }}
                         />
 
-                        <TextField
+                        <Input
                             label="Dirección"
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             required
                             fullWidth
-                            sx={{ mb: 3 }}
                         />
 
-                        <Grid container spacing={2} sx={{ mb: 3 }}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="Latitud (opcional)"
-                                    type="number"
-                                    inputProps={{ step: "any" }}
-                                    value={formData.latitude}
-                                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="Longitud (opcional)"
-                                    type="number"
-                                    inputProps={{ step: "any" }}
-                                    value={formData.longitude}
-                                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                    fullWidth
-                                />
-                            </Grid>
-                        </Grid>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <Input
+                                label="Latitud (opcional)"
+                                type="number"
+                                step="any"
+                                value={formData.latitude}
+                                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                fullWidth
+                            />
+                            <Input
+                                label="Longitud (opcional)"
+                                type="number"
+                                step="any"
+                                value={formData.longitude}
+                                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                                fullWidth
+                            />
+                        </div>
 
-                        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
-                            <Button onClick={() => router.back()} disabled={loading}>
+                        <div className="flex gap-3 justify-end pt-4">
+                            <Button
+                                type="button"
+                                variant="outlined"
+                                onClick={() => router.back()}
+                                disabled={loading}
+                            >
                                 Cancelar
                             </Button>
-                            <Button type="submit" disabled={loading} variant="contained">
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                loading={loading}
+                                disabled={loading}
+                            >
                                 {loading ? "Guardando..." : "Guardar Cambios"}
                             </Button>
-                        </Box>
-                    </Box>
+                        </div>
+                    </form>
                 </CardContent>
             </Card>
-        </Box>
+        </div>
     );
 }
-

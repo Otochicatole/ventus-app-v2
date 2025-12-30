@@ -2,21 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-    Card,
-    CardContent,
-    Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Button,
-    Box,
-    CircularProgress,
-} from "@mui/material";
-import ConfirmDialog from "../../components/ui/confirm-dialog";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 type Location = {
     id: string;
@@ -82,83 +68,73 @@ export default function LocationsPage() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <CircularProgress />
-            </Box>
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-                <Typography variant="h3" component="h1" fontWeight="bold">
-                    Ubicaciones
-                </Typography>
-                <Button
-                    component={Link}
+        <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-4xl font-bold text-white">Ubicaciones</h1>
+                <Link
                     href="/admin/cms/locations/new"
-                    variant="contained"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-all"
                 >
                     + Nueva Ubicación
-                </Button>
-            </Box>
+                </Link>
+            </div>
 
-            <Card>
-                <CardContent>
-                    <Typography variant="h6" component="h2" gutterBottom>
-                        Todas las Ubicaciones
-                    </Typography>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Nombre</TableCell>
-                                    <TableCell>Dirección</TableCell>
-                                    <TableCell align="right">Acciones</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {locations.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                                            <Typography color="text.secondary">
-                                                No hay ubicaciones registradas
-                                            </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    locations.map((location) => (
-                                        <TableRow key={location.id} hover>
-                                            <TableCell>{location.name}</TableCell>
-                                            <TableCell>{location.address}</TableCell>
-                                            <TableCell align="right">
-                                                <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                                                    <Button
-                                                        component={Link}
-                                                        href={`/admin/cms/locations/${location.id}/edit`}
-                                                        variant="outlined"
-                                                        size="small"
-                                                    >
-                                                        Editar
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() => setDeleteId(location.id)}
-                                                        variant="outlined"
-                                                        color="error"
-                                                        size="small"
-                                                    >
-                                                        Eliminar
-                                                    </Button>
-                                                </Box>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </CardContent>
-            </Card>
+            <div className="bg-neutral-800 border border-neutral-700 rounded-lg overflow-hidden">
+                <div className="px-6 py-4 border-b border-neutral-700">
+                    <h2 className="text-xl font-bold text-white">Todas las Ubicaciones</h2>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-neutral-900">
+                            <tr>
+                                <th className="text-left py-3 px-6 text-neutral-400 font-semibold text-sm">Nombre</th>
+                                <th className="text-left py-3 px-6 text-neutral-400 font-semibold text-sm">Dirección</th>
+                                <th className="text-right py-3 px-6 text-neutral-400 font-semibold text-sm">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {locations.length === 0 ? (
+                                <tr>
+                                    <td colSpan={3} className="py-8 text-center text-neutral-500">
+                                        No hay ubicaciones registradas
+                                    </td>
+                                </tr>
+                            ) : (
+                                locations.map((location) => (
+                                    <tr key={location.id} className="border-b border-neutral-800 hover:bg-neutral-900/50">
+                                        <td className="py-3 px-6 text-white">{location.name}</td>
+                                        <td className="py-3 px-6 text-neutral-300">{location.address}</td>
+                                        <td className="py-3 px-6">
+                                            <div className="flex gap-2 justify-end">
+                                                <Link
+                                                    href={`/admin/cms/locations/${location.id}/edit`}
+                                                    className="px-3 py-1.5 border-2 border-blue-600 text-blue-600 rounded-md hover:bg-blue-600/10 text-sm font-medium transition-all"
+                                                >
+                                                    Editar
+                                                </Link>
+                                                <button
+                                                    onClick={() => setDeleteId(location.id)}
+                                                    className="px-3 py-1.5 border-2 border-red-600 text-red-600 rounded-md hover:bg-red-600/10 text-sm font-medium transition-all"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <ConfirmDialog
                 isOpen={deleteId !== null}
@@ -169,7 +145,6 @@ export default function LocationsPage() {
                 confirmText="Eliminar"
                 loading={deleting}
             />
-        </Box>
+        </div>
     );
 }
-

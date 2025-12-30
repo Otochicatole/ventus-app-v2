@@ -2,20 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-    AppBar,
-    Box,
-    Toolbar,
-    IconButton,
-    Typography,
-    Menu,
-    Container,
-    Button,
-    MenuItem,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import ContentCutIcon from "@mui/icons-material/ContentCut";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const pages = [
     { name: "Inicio", href: "/" },
@@ -24,168 +10,78 @@ const pages = [
 ];
 
 export default function Navbar() {
-    const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
-
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
-    };
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <AppBar
-            position="fixed"
-            sx={{
-                background: "rgba(10, 10, 10, 0.95)",
-                backdropFilter: "blur(10px)",
-                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.3)",
-                borderBottom: "1px solid rgba(255, 215, 0, 0.1)",
-            }}
-        >
-            <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <ContentCutIcon
-                        sx={{
-                            display: { xs: "none", md: "flex" },
-                            mr: 1,
-                            color: "#FFD700",
-                            fontSize: 32,
-                        }}
-                    />
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component={Link}
-                        href="/"
-                        sx={{
-                            mr: 2,
-                            display: { xs: "none", md: "flex" },
-                            fontWeight: 900,
-                            fontSize: "1.5rem",
-                            background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            textDecoration: "none",
-                        }}
-                    >
-                        VENTUS
-                    </Typography>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-[rgba(10,10,10,0.95)] backdrop-blur-md border-b border-[rgba(255,215,0,0.1)] shadow-lg">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="flex items-center justify-between h-16">
+                    <Link href="/" className="flex items-center gap-2 text-2xl font-black">
+                        <svg className="w-8 h-8 text-[#FFD700]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm0 12c-1.1 0-2-.89-2-2s.9-2 2-2 2 .89 2 2-.9 2-2 2zm6-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zM19 3l-6 6 2 2 7-7V3z" />
+                        </svg>
+                        <span className="hidden md:block bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
+                            VENTUS
+                        </span>
+                    </Link>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="menu"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            sx={{ color: "#FFD700" }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "left",
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: "top",
-                                horizontal: "left",
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{
-                                display: { xs: "block", md: "none" },
-                            }}
-                        >
-                            {pages.map((page) => (
-                                <MenuItem
-                                    key={page.name}
-                                    onClick={handleCloseNavMenu}
-                                    component={Link}
-                                    href={page.href}
-                                >
-                                    <Typography textAlign="center">{page.name}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
-
-                    <ContentCutIcon
-                        sx={{
-                            display: { xs: "flex", md: "none" },
-                            mr: 1,
-                            color: "#FFD700",
-                        }}
-                    />
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component={Link}
-                        href="/"
-                        sx={{
-                            mr: 2,
-                            display: { xs: "flex", md: "none" },
-                            flexGrow: 1,
-                            fontWeight: 900,
-                            background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            textDecoration: "none",
-                        }}
-                    >
-                        VENTUS
-                    </Typography>
-
-                    <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, ml: 4 }}>
+                    <div className="hidden md:flex items-center gap-6">
                         {pages.map((page) => (
-                            <Button
+                            <Link
                                 key={page.name}
-                                component={Link}
                                 href={page.href}
-                                onClick={handleCloseNavMenu}
-                                sx={{
-                                    my: 2,
-                                    color: "#fff",
-                                    display: "block",
-                                    fontWeight: 600,
-                                    mx: 1,
-                                    "&:hover": {
-                                        color: "#FFD700",
-                                    },
-                                }}
+                                className="text-white font-semibold hover:text-[#FFD700] transition-colors"
                             >
                                 {page.name}
-                            </Button>
+                            </Link>
                         ))}
-                    </Box>
+                    </div>
 
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Button
-                            component={Link}
+                    <div className="flex items-center gap-4">
+                        <Link
                             href="/shifts"
-                            variant="contained"
-                            startIcon={<CalendarMonthIcon />}
-                            sx={{
-                                background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
-                                color: "#000",
-                                fontWeight: 700,
-                                px: 3,
-                                "&:hover": {
-                                    background: "linear-gradient(135deg, #FFA500 0%, #FF8C00 100%)",
-                                },
-                            }}
+                            className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-black font-bold rounded-md hover:from-[#FFA500] hover:to-[#FF8C00] transition-all shadow-lg"
                         >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                            </svg>
                             Reservar
-                        </Button>
-                    </Box>
-                </Toolbar>
-            </Container>
-        </AppBar>
+                        </Link>
+
+                        <button
+                            type="button"
+                            className="md:hidden text-[#FFD700] p-2"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                {mobileMenuOpen && (
+                    <div className="md:hidden py-4 border-t border-neutral-800">
+                        {pages.map((page) => (
+                            <Link
+                                key={page.name}
+                                href={page.href}
+                                className="block py-2 text-white hover:text-[#FFD700] transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                {page.name}
+                            </Link>
+                        ))}
+                        <Link
+                            href="/shifts"
+                            className="block mt-3 px-4 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-black font-bold rounded-md text-center"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Reservar Turno
+                        </Link>
+                    </div>
+                )}
+            </div>
+        </nav>
     );
 }
-

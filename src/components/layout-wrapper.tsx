@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "./navbar";
-import { Box } from "@mui/material";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -15,10 +14,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     return (
         <>
             <Navbar />
-            <Box sx={{ pt: 8 }}>
+            <div className="pt-16">
                 {children}
-            </Box>
+            </div>
         </>
     );
 }
-

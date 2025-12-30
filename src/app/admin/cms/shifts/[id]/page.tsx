@@ -2,17 +2,9 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-    Card,
-    CardContent,
-    Typography,
-    Button,
-    Box,
-    Chip,
-    TextField,
-    Grid,
-    CircularProgress,
-} from "@mui/material";
+import Button from "@/components/ui/button";
+import Chip from "@/components/ui/chip";
+import { Card, CardContent } from "@/components/ui/card";
 
 type Shift = {
     id: string;
@@ -103,148 +95,125 @@ export default function ShiftDetailPage() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <CircularProgress />
-            </Box>
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
         );
     }
 
     if (!shift) {
         return (
-            <Box sx={{ textAlign: "center", py: 8 }}>
-                <Typography color="text.secondary">Turno no encontrado</Typography>
-            </Box>
+            <div className="text-center py-12">
+                <p className="text-neutral-500">Turno no encontrado</p>
+            </div>
         );
     }
 
-    return (
-        <Box sx={{ maxWidth: 1000, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 4 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-                <Typography variant="h3" component="h1" fontWeight="bold">
-                    Detalle del Turno
-                </Typography>
-                <Button onClick={() => router.back()}>← Volver</Button>
-            </Box>
+    const dateStr = shift.date.split("T")[0];
+    const [year, month, day] = dateStr.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    return (
+        <div className="max-w-5xl mx-auto space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-4xl font-bold text-white">Detalle del Turno</h1>
+                <Button onClick={() => router.back()}>← Volver</Button>
+            </div>
+
+            <div className="space-y-6">
                 <Card>
-                    <CardContent>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-                            <Typography variant="h6" component="h2">
+                    <CardContent className="p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-white">
                                 Información del Paciente
-                            </Typography>
+                            </h2>
                             <Chip
                                 label={shift.confirmed ? "Confirmado" : "Pendiente"}
                                 color={shift.confirmed ? "success" : "warning"}
                             />
-                        </Box>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Nombre Completo
-                                </Typography>
-                                <Typography variant="h6">
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Nombre Completo</p>
+                                <p className="text-lg font-semibold text-white">
                                     {shift.name} {shift.lastName}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Email
-                                </Typography>
-                                <Typography variant="h6">{shift.email}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Teléfono
-                                </Typography>
-                                <Typography variant="h6">{shift.phone}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Fecha de Registro
-                                </Typography>
-                                <Typography variant="h6">
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Email</p>
+                                <p className="text-lg font-semibold text-white">{shift.email}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Teléfono</p>
+                                <p className="text-lg font-semibold text-white">{shift.phone}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Fecha de Registro</p>
+                                <p className="text-lg font-semibold text-white">
                                     {new Date(shift.createdAt).toLocaleString("es-AR")}
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                                </p>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardContent>
-                        <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+                    <CardContent className="p-6">
+                        <h2 className="text-xl font-bold text-white mb-6">
                             Información del Turno
-                        </Typography>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Ubicación
-                                </Typography>
-                                <Typography variant="h6">{shift.location.name}</Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {shift.location.address}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" color="text.secondary">
-                                    Fecha y Hora
-                                </Typography>
-                                <Typography variant="h6">
-                                    {(() => {
-                                        const dateStr = shift.date.split("T")[0];
-                                        const [year, month, day] = dateStr.split("-");
-                                        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                        return date.toLocaleDateString("es-AR", {
-                                            weekday: "long",
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                        });
-                                    })()}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {shift.time}
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Box sx={{ mt: 3 }}>
-                            <Button variant="contained" onClick={toggleConfirmed}>
-                                {shift.confirmed
-                                    ? "Marcar como Pendiente"
-                                    : "Marcar como Confirmado"}
-                            </Button>
-                        </Box>
+                        </h2>
+                        <div className="grid md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Ubicación</p>
+                                <p className="text-lg font-semibold text-white">{shift.location.name}</p>
+                                <p className="text-sm text-neutral-500">{shift.location.address}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-neutral-400 mb-1">Fecha y Hora</p>
+                                <p className="text-lg font-semibold text-white capitalize">
+                                    {date.toLocaleDateString("es-AR", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </p>
+                                <p className="text-sm text-neutral-500">{shift.time}</p>
+                            </div>
+                        </div>
+                        <Button variant="contained" onClick={toggleConfirmed}>
+                            {shift.confirmed
+                                ? "Marcar como Pendiente"
+                                : "Marcar como Confirmado"}
+                        </Button>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardContent>
-                        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+                    <CardContent className="p-6">
+                        <h2 className="text-xl font-bold text-white mb-4">
                             Notas del Admin
-                        </Typography>
-                        <Box component="form" onSubmit={handleSaveNotes}>
-                            <TextField
+                        </h2>
+                        <form onSubmit={handleSaveNotes}>
+                            <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                multiline
                                 rows={4}
-                                fullWidth
                                 placeholder="Agregar notas sobre el turno..."
-                                sx={{ mb: 2 }}
+                                className="w-full px-4 py-2.5 mb-4 bg-neutral-900 border border-neutral-700 rounded-md text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                             />
                             <Button
                                 type="submit"
-                                disabled={savingNotes}
                                 variant="contained"
+                                loading={savingNotes}
+                                disabled={savingNotes}
                             >
-                                {savingNotes ? <CircularProgress size={24} /> : "Guardar Notas"}
+                                {savingNotes ? "Guardando..." : "Guardar Notas"}
                             </Button>
-                        </Box>
+                        </form>
                     </CardContent>
                 </Card>
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 }
-
