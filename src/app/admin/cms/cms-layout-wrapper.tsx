@@ -8,7 +8,7 @@ import Sidebar from "../components/sidebar";
 type Admin = {
     adminId: string;
     email: string;
-    name: string;
+    name: string | null;
 };
 
 export default function CMSLayoutWrapper({

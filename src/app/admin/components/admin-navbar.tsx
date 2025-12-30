@@ -43,10 +43,10 @@ export default function AdminNavbar({ admin }: AdminNavbarProps) {
                 <div className="flex items-center gap-4">
                     <div className="hidden md:flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-200">
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                            {admin.name.charAt(0).toUpperCase()}
+                            {(admin.name || admin.email).charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-900">{admin.name}</p>
+                            <p className="text-sm font-medium text-gray-900">{admin.name || admin.email}</p>
                             <p className="text-xs text-gray-500">{admin.email}</p>
                         </div>
                     </div>
