@@ -24,9 +24,29 @@ export default async function CMSDashboard() {
         recentShifts,
     ] = await Promise.all([
         prisma.location.count(),
-        prisma.shift.count(),
-        prisma.shift.count({ where: { confirmed: true } }),
-        prisma.shift.count({ where: { confirmed: false } }),
+        prisma.shift.count({
+            where: {
+                date: {
+                    gte: today,
+                },
+            },
+        }),
+        prisma.shift.count({
+            where: {
+                confirmed: true,
+                date: {
+                    gte: today,
+                },
+            },
+        }),
+        prisma.shift.count({
+            where: {
+                confirmed: false,
+                date: {
+                    gte: today,
+                },
+            },
+        }),
         prisma.shift.count({
             where: {
                 date: {
@@ -36,6 +56,11 @@ export default async function CMSDashboard() {
             },
         }),
         prisma.shift.findMany({
+            where: {
+                date: {
+                    gte: today,
+                },
+            },
             take: 10,
             orderBy: { createdAt: "desc" },
             include: {
@@ -46,7 +71,7 @@ export default async function CMSDashboard() {
 
     const stats = [
         {
-            label: "Total Turnos",
+            label: "Turnos Activos",
             value: totalShifts,
             color: "text-gray-900",
         },

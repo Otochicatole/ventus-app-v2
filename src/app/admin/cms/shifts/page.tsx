@@ -58,7 +58,19 @@ export default function ShiftsPage() {
                 cache: "no-store",
             });
             const data = await res.json();
-            setShifts(data);
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const futureShifts = data.filter((shift: Shift) => {
+                const dateStr = shift.date.split("T")[0];
+                const [year, month, day] = dateStr.split("-");
+                const shiftDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                shiftDate.setHours(0, 0, 0, 0);
+                return shiftDate >= today;
+            });
+            
+            setShifts(futureShifts);
         } catch (error) {
             console.error("Error fetching shifts:", error);
         } finally {
