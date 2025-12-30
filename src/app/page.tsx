@@ -1,36 +1,88 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, Scissors, Star, Clock, MapPin, CheckCircle2 } from "lucide-react";
+import { Calendar, Scissors } from "lucide-react";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import AnimatedSpheres from "@/components/AnimatedSpheres";
+import CustomCursor from "@/components/CustomCursor";
 
 export default function Home() {
+    const [showContent, setShowContent] = useState(false);
+    const [hideTitle, setHideTitle] = useState(false);
+
+    const handleLoadComplete = () => {
+        setShowContent(true);
+        setTimeout(() => {
+            setHideTitle(true);
+        }, 500);
+    };
+
     return (
         <div className="bg-gray-50">
-            <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-white via-gray-50 to-blue-50">
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_50%,rgba(59,130,246,0.05)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(147,197,253,0.05)_0%,transparent_50%)]" />
-                </div>
+            <AnimatedSpheres onLoadComplete={handleLoadComplete} />
+            <CustomCursor />
 
-                <div className="container mx-auto px-4 relative z-10">
+            <motion.h1
+                initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                animate={{ opacity: hideTitle ? 0 : 1, scale: hideTitle ? 1.2 : 1, y: 0 }}
+                transition={{ 
+                    duration: 0.8, 
+                    ease: [0.6, -0.05, 0.01, 0.99],
+                    opacity: { duration: hideTitle ? 0.5 : 0.8 }
+                }}
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[160px] md:text-[200px] font-black uppercase tracking-tighter"
+                style={{ zIndex: 0 }}
+            >
+                VENTUS
+            </motion.h1>
+
+            <section
+                className={`relative min-h-screen flex items-center overflow-hidden ${
+                    showContent ? "opacity-100" : "opacity-0"
+                }`}
+                style={{ zIndex: 10 }}
+            >
+                <div className="container mx-auto px-4 relative">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
                             <div>
-                                <p className="text-blue-600 text-base font-semibold tracking-wide uppercase mb-3">
+                                <motion.p
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                                    transition={{ duration: 0.6, delay: 0.2, ease: [0.6, -0.05, 0.01, 0.99] }}
+                                    className="text-blue-600 text-base font-semibold tracking-wide uppercase mb-3"
+                                >
                                     VENTUS BARBERÍA
-                                </p>
-                                <h1 className="text-5xl md:text-7xl font-black leading-tight mb-4 bg-gradient-to-r from-gray-900 via-gray-800 to-blue-900 bg-clip-text text-transparent">
+                                </motion.p>
+                                <motion.h2
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                                    transition={{ duration: 0.7, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
+                                    className="text-5xl md:text-7xl font-black leading-tight mb-4 bg-gradient-to-r from-blue-800 via-gray-800 to-black bg-clip-text text-transparent"
+                                >
                                     Tu Estilo,
                                     <br />
                                     Nuestra Pasión
-                                </h1>
+                                </motion.h2>
                             </div>
 
-                            <p className="text-gray-600 text-xl md:text-2xl font-light max-w-xl">
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                                transition={{ duration: 0.6, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
+                                className="text-xl md:text-2xl font-light max-w-xl"
+                            >
                                 Experimentá el arte del barbering moderno. Cortes precisos,
                                 estilo único y atención personalizada.
-                            </p>
+                            </motion.p>
 
-                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                                transition={{ duration: 0.6, delay: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
+                                className="flex flex-col sm:flex-row gap-4 pt-4"
+                            >
                                 <Link
                                     href="/shifts"
                                     className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:bg-blue-700 transition-all hover:-translate-y-1 shadow-lg hover:shadow-xl"
@@ -40,24 +92,25 @@ export default function Home() {
                                 </Link>
                                 <Link
                                     href="/services"
-                                    className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-700 text-lg font-bold rounded-xl hover:bg-gray-100 transition-all"
+                                    className="inline-flex items-center justify-center px-8 py-4 border border-black/10 text-lg font-bold rounded-xl hover:bg-black/10 backdrop-blur-3xl transition-all"
                                 >
                                     Ver Servicios
                                 </Link>
-                            </div>
+                            </motion.div>
                         </div>
 
                         <div className="flex items-center justify-center h-[300px] md:h-[500px]">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
-                                <Scissors className="relative w-48 h-48 md:w-80 md:h-80 text-blue-600 opacity-20 animate-[float_3s_ease-in-out_infinite]" />
-                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <footer className="py-8 bg-white border-t border-gray-200">
+            <footer
+                className={`py-8 bg-white border-t border-gray-200 relative transition-opacity duration-500 ${
+                    showContent ? "opacity-100" : "opacity-0"
+                }`}
+                style={{ zIndex: 10 }}
+            >
                 <div className="container mx-auto px-4">
                     <div className="text-center space-y-4">
                         <div className="flex items-center justify-center gap-2">
