@@ -194,7 +194,7 @@ export default function ServicesPage() {
             </div>
 
             {message && (
-                <Alert severity={message.type} onClose={() => setMessage(null)}>
+                <Alert severity={message.type}>
                     {message.text}
                 </Alert>
             )}
