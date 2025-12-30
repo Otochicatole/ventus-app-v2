@@ -21,7 +21,7 @@ export default function CMSLayoutWrapper({
             <AdminNavbar admin={admin} />
             <div className="flex">
                 <Sidebar />
-                <main className="flex-1 p-8 md:p-10 lg:p-12 min-h-[calc(100vh-4rem)] overflow-auto">
+                <main className="flex-1 p-4 pb-20 md:p-10 lg:p-12 md:pb-10 lg:pb-12 min-h-[calc(100vh-4rem)] overflow-auto">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>
