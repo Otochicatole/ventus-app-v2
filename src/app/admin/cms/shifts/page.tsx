@@ -220,6 +220,17 @@ export default function ShiftsPage() {
                             >
                                 Pendientes
                             </button>
+                            <div className="w-px h-8 bg-gray-300 hidden sm:block self-center"></div>
+                            <button
+                                onClick={() => setDateFilter(dayjs())}
+                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                    dateFilter && dateFilter.isSame(dayjs(), 'day')
+                                        ? "bg-purple-600 text-white shadow-sm"
+                                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                }`}
+                            >
+                                Hoy
+                            </button>
                         </div>
 
                         <div className="flex gap-2 items-center w-full sm:w-auto sm:flex-1 sm:justify-end">
@@ -273,6 +284,13 @@ export default function ShiftsPage() {
                             const dateStr = shift.date.split("T")[0];
                             const [year, month, day] = dateStr.split("-");
                             const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                            
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const shiftDate = new Date(date);
+                            shiftDate.setHours(0, 0, 0, 0);
+                            const isToday = shiftDate.getTime() === today.getTime();
+                            
                             return (
                                 <Card key={shift.id}>
                                     <CardContent>
@@ -300,9 +318,17 @@ export default function ShiftsPage() {
 
                                                 <div className="flex items-center gap-2">
                                                     <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
-                                                    <div>
+                                                    <div className="flex items-center gap-2">
                                                         <span className="text-gray-900 font-medium">{date.toLocaleDateString("es-AR")}</span>
-                                                        <span className="text-gray-500 ml-2">{shift.time}</span>
+                                                        <span className="text-gray-500">{shift.time}</span>
+                                                        {isToday && (
+                                                            <Chip
+                                                                label="Hoy"
+                                                                color="primary"
+                                                                variant="filled"
+                                                                size="small"
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
 

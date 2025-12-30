@@ -120,6 +120,13 @@ export default async function CMSDashboard() {
                             const dateStr = shift.date.toISOString().split("T")[0];
                             const [year, month, day] = dateStr.split("-");
                             const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                            
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const shiftDate = new Date(date);
+                            shiftDate.setHours(0, 0, 0, 0);
+                            const isToday = shiftDate.getTime() === today.getTime();
+                            
                             return (
                                 <Link key={shift.id} href={`/admin/cms/shifts/${shift.id}`} className="cursor-pointer">
                                     <Card className="hover:border-gray-300 transition-colors hover:shadow-md">
@@ -149,9 +156,17 @@ export default async function CMSDashboard() {
 
                                         <div className="flex items-center gap-2">
                                             <Calendar className="w-5 h-5 text-gray-400" />
-                                            <div className="text-sm">
+                                            <div className="flex items-center gap-2 text-sm">
                                                 <span className="text-gray-900 font-medium">{date.toLocaleDateString("es-AR")}</span>
-                                                <span className="text-gray-500 ml-2">{shift.time}</span>
+                                                <span className="text-gray-500">{shift.time}</span>
+                                                {isToday && (
+                                                    <Chip
+                                                        label="Hoy"
+                                                        color="primary"
+                                                        variant="filled"
+                                                        size="small"
+                                                    />
+                                                )}
                                             </div>
                                         </div>
 
