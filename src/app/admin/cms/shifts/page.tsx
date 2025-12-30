@@ -7,7 +7,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/es";
-import { Search, Plus, Package, MapPin, Calendar, X } from "lucide-react";
+import { Search, Plus, Package, MapPin, Calendar, X, History } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Chip from "@/components/ui/chip";
@@ -222,11 +222,18 @@ _Ventus Barberia_`;
                     <h1 className="text-4xl font-bold text-gray-900 mb-3">Turnos</h1>
                     <p className="text-gray-600 text-lg">Gestión de reservas y confirmaciones</p>
                 </div>
-                <Link href="/admin/cms/shifts/new">
-                    <Button size="large" startIcon={<Plus className="w-5 h-5" />}>
-                        Nuevo Turno
-                    </Button>
-                </Link>
+                <div className="flex gap-3">
+                    <Link href="/admin/cms/history">
+                        <Button size="large" variant="outlined" startIcon={<History className="w-5 h-5" />}>
+                            Historial
+                        </Button>
+                    </Link>
+                    <Link href="/admin/cms/shifts/new">
+                        <Button size="large" startIcon={<Plus className="w-5 h-5" />}>
+                            Nuevo Turno
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <div className="space-y-4">
