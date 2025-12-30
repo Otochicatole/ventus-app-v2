@@ -10,9 +10,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("ventus_POSTGRES_URL")
-  directUrl = env("ventus_PRISMA_DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("ventus_PRISMA_DATABASE_URL")
+  directUrl = env("ventus_POSTGRES_URL")
 }
 
 model User {
@@ -49,9 +49,8 @@ model Shift {
   updatedAt  DateTime @updatedAt
 }
 
-
 model Location {
-  id               String             @id @default(cuid())
+  id               String            @id @default(cuid())
   name             String
   address          String
   latitude         Float?
@@ -59,8 +58,8 @@ model Location {
   shifts           Shift[]
   timeSlots        TimeSlot[]
   unavailableDates UnavailableDate[]
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model UnavailableDate {
