@@ -151,18 +151,24 @@ export default function TimeSlotsPage() {
 
             {selectedLocationId && (
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <h2 className="text-2xl font-bold text-white mb-2">Horarios Disponibles</h2>
-                            <p className="text-neutral-400">{timeSlots.length} horario(s) configurado(s)</p>
+                    <CardHeader className="flex flex-col gap-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-2">Horarios Disponibles</h2>
+                                <p className="text-neutral-400">{timeSlots.length} horario(s) configurado(s)</p>
+                            </div>
+                            <Button 
+                                onClick={() => setShowModal(true)} 
+                                startIcon={
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                                    </svg>
+                                }
+                                className="w-full lg:w-auto"
+                            >
+                                Agregar Horario
+                            </Button>
                         </div>
-                        <Button onClick={() => setShowModal(true)} startIcon={
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                            </svg>
-                        }>
-                            Agregar Horario
-                        </Button>
                     </CardHeader>
 
                     <CardContent>
@@ -187,7 +193,7 @@ export default function TimeSlotsPage() {
                                         <span className="text-white font-medium text-lg">{slot.time}</span>
                                         <button
                                             onClick={() => setDeleteId(slot.id)}
-                                            className="text-neutral-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                                            className="text-neutral-500 hover:text-red-500 transition-colors md:opacity-0 md:group-hover:opacity-100 cursor-pointer"
                                         >
                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />

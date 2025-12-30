@@ -5,6 +5,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
+import { Search, Calendar as CalendarIcon, Trash2 } from "lucide-react";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export default function BlockedDatesPage() {
     const [newDate, setNewDate] = useState("");
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         fetchLocations();
@@ -136,6 +138,19 @@ export default function BlockedDatesPage() {
         });
     };
 
+    const filteredBlockedDates = blockedDates.filter((blocked) => {
+        if (!searchTerm) return true;
+        
+        const search = searchTerm.toLowerCase();
+        const dateStr = blocked.date.split("T")[0];
+        const [year, month, day] = dateStr.split("-");
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const formattedDate = date.toLocaleDateString("es-AR").toLowerCase();
+        const weekday = date.toLocaleDateString("es-AR", { weekday: "long" }).toLowerCase();
+        
+        return formattedDate.includes(search) || weekday.includes(search);
+    });
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div className="space-y-8 animate-fadeIn">
@@ -163,79 +178,93 @@ export default function BlockedDatesPage() {
                 </Card>
 
                 {selectedLocationId && (
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
+                    <div className="space-y-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Fechas Bloqueadas</h2>
-                                <p className="text-neutral-400">{blockedDates.length} fecha(s) bloqueada(s)</p>
+                                <p className="text-neutral-400 text-sm">
+                                    {filteredBlockedDates.length} de {blockedDates.length} fecha(s) bloqueada(s)
+                                </p>
                             </div>
-                            <Button onClick={() => setShowModal(true)} startIcon={
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                                </svg>
-                            }>
-                                Bloquear Fecha
-                            </Button>
-                        </CardHeader>
-
-                        <div className="overflow-x-auto">
-                            {loading ? (
-                                <div className="flex justify-center py-12">
-                                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+                            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                <div className="relative flex-1 sm:w-80">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por fecha o día..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                                    />
                                 </div>
-                            ) : blockedDates.length > 0 ? (
-                                <table className="w-full">
-                                    <thead className="bg-neutral-900 border-b border-neutral-800">
-                                        <tr>
-                                            <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Fecha</th>
-                                            <th className="text-left py-5 px-8 text-neutral-400 font-semibold text-sm">Día de la Semana</th>
-                                            <th className="text-right py-5 px-8 text-neutral-400 font-semibold text-sm">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-neutral-800">
-                                        {blockedDates.map((blocked) => {
-                                            const dateStr = blocked.date.split("T")[0];
-                                            const [year, month, day] = dateStr.split("-");
-                                            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                            return (
-                                                <tr key={blocked.id} className="hover:bg-neutral-900/50 transition-colors cursor-pointer">
-                                                    <td className="py-5 px-8 text-white font-medium">
-                                                        {date.toLocaleDateString("es-AR", {
-                                                            year: "numeric",
-                                                            month: "long",
-                                                            day: "numeric",
-                                                        })}
-                                                    </td>
-                                                    <td className="py-5 px-8 text-neutral-300 capitalize">
-                                                        {date.toLocaleDateString("es-AR", {
-                                                            weekday: "long",
-                                                        })}
-                                                    </td>
-                                                    <td className="py-5 px-8 text-right">
-                                                        <Button
-                                                            size="small"
-                                                            variant="outlined"
-                                                            color="error"
-                                                            onClick={() => setDeleteId(blocked.id)}
-                                                        >
-                                                            Desbloquear
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <div className="py-12 text-center">
-                                    <svg className="w-16 h-16 mx-auto mb-4 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p className="text-neutral-500">No hay fechas bloqueadas para esta ubicación</p>
-                                </div>
-                            )}
+                                <Button 
+                                    onClick={() => setShowModal(true)} 
+                                    startIcon={
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                                        </svg>
+                                    }
+                                    className="w-full sm:w-auto whitespace-nowrap"
+                                >
+                                    Bloquear Fecha
+                                </Button>
+                            </div>
                         </div>
-                    </Card>
+
+                        {loading ? (
+                            <Card>
+                                <CardContent>
+                                    <div className="flex justify-center py-12">
+                                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : filteredBlockedDates.length === 0 ? (
+                            <Card>
+                                <CardContent>
+                                    <div className="flex flex-col items-center gap-4 py-12 text-neutral-500">
+                                        <CalendarIcon className="w-16 h-16 text-neutral-700" />
+                                        <p>{searchTerm ? "No se encontraron fechas con ese criterio" : "No hay fechas bloqueadas para esta ubicación"}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4">
+                                {filteredBlockedDates.map((blocked) => {
+                                    const dateStr = blocked.date.split("T")[0];
+                                    const [year, month, day] = dateStr.split("-");
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    return (
+                                        <Card key={blocked.id}>
+                                            <CardContent>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-red-950 border border-red-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                        <CalendarIcon className="w-6 h-6 text-red-500" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-white font-semibold text-lg mb-1">
+                                                            {date.toLocaleDateString("es-AR")}
+                                                        </h3>
+                                                        <p className="text-neutral-400 text-sm capitalize">
+                                                            {date.toLocaleDateString("es-AR", {
+                                                                weekday: "long",
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setDeleteId(blocked.id)}
+                                                        className="w-10 h-10 rounded-lg border border-red-900 bg-red-950 hover:bg-red-900 hover:border-red-500 text-red-500 transition-all flex items-center justify-center group flex-shrink-0"
+                                                    >
+                                                        <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                                    </button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 <Dialog open={showModal} onClose={() => setShowModal(false)} title="Bloquear Fecha" maxWidth="sm">

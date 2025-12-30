@@ -116,20 +116,23 @@ export default function ShiftDetailPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold text-white">Detalle del Turno</h1>
+                <h1 className="text-4xl font-bold text-white">Detalles</h1>
                 <Button onClick={() => router.back()}>← Volver</Button>
             </div>
 
             <div className="space-y-6">
                 <Card>
                     <CardContent className="p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-white">
-                                Información del Paciente
-                            </h2>
+                        <h2 className="text-xl font-bold text-white mb-6">
+                            Información del Cliente
+                        </h2>
+                        <div className="flex gap-6 items-start mb-6">
+                            <p>Estado del turno:</p>
                             <Chip
                                 label={shift.confirmed ? "Confirmado" : "Pendiente"}
                                 color={shift.confirmed ? "success" : "warning"}
+                                variant="soft"
+                                size="small"
                             />
                         </div>
                         <div className="grid md:grid-cols-2 gap-6">
