@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import MUIThemeProvider from "@/components/theme-provider";
+import LayoutWrapper from "@/components/layout-wrapper";
 
 export const metadata: Metadata = {
-  title: "Ventus - Sistema de Turnos",
-  description: "Sistema de gestión de turnos médicos",
+  title: "Ventus Barbería - Tu Estilo, Nuestra Pasión",
+  description: "Barbería moderna en Buenos Aires. Reservá tu turno online para cortes, barba y styling premium.",
 };
 
 export default function RootLayout({
@@ -13,9 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body>
-        <MUIThemeProvider>{children}</MUIThemeProvider>
+    <html lang="es" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <MUIThemeProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </MUIThemeProvider>
       </body>
     </html>
   );

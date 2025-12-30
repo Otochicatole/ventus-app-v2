@@ -2,8 +2,7 @@ import { redirect } from "next/navigation";
 import { getAuthCookie } from "@/lib/cookies";
 import { verifyToken } from "@/lib/jwt";
 import { prisma } from "@/lib/prisma";
-import AdminNavbar from "../components/admin-navbar";
-import Sidebar from "../components/sidebar";
+import CMSLayoutWrapper from "./cms-layout-wrapper";
 
 export default async function CMSLayout({
     children,
@@ -36,21 +35,15 @@ export default async function CMSLayout({
     }
 
     return (
-        <div className="min-h-screen bg-neutral-900">
-            <AdminNavbar
-                admin={{
-                    adminId: admin.id,
-                    email: admin.email,
-                    name: admin.name,
-                }}
-            />
-            <div style={{ display: "flex" }}>
-                <Sidebar />
-                <main style={{ flex: 1, minHeight: "calc(100vh - 64px)" }}>
-                    {children}
-                </main>
-            </div>
-        </div>
+        <CMSLayoutWrapper
+            admin={{
+                adminId: admin.id,
+                email: admin.email,
+                name: admin.name,
+            }}
+        >
+            {children}
+        </CMSLayoutWrapper>
     );
 }
 
