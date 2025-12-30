@@ -248,7 +248,7 @@ export default function BlockedDatesPage() {
                                                     </div>
                                                     <button
                                                         onClick={() => setDeleteId(blocked.id)}
-                                                        className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group shrink-0"
+                                                        className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group shrink-0 cursor-pointer"
                                                     >
                                                         <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                     </button>

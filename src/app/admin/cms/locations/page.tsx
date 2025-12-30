@@ -150,13 +150,13 @@ export default function LocationsPage() {
                                         </div>
                                         <div className="flex gap-2 flex-shrink-0">
                                             <Link href={`/admin/cms/locations/${location.id}/edit`}>
-                                                <button className="w-10 h-10 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 text-gray-700 transition-all flex items-center justify-center group">
+                                                <button className="w-10 h-10 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 text-gray-700 transition-all flex items-center justify-center group cursor-pointer">
                                                     <Edit2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                 </button>
                                             </Link>
                                             <button
                                                 onClick={() => setDeleteId(location.id)}
-                                                className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group"
+                                                className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group cursor-pointer"
                                             >
                                                 <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                             </button>

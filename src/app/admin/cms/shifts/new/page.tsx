@@ -138,7 +138,7 @@ export default function NewShiftPage() {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div className="max-w-4xl mx-auto space-y-6">
-                <h1 className="text-4xl font-bold text-white">Nuevo Turno</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Nuevo Turno</h1>
 
                 <Card>
                     <CardContent className="p-6">
@@ -287,13 +287,13 @@ export default function NewShiftPage() {
                                                 confirmed: e.target.checked,
                                             })
                                         }
-                                        className="w-5 h-5 rounded border-neutral-700 bg-neutral-900 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                                        className="w-5 h-5 rounded border-gray-300 bg-white text-blue-600 focus:ring-2 focus:ring-blue-600"
                                     />
-                                    <span className="font-medium">Marcar como confirmado</span>
+                                    <span className="font-medium text-gray-900">Marcar como confirmado</span>
                                 </label>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-300 mb-2">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         Notas (opcional)
                                     </label>
                                     <textarea
@@ -303,7 +303,7 @@ export default function NewShiftPage() {
                                         }
                                         rows={3}
                                         placeholder="Notas adicionales sobre el turno..."
-                                        className="w-full px-4 py-2.5 bg-neutral-900 border border-neutral-700 rounded-md text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                        className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all resize-none"
                                     />
                                 </div>
                             </div>

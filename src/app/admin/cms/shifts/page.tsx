@@ -254,7 +254,7 @@ _Ventus Barberia_`;
                         <div className="flex gap-2 flex-wrap">
                             <button
                                 onClick={() => setStatusFilter("all")}
-                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                className={`px-4 py-2 rounded-xl font-medium text-sm cursor-pointer ${
                                     statusFilter === "all"
                                         ? "bg-blue-600 text-white shadow-sm"
                                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -264,7 +264,7 @@ _Ventus Barberia_`;
                             </button>
                             <button
                                 onClick={() => setStatusFilter("confirmed")}
-                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                className={`px-4 py-2 rounded-xl font-medium text-sm cursor-pointer ${
                                     statusFilter === "confirmed"
                                         ? "bg-green-600 text-white shadow-sm"
                                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -274,7 +274,7 @@ _Ventus Barberia_`;
                             </button>
                             <button
                                 onClick={() => setStatusFilter("pending")}
-                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                className={`px-4 py-2 rounded-xl font-medium text-sm cursor-pointer ${
                                     statusFilter === "pending"
                                         ? "bg-amber-600 text-white shadow-sm"
                                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -285,7 +285,7 @@ _Ventus Barberia_`;
                             <div className="w-px h-8 bg-gray-300 hidden sm:block self-center"></div>
                             <button
                                 onClick={() => setDateFilter(dayjs())}
-                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                className={`px-4 py-2 rounded-xl font-medium text-sm cursor-pointer ${
                                     dateFilter && dateFilter.isSame(dayjs(), 'day')
                                         ? "bg-purple-600 text-white shadow-sm"
                                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -319,13 +319,13 @@ _Ventus Barberia_`;
                                 <button
                                     onClick={() => {
                                         setStatusFilter("all");
-                                        setDateFilter(null);
-                                    }}
-                                    className="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-2 font-medium text-sm shrink-0"
-                                >
-                                    <X className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Limpiar</span>
-                                </button>
+                                    setDateFilter(null);
+                                }}
+                                className="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-2 font-medium text-sm shrink-0 cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                                <span className="hidden sm:inline">Limpiar</span>
+                            </button>
                             )}
                         </div>
                     </div>

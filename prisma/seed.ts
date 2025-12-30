@@ -12,6 +12,7 @@ async function main() {
     await prisma.location.deleteMany();
     await prisma.user.deleteMany();
     await prisma.admin.deleteMany();
+    await prisma.service.deleteMany();
 
     console.log("✅ Datos anteriores eliminados");
 
@@ -214,6 +215,58 @@ async function main() {
 
     console.log("✅ Turnos creados");
 
+    await prisma.service.create({
+        data: {
+            name: "Corte de Pelo",
+            description: "Corte de pelo clásico o moderno según tu estilo",
+            price: 5000,
+            duration: 30,
+            active: true,
+        },
+    });
+
+    await prisma.service.create({
+        data: {
+            name: "Corte de Barba",
+            description: "Recorte y perfilado de barba",
+            price: 3000,
+            duration: 20,
+            active: true,
+        },
+    });
+
+    await prisma.service.create({
+        data: {
+            name: "Corte + Barba",
+            description: "Combo de corte de pelo y barba",
+            price: 7000,
+            duration: 45,
+            active: true,
+        },
+    });
+
+    await prisma.service.create({
+        data: {
+            name: "Afeitado Completo",
+            description: "Afeitado tradicional con toalla caliente",
+            price: 4000,
+            duration: 25,
+            active: true,
+        },
+    });
+
+    await prisma.service.create({
+        data: {
+            name: "Tintura",
+            description: "Coloración y tintura de cabello",
+            price: 6000,
+            duration: 60,
+            active: true,
+        },
+    });
+
+    console.log("✅ Servicios creados");
+
     await prisma.user.create({
         data: {
             email: "admin@ventus.com",
@@ -242,6 +295,7 @@ async function main() {
     console.log(`   - ${await prisma.timeSlot.count()} horarios`);
     console.log(`   - ${await prisma.unavailableDate.count()} fechas bloqueadas`);
     console.log(`   - ${await prisma.shift.count()} turnos reservados`);
+    console.log(`   - ${await prisma.service.count()} servicios`);
     console.log(`   - ${await prisma.user.count()} usuarios`);
     console.log(`   - ${await prisma.admin.count()} administradores`);
 }

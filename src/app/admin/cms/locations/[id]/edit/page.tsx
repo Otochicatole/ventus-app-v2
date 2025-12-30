@@ -92,11 +92,11 @@ export default function EditLocationPage() {
 
     return (
         <div className="max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl font-bold text-white">Editar Ubicación</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Editar Ubicación</h1>
 
             <Card>
                 <CardContent className="p-6">
-                    <h2 className="text-xl font-bold text-white mb-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-6">
                         Información de la Ubicación
                     </h2>
 
