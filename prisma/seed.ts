@@ -62,16 +62,16 @@ async function main() {
         "17:00",
     ];
 
-    for (const location of [location1, location2, location3]) {
-        for (const time of timeSlots) {
-            await prisma.timeSlot.create({
-                data: {
-                    time,
-                    locationId: location.id,
-                },
-            });
-        }
-    }
+    const timeSlotsData = [location1, location2, location3].flatMap(location =>
+        timeSlots.map(time => ({
+            time,
+            locationId: location.id,
+        }))
+    );
+
+    await prisma.timeSlot.createMany({
+        data: timeSlotsData,
+    });
 
     console.log("✅ Horarios creados");
 

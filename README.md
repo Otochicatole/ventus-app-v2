@@ -1,36 +1,216 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ventus Barber App
 
-## Getting Started
+Sistema de gestión de turnos para barbería profesional construido con Next.js 16, React 19, Prisma y PostgreSQL.
 
-First, run the development server:
+## Características
 
+- 🗓️ Sistema de reserva de turnos online
+- 👨‍💼 Panel de administración completo
+- 📍 Gestión de múltiples ubicaciones
+- ⏰ Horarios personalizables por ubicación
+- 💈 Catálogo de servicios
+- 📊 Dashboard con estadísticas en tiempo real
+- 🔐 Autenticación segura con JWT
+- 🎨 Interfaz moderna con animaciones (Framer Motion)
+- 📱 Diseño responsive
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **UI**: React 19, Tailwind CSS 4, Material-UI
+- **Base de datos**: PostgreSQL (Vercel Postgres)
+- **ORM**: Prisma 5
+- **Autenticación**: JWT (jose)
+- **Animaciones**: Framer Motion, GSAP
+- **Runtime**: Bun
+- **Deploy**: Vercel
+
+## Requisitos Previos
+
+- Node.js 20+ o Bun 1.0+
+- PostgreSQL (local o Vercel Postgres)
+
+## Instalación Local
+
+1. Clonar el repositorio:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+git clone <repo-url>
+cd ventus-app
+```
+
+2. Instalar dependencias:
+```bash
+bun install
+```
+
+3. Configurar variables de entorno (copiar `env.example`):
+```bash
+cp env.example .env.local
+```
+
+4. Editar `.env.local` con tus credenciales:
+```env
+DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+DIRECT_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+JWT_SECRET="tu-secreto-super-largo-minimo-32-caracteres"
+JWT_EXPIRES_IN="7d"
+NODE_ENV="development"
+```
+
+5. Generar Prisma Client:
+```bash
+bunx prisma generate
+```
+
+6. Ejecutar migraciones:
+```bash
+bunx prisma migrate deploy
+```
+
+7. Seedear la base de datos:
+```bash
+bun run seed
+```
+
+8. Iniciar servidor de desarrollo:
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La app estará disponible en [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy en Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Crear Base de Datos PostgreSQL
 
-## Learn More
+1. Ve a tu proyecto en Vercel
+2. Navega a **Storage** → **Create Database**
+3. Selecciona **Postgres** → **Continue**
+4. Configura el nombre y región
+5. Copia las credenciales `DATABASE_URL` y `DIRECT_URL`
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Configurar Variables de Entorno
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+En tu proyecto de Vercel, ve a **Settings** → **Environment Variables** y agrega:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+DATABASE_URL=<tu-url-de-postgres-de-vercel>
+DIRECT_URL=<tu-direct-url-de-postgres-de-vercel>
+JWT_SECRET=<genera-uno-seguro-de-32+-caracteres>
+JWT_EXPIRES_IN=7d
+NODE_ENV=production
+```
 
-## Deploy on Vercel
+### 3. Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Opción A - **Conectar repositorio Git**:
+1. Conecta tu repositorio de GitHub/GitLab/Bitbucket
+2. Vercel detectará automáticamente Next.js
+3. Click en **Deploy**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Opción B - **Vercel CLI**:
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+### 4. Seedear Base de Datos en Producción
+
+Después del primer deploy exitoso:
+
+```bash
+# Conectar a tu base de datos de producción
+vercel env pull .env.production
+bun run seed
+```
+
+O ejecuta el seed directamente en Vercel:
+```bash
+vercel exec bun run seed
+```
+
+## Scripts Disponibles
+
+```bash
+bun dev          # Desarrollo local
+bun build        # Build de producción
+bun start        # Servidor de producción
+bun run seed     # Seedear base de datos
+bun run lint     # Linter
+```
+
+## Credenciales de Admin (después del seed)
+
+- **Email**: `ventus@barber.com`
+- **Contraseña**: `15651106asd`
+
+🔒 **IMPORTANTE**: Cambia estas credenciales después del primer login en producción.
+
+## Estructura del Proyecto
+
+```
+ventus-app/
+├── prisma/
+│   ├── schema.prisma      # Schema de base de datos
+│   └── seed.ts           # Datos iniciales
+├── src/
+│   ├── app/              # App Router de Next.js
+│   │   ├── admin/        # Panel de administración
+│   │   ├── api/          # API Routes
+│   │   └── ...           # Páginas públicas
+│   ├── components/       # Componentes reutilizables
+│   ├── core/             # Lógica de negocio
+│   ├── hooks/            # React hooks custom
+│   └── lib/              # Utilidades y helpers
+├── public/               # Assets estáticos
+└── middleware.ts         # Middleware de autenticación
+```
+
+## Rutas Principales
+
+### Públicas
+- `/` - Home
+- `/services` - Catálogo de servicios
+- `/shifts` - Reserva de turnos
+- `/confirmed-shifts` - Turnos confirmados públicos
+
+### Admin (protegidas)
+- `/admin/login` - Login de administrador
+- `/admin/cms` - Dashboard
+- `/admin/cms/shifts` - Gestión de turnos
+- `/admin/cms/locations` - Gestión de ubicaciones
+- `/admin/cms/services` - Gestión de servicios
+
+## Seguridad
+
+- ✅ Autenticación JWT con cookies HTTP-only
+- ✅ Middleware de protección en rutas admin
+- ✅ Validación de datos con Zod
+- ✅ Passwords hasheados con bcrypt
+- ✅ Variables de entorno para secretos
+- ✅ No hay endpoints públicos para crear admins
+
+## Troubleshooting
+
+### Error: Prisma Client no generado
+```bash
+bunx prisma generate
+```
+
+### Error de migraciones
+```bash
+bunx prisma migrate reset
+bunx prisma migrate deploy
+```
+
+### Error de build en Vercel
+Verifica que las variables de entorno `DATABASE_URL` y `DIRECT_URL` estén configuradas correctamente.
+
+## Licencia
+
+Privado - Todos los derechos reservados
+
+## Soporte
+
+Para problemas o consultas, contacta al equipo de desarrollo.
