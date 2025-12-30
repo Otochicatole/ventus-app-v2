@@ -42,12 +42,18 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { name, lastName, email, phone, date, time, locationId } = body;
 
-        const dateObj = new Date(date + "T12:00:00.000Z");
+        const [year, month, day] = date.split("-").map(Number);
+        const dateObj = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+        const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+        const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
         const isDateBlocked = await prisma.unavailableDate.findFirst({
             where: {
                 locationId,
-                date: dateObj,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
             },
         });
 
@@ -58,17 +64,21 @@ export async function POST(request: Request) {
             );
         }
 
-        const existingShift = await prisma.shift.findFirst({
+        const confirmedShift = await prisma.shift.findFirst({
             where: {
                 locationId,
-                date: dateObj,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
                 time,
+                confirmed: true,
             },
         });
 
-        if (existingShift) {
+        if (confirmedShift) {
             return NextResponse.json(
-                { error: "El horario seleccionado ya está ocupado" },
+                { error: "El horario seleccionado ya está ocupado por un turno confirmado" },
                 { status: 400 }
             );
         }

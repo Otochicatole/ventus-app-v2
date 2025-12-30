@@ -17,17 +17,17 @@ async function main() {
 
     const location1 = await prisma.location.create({
         data: {
-            name: "Hospital Central",
-            address: "Av. Libertador 1234, CABA",
-            latitude: -34.603722,
-            longitude: -58.381592,
+            name: "Ventus Palermo",
+            address: "Av. Santa Fe 3456, Palermo",
+            latitude: -34.588433,
+            longitude: -58.413827,
         },
     });
 
     const location2 = await prisma.location.create({
         data: {
-            name: "Clínica Norte",
-            address: "Av. Cabildo 5678, CABA",
+            name: "Ventus Belgrano",
+            address: "Av. Cabildo 2100, Belgrano",
             latitude: -34.55891,
             longitude: -58.45727,
         },
@@ -35,10 +35,10 @@ async function main() {
 
     const location3 = await prisma.location.create({
         data: {
-            name: "Centro Médico Sur",
-            address: "Av. Rivadavia 9012, CABA",
-            latitude: -34.61315,
-            longitude: -58.37723,
+            name: "Ventus Centro",
+            address: "Florida 650, Microcentro",
+            latitude: -34.59839,
+            longitude: -58.37451,
         },
     });
 
@@ -75,6 +75,7 @@ async function main() {
     console.log("✅ Horarios creados");
 
     const today = new Date();
+    today.setHours(12, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const nextWeek = new Date(today);
@@ -98,7 +99,7 @@ async function main() {
             date: tomorrow,
             time: "10:00",
             confirmed: true,
-            notes: "Primera consulta",
+            notes: "Corte y barba",
             locationId: location1.id,
         },
     });
@@ -126,6 +127,36 @@ async function main() {
             time: "14:30",
             confirmed: true,
             locationId: location2.id,
+        },
+    });
+
+    const dayAfterTomorrow = new Date(today);
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+    dayAfterTomorrow.setHours(12, 0, 0, 0);
+
+    await prisma.shift.create({
+        data: {
+            name: "Pedro",
+            lastName: "Martinez",
+            email: "pedro.martinez@example.com",
+            phone: "1156789012",
+            date: dayAfterTomorrow,
+            time: "09:30",
+            confirmed: true,
+            locationId: location3.id,
+        },
+    });
+
+    await prisma.shift.create({
+        data: {
+            name: "Ana",
+            lastName: "Lopez",
+            email: "ana.lopez@example.com",
+            phone: "1167890123",
+            date: dayAfterTomorrow,
+            time: "15:00",
+            confirmed: false,
+            locationId: location1.id,
         },
     });
 

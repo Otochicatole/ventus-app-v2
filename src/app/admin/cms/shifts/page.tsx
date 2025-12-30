@@ -81,6 +81,8 @@ export default function ShiftsPage() {
     const handleDelete = async () => {
         if (!deleteId) return;
 
+        const shiftToDelete = shifts.find(s => s.id === deleteId);
+        
         setDeleting(true);
         try {
             const res = await fetch(`/api/shifts/${deleteId}`, {
@@ -88,6 +90,29 @@ export default function ShiftsPage() {
             });
 
             if (res.ok) {
+                if (shiftToDelete && shiftToDelete.confirmed) {
+                    const dateStr = shiftToDelete.date.split("T")[0];
+                    const [year, month, day] = dateStr.split("-");
+                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    const formattedDate = date.toLocaleDateString("es-AR");
+                    
+                    const phone = shiftToDelete.phone.replace(/\D/g, '');
+                    const message = `Hola ${shiftToDelete.name}!
+
+Lamentamos informarte que tu turno ha sido *cancelado*.
+
+*Fecha:* ${formattedDate}
+*Hora:* ${shiftToDelete.time}
+*Ubicacion:* ${shiftToDelete.location.name}
+
+Disculpa las molestias. Podes reservar un nuevo turno cuando gustes.
+
+_Ventus Barberia_`;
+                    
+                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                }
+                
                 setShifts(shifts.filter((shift) => shift.id !== deleteId));
                 setDeleteId(null);
             }

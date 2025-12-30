@@ -14,12 +14,17 @@ export async function GET(request: Request) {
             );
         }
 
-        const selectedDate = new Date(dateStr + "T12:00:00.000Z");
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+        const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
         const isDateBlocked = await prisma.unavailableDate.findFirst({
             where: {
                 locationId,
-                date: selectedDate,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
             },
         });
 
@@ -32,18 +37,22 @@ export async function GET(request: Request) {
             orderBy: { time: "asc" },
         });
 
-        const bookedShifts = await prisma.shift.findMany({
+        const confirmedShifts = await prisma.shift.findMany({
             where: {
                 locationId,
-                date: selectedDate,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+                confirmed: true,
             },
             select: { time: true },
         });
 
-        const bookedTimes = bookedShifts.map((shift) => shift.time);
+        const confirmedTimes = confirmedShifts.map((shift) => shift.time);
 
         const availableSlots = allTimeSlots.filter(
-            (slot) => !bookedTimes.includes(slot.time)
+            (slot) => !confirmedTimes.includes(slot.time)
         );
 
         return NextResponse.json(availableSlots);

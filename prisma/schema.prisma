@@ -36,7 +36,7 @@ model Shift {
   id         String   @id @default(cuid())
   name       String
   lastName   String
-  email      String   @unique
+  email      String
   phone      String
   date       DateTime
   time       String
@@ -46,8 +46,6 @@ model Shift {
   location   Location @relation(fields: [locationId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  @@unique([locationId, date, time])
 }
 
 
