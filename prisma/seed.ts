@@ -119,6 +119,58 @@ async function main() {
 
     await prisma.shift.create({
         data: {
+            name: "Laura",
+            lastName: "Fernández",
+            email: "laura.fernandez@example.com",
+            phone: "1145678902",
+            date: tomorrow,
+            time: "11:00",
+            confirmed: false,
+            locationId: location1.id,
+        },
+    });
+
+    await prisma.shift.create({
+        data: {
+            name: "Sofía",
+            lastName: "López",
+            email: "sofia.lopez@example.com",
+            phone: "1156789013",
+            date: tomorrow,
+            time: "14:00",
+            confirmed: false,
+            locationId: location1.id,
+        },
+    });
+
+    await prisma.shift.create({
+        data: {
+            name: "Valentina",
+            lastName: "Díaz",
+            email: "valentina.diaz@example.com",
+            phone: "1167890124",
+            date: tomorrow,
+            time: "14:00",
+            confirmed: false,
+            locationId: location1.id,
+        },
+    });
+
+    await prisma.shift.create({
+        data: {
+            name: "Camila",
+            lastName: "Ruiz",
+            email: "camila.ruiz@example.com",
+            phone: "1178901235",
+            date: tomorrow,
+            time: "14:00",
+            confirmed: false,
+            locationId: location1.id,
+        },
+    });
+
+    await prisma.shift.create({
+        data: {
             name: "Carlos",
             lastName: "Rodríguez",
             email: "carlos.rodriguez@example.com",

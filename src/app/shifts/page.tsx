@@ -24,6 +24,8 @@ type Location = {
 type TimeSlot = {
     id: string;
     time: string;
+    pendingCount?: number;
+    isHighDemand?: boolean;
 };
 
 export default function ShiftsPage() {
@@ -290,20 +292,40 @@ export default function ShiftsPage() {
                                             <p className="text-gray-600">Cargando horarios disponibles...</p>
                                         </div>
                                     ) : availableSlots.length > 0 ? (
-                                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                            {availableSlots.map((slot) => (
-                                                <Chip
-                                                    key={slot.id}
-                                                    label={slot.time}
-                                                    onClick={() =>
-                                                        setFormData({ ...formData, time: slot.time })
-                                                    }
-                                                    color={formData.time === slot.time ? "primary" : "default"}
-                                                    variant={formData.time === slot.time ? "filled" : "outlined"}
-                                                    className="w-full justify-center cursor-pointer hover:bg-gray-100 transition-colors"
-                                                />
-                                            ))}
-                                        </div>
+                                        <>
+                                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                                {availableSlots.map((slot) => (
+                                                    <div key={slot.id} className="relative">
+                                                        <Chip
+                                                            label={slot.time}
+                                                            onClick={() =>
+                                                                setFormData({ ...formData, time: slot.time })
+                                                            }
+                                                            color={formData.time === slot.time ? "primary" : "default"}
+                                                            variant={formData.time === slot.time ? "filled" : "outlined"}
+                                                            className={`w-full justify-center cursor-pointer transition-colors ${
+                                                                slot.isHighDemand && formData.time !== slot.time
+                                                                    ? "bg-orange-100 border-orange-300 text-orange-800 hover:bg-orange-200"
+                                                                    : formData.time !== slot.time
+                                                                    ? "hover:bg-gray-100"
+                                                                    : ""
+                                                            }`}
+                                                        />
+                                                        {slot.isHighDemand && (
+                                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {availableSlots.some(slot => slot.isHighDemand) && (
+                                                <Alert severity="warning" className="mt-4">
+                                                    Los horarios marcados con 🔴 tienen alta demanda ({availableSlots.filter(s => s.isHighDemand).length} horario{availableSlots.filter(s => s.isHighDemand).length > 1 ? 's' : ''} con múltiples solicitudes pendientes)
+                                                </Alert>
+                                            )}
+                                        </>
                                     ) : (
                                         <Alert severity="info">
                                             No hay horarios disponibles para esta fecha
