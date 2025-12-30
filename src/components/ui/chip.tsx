@@ -1,4 +1,5 @@
 import { HTMLAttributes } from "react";
+import { X } from "lucide-react";
 
 interface ChipProps extends HTMLAttributes<HTMLDivElement> {
     label: string;
@@ -25,25 +26,25 @@ export default function Chip({
 
     const colorStyles = {
         filled: {
-            default: "bg-neutral-700 text-neutral-200",
-            primary: "bg-white text-black",
+            default: "bg-gray-900 text-white",
+            primary: "bg-blue-600 text-white",
             success: "bg-green-600 text-white",
             error: "bg-red-600 text-white",
-            warning: "bg-amber-600 text-black",
+            warning: "bg-amber-600 text-white",
         },
         outlined: {
-            default: "border-2 border-neutral-600 text-neutral-300 bg-transparent",
-            primary: "border-2 border-white text-white bg-transparent",
-            success: "border-2 border-green-500 text-green-400 bg-transparent",
-            error: "border-2 border-red-500 text-red-400 bg-transparent",
-            warning: "border-2 border-amber-500 text-amber-400 bg-transparent",
+            default: "border-2 border-gray-300 text-gray-700 bg-transparent",
+            primary: "border-2 border-blue-600 text-blue-600 bg-transparent",
+            success: "border-2 border-green-600 text-green-600 bg-transparent",
+            error: "border-2 border-red-600 text-red-600 bg-transparent",
+            warning: "border-2 border-amber-600 text-amber-600 bg-transparent",
         },
         soft: {
-            default: "bg-neutral-800/50 text-neutral-300 border border-neutral-700",
-            primary: "bg-white/10 text-white border border-white/20",
-            success: "bg-green-500/10 text-green-400 border border-green-500/20",
-            error: "bg-red-500/10 text-red-400 border border-red-500/20",
-            warning: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+            default: "bg-gray-100 text-gray-700 border border-gray-200",
+            primary: "bg-blue-50 text-blue-700 border border-blue-200",
+            success: "bg-green-50 text-green-700 border border-green-200",
+            error: "bg-red-50 text-red-700 border border-red-200",
+            warning: "bg-amber-50 text-amber-700 border border-amber-200",
         },
     };
 
@@ -65,13 +66,7 @@ export default function Chip({
                     }}
                     className="hover:opacity-70 transition-opacity cursor-pointer"
                 >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            fillRule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
+                    <X className="w-4 h-4" />
                 </button>
             )}
         </div>

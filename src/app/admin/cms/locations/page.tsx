@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, MapPin, Edit2, Trash2 } from "lucide-react";
+import { Search, MapPin, Edit2, Trash2, Plus } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
@@ -83,7 +83,7 @@ export default function LocationsPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
             </div>
         );
     }
@@ -92,15 +92,11 @@ export default function LocationsPage() {
         <div className="space-y-8 animate-fadeIn">
             <div className="flex justify-between items-start flex-wrap gap-6">
                 <div>
-                    <h1 className="text-4xl font-bold text-white mb-3">Ubicaciones</h1>
-                    <p className="text-neutral-400 text-lg">Gestión de sedes y direcciones</p>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Ubicaciones</h1>
+                    <p className="text-gray-600 text-lg">Gestión de sedes y direcciones</p>
                 </div>
                 <Link href="/admin/cms/locations/new">
-                    <Button size="large" startIcon={
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                        </svg>
-                    }>
+                    <Button size="large" startIcon={<Plus className="w-5 h-5" />}>
                         Nueva Ubicación
                     </Button>
                 </Link>
@@ -109,19 +105,19 @@ export default function LocationsPage() {
             <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-white">Todas las Ubicaciones</h2>
-                        <p className="text-neutral-400 text-sm mt-1">
+                        <h2 className="text-2xl font-bold text-gray-900">Todas las Ubicaciones</h2>
+                        <p className="text-gray-600 text-sm mt-1">
                             {filteredLocations.length} de {locations.length} ubicación(es)
                         </p>
                     </div>
                     <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Buscar por nombre o dirección..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         />
                     </div>
                 </div>
@@ -129,8 +125,8 @@ export default function LocationsPage() {
                 {filteredLocations.length === 0 ? (
                     <Card>
                         <CardContent>
-                            <div className="flex flex-col items-center gap-4 py-12 text-neutral-500">
-                                <MapPin className="w-16 h-16 text-neutral-700" />
+                            <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
+                                <MapPin className="w-16 h-16 text-gray-300" />
                                 <p>{searchTerm ? "No se encontraron ubicaciones con ese criterio" : "No hay ubicaciones registradas"}</p>
                             </div>
                         </CardContent>
@@ -141,26 +137,26 @@ export default function LocationsPage() {
                             <Card key={location.id}>
                                 <CardContent>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <MapPin className="w-6 h-6 text-black" />
+                                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <MapPin className="w-6 h-6 text-blue-600" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="text-white font-semibold text-lg mb-1">
+                                            <h3 className="text-gray-900 font-semibold text-lg mb-1">
                                                 {location.name}
                                             </h3>
-                                            <p className="text-neutral-400 text-sm">
+                                            <p className="text-gray-600 text-sm">
                                                 {location.address}
                                             </p>
                                         </div>
                                         <div className="flex gap-2 flex-shrink-0">
                                             <Link href={`/admin/cms/locations/${location.id}/edit`}>
-                                                <button className="w-10 h-10 rounded-lg border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 hover:border-white text-white transition-all flex items-center justify-center group">
+                                                <button className="w-10 h-10 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 text-gray-700 transition-all flex items-center justify-center group">
                                                     <Edit2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                 </button>
                                             </Link>
                                             <button
                                                 onClick={() => setDeleteId(location.id)}
-                                                className="w-10 h-10 rounded-lg border border-red-900 bg-red-950 hover:bg-red-900 hover:border-red-500 text-red-500 transition-all flex items-center justify-center group"
+                                                className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group"
                                             >
                                                 <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                             </button>

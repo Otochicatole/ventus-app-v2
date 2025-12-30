@@ -5,13 +5,12 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import { Search, Calendar as CalendarIcon, Trash2 } from "lucide-react";
+import { Search, Calendar as CalendarIcon, Trash2, Plus, Ban } from "lucide-react";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Dialog, { DialogContent, DialogActions } from "@/components/ui/dialog";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-import { TextField } from "@mui/material";
 
 type Location = {
     id: string;
@@ -155,8 +154,8 @@ export default function BlockedDatesPage() {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div className="space-y-8 animate-fadeIn">
                 <div>
-                    <h1 className="text-4xl font-bold text-white mb-3">Fechas Bloqueadas</h1>
-                    <p className="text-neutral-400 text-lg">Gestión de fechas no disponibles para reservas</p>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Fechas Bloqueadas</h1>
+                    <p className="text-gray-600 text-lg">Gestión de fechas no disponibles para reservas</p>
                 </div>
 
                 <Card>
@@ -181,29 +180,25 @@ export default function BlockedDatesPage() {
                     <div className="space-y-4">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
-                                <h2 className="text-2xl font-bold text-white mb-2">Fechas Bloqueadas</h2>
-                                <p className="text-neutral-400 text-sm">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Fechas Bloqueadas</h2>
+                                <p className="text-gray-600 text-sm">
                                     {filteredBlockedDates.length} de {blockedDates.length} fecha(s) bloqueada(s)
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                                 <div className="relative flex-1 sm:w-80">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <input
                                         type="text"
                                         placeholder="Buscar por fecha o día..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     />
                                 </div>
                                 <Button 
                                     onClick={() => setShowModal(true)} 
-                                    startIcon={
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                                        </svg>
-                                    }
+                                    startIcon={<Plus className="w-5 h-5" />}
                                     className="w-full sm:w-auto whitespace-nowrap"
                                 >
                                     Bloquear Fecha
@@ -215,15 +210,15 @@ export default function BlockedDatesPage() {
                             <Card>
                                 <CardContent>
                                     <div className="flex justify-center py-12">
-                                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent"></div>
+                                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
                                     </div>
                                 </CardContent>
                             </Card>
                         ) : filteredBlockedDates.length === 0 ? (
                             <Card>
                                 <CardContent>
-                                    <div className="flex flex-col items-center gap-4 py-12 text-neutral-500">
-                                        <CalendarIcon className="w-16 h-16 text-neutral-700" />
+                                    <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
+                                        <CalendarIcon className="w-16 h-16 text-gray-300" />
                                         <p>{searchTerm ? "No se encontraron fechas con ese criterio" : "No hay fechas bloqueadas para esta ubicación"}</p>
                                     </div>
                                 </CardContent>
@@ -238,14 +233,14 @@ export default function BlockedDatesPage() {
                                         <Card key={blocked.id}>
                                             <CardContent>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-red-950 border border-red-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <CalendarIcon className="w-6 h-6 text-red-500" />
+                                                    <div className="w-12 h-12 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center shrink-0">
+                                                        <CalendarIcon className="w-6 h-6 text-red-600" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="text-white font-semibold text-lg mb-1">
+                                                        <h3 className="text-gray-900 font-semibold text-lg mb-1">
                                                             {date.toLocaleDateString("es-AR")}
                                                         </h3>
-                                                        <p className="text-neutral-400 text-sm capitalize">
+                                                        <p className="text-gray-600 text-sm capitalize">
                                                             {date.toLocaleDateString("es-AR", {
                                                                 weekday: "long",
                                                             })}
@@ -253,7 +248,7 @@ export default function BlockedDatesPage() {
                                                     </div>
                                                     <button
                                                         onClick={() => setDeleteId(blocked.id)}
-                                                        className="w-10 h-10 rounded-lg border border-red-900 bg-red-950 hover:bg-red-900 hover:border-red-500 text-red-500 transition-all flex items-center justify-center group flex-shrink-0"
+                                                        className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group shrink-0"
                                                     >
                                                         <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                     </button>
@@ -277,106 +272,11 @@ export default function BlockedDatesPage() {
                                     onChange={(date) => setNewDate(date ? date.format("YYYY-MM-DD") : "")}
                                     shouldDisableDate={shouldDisableDate}
                                     minDate={dayjs()}
-                                    enableAccessibleFieldDOMStructure={false}
-                                    slots={{
-                                        textField: (params) => (
-                                            <TextField
-                                                {...params}
-                                                fullWidth
-                                                required
-                                                InputLabelProps={{
-                                                    ...params.InputLabelProps,
-                                                    style: { color: '#d4d4d4' },
-                                                }}
-                                                InputProps={{
-                                                    ...params.InputProps,
-                                                    style: { color: '#ffffff' },
-                                                }}
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        backgroundColor: 'rgba(38, 38, 38, 0.5)',
-                                                        borderRadius: '8px',
-                                                        '& fieldset': {
-                                                            borderColor: 'rgba(64, 64, 64, 0.5)',
-                                                            borderWidth: '2px',
-                                                        },
-                                                        '&:hover fieldset': {
-                                                            borderColor: 'rgba(82, 82, 82, 0.5)',
-                                                        },
-                                                        '&.Mui-focused fieldset': {
-                                                            borderColor: '#ffffff',
-                                                            borderWidth: '2px',
-                                                        },
-                                                        '& input': {
-                                                            color: '#ffffff',
-                                                        },
-                                                    },
-                                                    '& .MuiIconButton-root': {
-                                                        color: '#ffffff',
-                                                    },
-                                                }}
-                                            />
-                                        ),
-                                    }}
                                     slotProps={{
-                                        popper: {
-                                            placement: 'bottom-start',
-                                            modifiers: [
-                                                {
-                                                    name: 'flip',
-                                                    enabled: false,
-                                                },
-                                                {
-                                                    name: 'preventOverflow',
-                                                    enabled: false,
-                                                },
-                                            ],
-                                        },
-                                        desktopPaper: {
-                                            sx: {
-                                                backgroundColor: "#171717",
-                                                border: "1px solid #262626",
-                                                borderRadius: "12px",
-                                                transition: 'none !important',
-                                                transform: 'none !important',
-                                                "& .MuiPickersDay-root": {
-                                                    color: "#ffffff",
-                                                    fontWeight: 500,
-                                                    transition: 'background-color 0.15s',
-                                                    "&:hover": {
-                                                        backgroundColor: "#262626",
-                                                    },
-                                                },
-                                                "& .MuiPickersDay-root.Mui-disabled": {
-                                                    color: "#ef4444 !important",
-                                                    backgroundColor: "#7f1d1d",
-                                                    textDecoration: "line-through",
-                                                    opacity: 0.8,
-                                                },
-                                                "& .MuiPickersCalendarHeader-label": {
-                                                    color: "#ffffff",
-                                                    fontWeight: 600,
-                                                },
-                                                "& .MuiPickersCalendarHeader-switchViewButton": {
-                                                    color: "#ffffff",
-                                                },
-                                                "& .MuiPickersArrowSwitcher-button": {
-                                                    color: "#ffffff",
-                                                },
-                                                "& .MuiDayCalendar-weekDayLabel": {
-                                                    color: "#a3a3a3",
-                                                    fontWeight: 600,
-                                                },
-                                                "& .Mui-selected": {
-                                                    backgroundColor: "#ffffff !important",
-                                                    color: "#000000 !important",
-                                                    fontWeight: 700,
-                                                    "&:hover": {
-                                                        backgroundColor: "#e5e5e5 !important",
-                                                    },
-                                                },
-                                            },
-                                        },
+                                        textField: {
+                                            fullWidth: true,
+                                            required: true,
+                                        }
                                     }}
                                 />
                                 <p className="text-sm text-neutral-500">
@@ -384,9 +284,7 @@ export default function BlockedDatesPage() {
                                 </p>
                                 {blockedDates.length > 0 && (
                                     <p className="text-xs text-red-400 flex items-center gap-2">
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clipRule="evenodd" />
-                                        </svg>
+                                        <Ban className="w-4 h-4" />
                                         Las fechas bloqueadas aparecen tachadas en rojo
                                     </p>
                                 )}

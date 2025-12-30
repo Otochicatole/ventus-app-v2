@@ -104,7 +104,7 @@ export default function ShiftDetailPage() {
     if (!shift) {
         return (
             <div className="text-center py-12">
-                <p className="text-neutral-500">Turno no encontrado</p>
+                <p className="text-gray-500">Turno no encontrado</p>
             </div>
         );
     }
@@ -116,18 +116,18 @@ export default function ShiftDetailPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold text-white">Detalles</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Detalles</h1>
                 <Button onClick={() => router.back()}>← Volver</Button>
             </div>
 
             <div className="space-y-6">
                 <Card>
                     <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-white mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Información del Cliente
                         </h2>
                         <div className="flex gap-6 items-start mb-6">
-                            <p>Estado del turno:</p>
+                            <p className="text-gray-700">Estado del turno:</p>
                             <Chip
                                 label={shift.confirmed ? "Confirmado" : "Pendiente"}
                                 color={shift.confirmed ? "success" : "warning"}
@@ -137,22 +137,22 @@ export default function ShiftDetailPage() {
                         </div>
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Nombre Completo</p>
-                                <p className="text-lg font-semibold text-white">
+                                <p className="text-sm text-gray-600 mb-1">Nombre Completo</p>
+                                <p className="text-lg font-semibold text-gray-900">
                                     {shift.name} {shift.lastName}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Email</p>
-                                <p className="text-lg font-semibold text-white">{shift.email}</p>
+                                <p className="text-sm text-gray-600 mb-1">Email</p>
+                                <p className="text-lg font-semibold text-gray-900">{shift.email}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Teléfono</p>
-                                <p className="text-lg font-semibold text-white">{shift.phone}</p>
+                                <p className="text-sm text-gray-600 mb-1">Teléfono</p>
+                                <p className="text-lg font-semibold text-gray-900">{shift.phone}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Fecha de Registro</p>
-                                <p className="text-lg font-semibold text-white">
+                                <p className="text-sm text-gray-600 mb-1">Fecha de Registro</p>
+                                <p className="text-lg font-semibold text-gray-900">
                                     {new Date(shift.createdAt).toLocaleString("es-AR")}
                                 </p>
                             </div>
@@ -162,18 +162,18 @@ export default function ShiftDetailPage() {
 
                 <Card>
                     <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-white mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Información del Turno
                         </h2>
                         <div className="grid md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Ubicación</p>
-                                <p className="text-lg font-semibold text-white">{shift.location.name}</p>
-                                <p className="text-sm text-neutral-500">{shift.location.address}</p>
+                                <p className="text-sm text-gray-600 mb-1">Ubicación</p>
+                                <p className="text-lg font-semibold text-gray-900">{shift.location.name}</p>
+                                <p className="text-sm text-gray-500">{shift.location.address}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Fecha y Hora</p>
-                                <p className="text-lg font-semibold text-white capitalize">
+                                <p className="text-sm text-gray-600 mb-1">Fecha y Hora</p>
+                                <p className="text-lg font-semibold text-gray-900 capitalize">
                                     {date.toLocaleDateString("es-AR", {
                                         weekday: "long",
                                         year: "numeric",
@@ -181,7 +181,7 @@ export default function ShiftDetailPage() {
                                         day: "numeric",
                                     })}
                                 </p>
-                                <p className="text-sm text-neutral-500">{shift.time}</p>
+                                <p className="text-sm text-gray-500">{shift.time}</p>
                             </div>
                         </div>
                         <Button variant="contained" onClick={toggleConfirmed}>
@@ -194,7 +194,7 @@ export default function ShiftDetailPage() {
 
                 <Card>
                     <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-white mb-4">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">
                             Notas del Admin
                         </h2>
                         <form onSubmit={handleSaveNotes}>
@@ -203,7 +203,7 @@ export default function ShiftDetailPage() {
                                 onChange={(e) => setNotes(e.target.value)}
                                 rows={4}
                                 placeholder="Agregar notas sobre el turno..."
-                                className="w-full px-4 py-2.5 mb-4 bg-neutral-900 border border-neutral-700 rounded-md text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                className="w-full px-4 py-2.5 mb-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                             <Button
                                 type="submit"

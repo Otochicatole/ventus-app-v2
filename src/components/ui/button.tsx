@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
+import { Loader2 } from "lucide-react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "contained" | "outlined" | "text";
@@ -37,25 +38,25 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
         const variantStyles = {
             contained: {
-                default: "bg-neutral-700 text-white hover:bg-neutral-600 shadow-md",
-                primary: "bg-white text-black hover:bg-neutral-100 shadow-md",
-                success: "bg-green-600 text-white hover:bg-green-700 shadow-md",
-                error: "bg-red-600 text-white hover:bg-red-700 shadow-md",
-                warning: "bg-amber-600 text-black hover:bg-amber-700 shadow-md",
+                default: "bg-gray-900 text-white hover:bg-gray-800 shadow-sm",
+                primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
+                success: "bg-green-600 text-white hover:bg-green-700 shadow-sm",
+                error: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
+                warning: "bg-amber-600 text-white hover:bg-amber-700 shadow-sm",
             },
             outlined: {
-                default: "border-2 border-neutral-600 text-neutral-300 hover:bg-neutral-800/50",
-                primary: "border-2 border-white text-white hover:bg-white/10",
-                success: "border-2 border-green-500 text-green-400 hover:bg-green-500/10",
-                error: "border-2 border-red-500 text-red-400 hover:bg-red-500/10",
-                warning: "border-2 border-amber-500 text-amber-400 hover:bg-amber-500/10",
+                default: "border-2 border-gray-300 text-gray-700 hover:bg-gray-50",
+                primary: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50",
+                success: "border-2 border-green-600 text-green-600 hover:bg-green-50",
+                error: "border-2 border-red-600 text-red-600 hover:bg-red-50",
+                warning: "border-2 border-amber-600 text-amber-600 hover:bg-amber-50",
             },
             text: {
-                default: "text-neutral-300 hover:bg-neutral-800/50",
-                primary: "text-white hover:bg-white/10",
-                success: "text-green-400 hover:bg-green-500/10",
-                error: "text-red-400 hover:bg-red-500/10",
-                warning: "text-amber-400 hover:bg-amber-500/10",
+                default: "text-gray-700 hover:bg-gray-100",
+                primary: "text-blue-600 hover:bg-blue-50",
+                success: "text-green-600 hover:bg-green-50",
+                error: "text-red-600 hover:bg-red-50",
+                warning: "text-amber-600 hover:bg-amber-50",
             },
         };
 
@@ -68,12 +69,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 disabled={disabled || loading}
                 {...props}
             >
-                {loading && (
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                )}
+                {loading && <Loader2 className="w-5 h-5 animate-spin" />}
                 {!loading && startIcon && startIcon}
                 {children}
                 {endIcon && endIcon}

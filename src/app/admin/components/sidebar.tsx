@@ -37,8 +37,8 @@ export default function Sidebar() {
 
     return (
         <>
-            <aside className="hidden md:block w-64 bg-neutral-950 border-r border-neutral-800 h-screen sticky top-0">
-                <nav className="p-4 space-y-3">
+            <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
+                <nav className="p-4 space-y-2">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;
                         const Icon = item.icon;
@@ -46,10 +46,10 @@ export default function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center gap-4 px-4 py-3.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 cursor-pointer ${
                                     isActive
-                                        ? "bg-white text-black font-semibold"
-                                        : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
+                                        ? "bg-blue-600 text-white font-semibold shadow-sm"
+                                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                                 }`}
                             >
                                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -60,7 +60,7 @@ export default function Sidebar() {
                 </nav>
             </aside>
 
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[rgba(10,10,10,0.98)] backdrop-blur-md border-t border-neutral-800 shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                 <div className="grid grid-cols-5 h-16">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;
@@ -73,16 +73,16 @@ export default function Sidebar() {
                                 className="flex flex-col items-center justify-center gap-1 relative group"
                             >
                                 {isActive && (
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-white rounded-b-full" />
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-600 rounded-b-full" />
                                 )}
                                 <Icon 
                                     className={`w-5 h-5 transition-colors ${
-                                        isActive ? "text-white" : "text-neutral-500 group-hover:text-white"
+                                        isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
                                     }`}
                                 />
                                 <span 
                                     className={`text-[10px] font-medium transition-colors ${
-                                        isActive ? "text-white" : "text-neutral-500 group-hover:text-white"
+                                        isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
                                     }`}
                                 >
                                     {item.label}

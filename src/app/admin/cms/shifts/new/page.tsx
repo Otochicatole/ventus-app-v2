@@ -189,49 +189,6 @@ export default function NewShiftPage() {
                                     textField: {
                                         fullWidth: true,
                                         required: true,
-                                        sx: {
-                                            "& .MuiOutlinedInput-root": {
-                                                backgroundColor: "#171717",
-                                                "& fieldset": {
-                                                    borderColor: "#404040",
-                                                },
-                                                "&:hover fieldset": {
-                                                    borderColor: "#525252",
-                                                },
-                                                "&.Mui-focused fieldset": {
-                                                    borderColor: "#2563eb",
-                                                },
-                                            },
-                                            "& .MuiInputLabel-root": {
-                                                color: "#d4d4d4",
-                                            },
-                                            "& .MuiInputBase-input": {
-                                                color: "#ffffff",
-                                            },
-                                        },
-                                    },
-                                    desktopPaper: {
-                                        sx: {
-                                            backgroundColor: "#262626",
-                                            "& .MuiPickersDay-root": {
-                                                color: "#ffffff",
-                                            },
-                                            "& .MuiPickersCalendarHeader-label": {
-                                                color: "#ffffff",
-                                            },
-                                            "& .MuiPickersCalendarHeader-switchViewButton": {
-                                                color: "#ffffff",
-                                            },
-                                            "& .MuiPickersArrowSwitcher-button": {
-                                                color: "#ffffff",
-                                            },
-                                            "& .MuiDayCalendar-weekDayLabel": {
-                                                color: "#a3a3a3",
-                                            },
-                                            "& .Mui-selected": {
-                                                backgroundColor: "#2563eb !important",
-                                            },
-                                        },
                                     },
                                 }}
                             />

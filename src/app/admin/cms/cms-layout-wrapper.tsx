@@ -17,7 +17,7 @@ export default function CMSLayoutWrapper({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-gray-50">
             <AdminNavbar admin={admin} />
             <div className="flex">
                 <Sidebar />
