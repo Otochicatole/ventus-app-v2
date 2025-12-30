@@ -11,8 +11,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("VENTUS_PRISMA_DATABASE_URL")
-  directUrl = env("VENTUS_POSTGRES_URL")
+  url       = env("VENTUS_APP_PRISMA_DATABASE_URL")
+  directUrl = env("VENTUS_APP_POSTGRES_URL")
 }
 
 model User {
