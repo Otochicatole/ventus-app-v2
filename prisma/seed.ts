@@ -267,27 +267,17 @@ async function main() {
 
     console.log("✅ Servicios creados");
 
-    await prisma.user.create({
-        data: {
-            email: "admin@ventus.com",
-            name: "Administrador",
-            password: "hashed_password_here",
-        },
-    });
-
-    console.log("✅ Usuario admin creado");
-
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const hashedPassword = await bcrypt.hash("15651106asd", 10);
 
     await prisma.admin.create({
         data: {
-            email: "admin@ventus.com",
-            name: "Administrador",
+            email: "ventus@barber.com",
+            name: "Ventus Admin",
             password: hashedPassword,
         },
     });
 
-    console.log("✅ Admin creado (email: admin@ventus.com, password: admin123)");
+    console.log("✅ Admin creado (email: ventus@barber.com)");
 
     console.log("\n🎉 Seed completado exitosamente!");
     console.log("\n📊 Resumen:");
