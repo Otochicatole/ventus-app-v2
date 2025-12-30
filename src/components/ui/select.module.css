@@ -1,0 +1,36 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rotateChevron {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(180deg);
+    }
+}
+
+.dropdown {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.chevronOpen {
+    animation: rotateChevron 0.2s ease-out forwards;
+}
+
+.chevronClosed {
+    animation: rotateChevron 0.2s ease-out reverse;
+}
+
+.option {
+    transition: all 0.15s ease;
+}
+
