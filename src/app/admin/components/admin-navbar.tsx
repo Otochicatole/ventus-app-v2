@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { GraduationCap, LogOut, Loader2 } from "lucide-react";
+import { Scissors, LogOut, Loader2 } from "lucide-react";
 import type { AdminSession } from "@/core/domain/admin.types";
 
 type AdminNavbarProps = {
@@ -33,7 +33,7 @@ export default function AdminNavbar({ admin }: AdminNavbarProps) {
             <div className="h-full px-6 md:px-8 flex items-center justify-between max-w-screen-2xl mx-auto">
                 <div className="flex items-center gap-4">
                     <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <GraduationCap className="w-5 h-5 text-white" />
+                        <Scissors className="w-5 h-5 text-white" />
                     </div>
                     <h1 className="text-lg md:text-xl font-bold text-gray-900 hidden sm:block">
                         Ventus CMS

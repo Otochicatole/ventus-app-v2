@@ -7,6 +7,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TextField } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/es";
+import { CheckCircle2 } from "lucide-react";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
@@ -169,14 +170,14 @@ export default function ShiftsPage() {
         formData.phone;
 
     return (
-        <div className="min-h-screen py-12 px-4 bg-neutral-950">
+        <div className="min-h-screen py-12 px-4 bg-gray-50">
             <div className="container mx-auto max-w-3xl">
                 <Card>
                     <CardContent className="p-8">
-                        <h1 className="text-4xl font-bold text-white mb-2">
+                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
                             Reservar Turno
                         </h1>
-                        <p className="text-neutral-400 mb-8">
+                        <p className="text-gray-600 mb-8">
                             Completá el formulario para reservar tu turno
                         </p>
 
@@ -226,35 +227,21 @@ export default function ShiftsPage() {
                                                         {...params}
                                                         fullWidth
                                                         required
-                                                        InputLabelProps={{
-                                                            ...params.InputLabelProps,
-                                                            style: { color: '#d4d4d4' },
-                                                        }}
-                                                        InputProps={{
-                                                            ...params.InputProps,
-                                                            style: { color: '#ffffff' },
-                                                        }}
                                                         sx={{
                                                             '& .MuiOutlinedInput-root': {
-                                                                backgroundColor: 'rgba(38, 38, 38, 0.5)',
+                                                                backgroundColor: 'white',
                                                                 borderRadius: '8px',
                                                                 '& fieldset': {
-                                                                    borderColor: 'rgba(64, 64, 64, 0.5)',
+                                                                    borderColor: 'rgb(209, 213, 219)',
                                                                     borderWidth: '2px',
                                                                 },
                                                                 '&:hover fieldset': {
-                                                                    borderColor: 'rgba(82, 82, 82, 0.5)',
+                                                                    borderColor: 'rgb(156, 163, 175)',
                                                                 },
                                                                 '&.Mui-focused fieldset': {
-                                                                    borderColor: '#ffffff',
+                                                                    borderColor: 'rgb(37, 99, 235)',
                                                                     borderWidth: '2px',
                                                                 },
-                                                                '& input': {
-                                                                    color: '#ffffff',
-                                                                },
-                                                            },
-                                                            '& .MuiIconButton-root': {
-                                                                color: '#ffffff',
                                                             },
                                                         }}
                                                     />
@@ -276,45 +263,8 @@ export default function ShiftsPage() {
                                                 },
                                                 desktopPaper: {
                                                     sx: {
-                                                        backgroundColor: "#171717",
-                                                        border: "1px solid #262626",
-                                                        borderRadius: "12px",
-                                                        transition: 'none !important',
-                                                        transform: 'none !important',
-                                                        "& .MuiPickersDay-root": {
-                                                            color: "#ffffff",
-                                                            fontWeight: 500,
-                                                            transition: 'background-color 0.15s',
-                                                            "&:hover": {
-                                                                backgroundColor: "#262626",
-                                                            },
-                                                        },
                                                         "& .MuiPickersDay-root.Mui-disabled": {
-                                                            color: "#737373 !important",
-                                                            backgroundColor: "transparent",
                                                             textDecoration: "line-through",
-                                                        },
-                                                        "& .MuiPickersCalendarHeader-label": {
-                                                            color: "#ffffff",
-                                                            fontWeight: 600,
-                                                        },
-                                                        "& .MuiPickersCalendarHeader-switchViewButton": {
-                                                            color: "#ffffff",
-                                                        },
-                                                        "& .MuiPickersArrowSwitcher-button": {
-                                                            color: "#ffffff",
-                                                        },
-                                                        "& .MuiDayCalendar-weekDayLabel": {
-                                                            color: "#a3a3a3",
-                                                            fontWeight: 600,
-                                                        },
-                                                        "& .Mui-selected": {
-                                                            backgroundColor: "#ffffff !important",
-                                                            color: "#000000 !important",
-                                                            fontWeight: 700,
-                                                            "&:hover": {
-                                                                backgroundColor: "#e5e5e5 !important",
-                                                            },
                                                         },
                                                     },
                                                 },
@@ -322,7 +272,7 @@ export default function ShiftsPage() {
                                         />
                                     </LocalizationProvider>
                                     {unavailableDates.length > 0 && (
-                                        <p className="text-sm text-neutral-500 mt-2">
+                                        <p className="text-sm text-gray-500 mt-2">
                                             Las fechas tachadas no están disponibles
                                         </p>
                                     )}
@@ -331,13 +281,13 @@ export default function ShiftsPage() {
 
                             {selectedDate && (
                                 <div>
-                                    <label className="block text-sm font-semibold text-neutral-300 mb-3">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         Horario
                                     </label>
                                     {loadingSlots ? (
                                         <div className="flex items-center gap-3 py-4">
-                                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                                            <p className="text-neutral-400">Cargando horarios disponibles...</p>
+                                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+                                            <p className="text-gray-600">Cargando horarios disponibles...</p>
                                         </div>
                                     ) : availableSlots.length > 0 ? (
                                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -350,7 +300,7 @@ export default function ShiftsPage() {
                                                     }
                                                     color={formData.time === slot.time ? "primary" : "default"}
                                                     variant={formData.time === slot.time ? "filled" : "outlined"}
-                                                    className="w-full justify-center cursor-pointer hover:bg-neutral-700 transition-colors"
+                                                    className="w-full justify-center cursor-pointer hover:bg-gray-100 transition-colors"
                                                 />
                                             ))}
                                         </div>
@@ -363,8 +313,8 @@ export default function ShiftsPage() {
                             )}
 
                             {formData.time && (
-                                <div className="space-y-6 pt-6 border-t border-neutral-800">
-                                    <h2 className="text-2xl font-bold text-white">
+                                <div className="space-y-6 pt-6 border-t border-gray-200">
+                                    <h2 className="text-2xl font-bold text-gray-900">
                                         Datos Personales
                                     </h2>
 
@@ -417,13 +367,7 @@ export default function ShiftsPage() {
                                         loading={loading}
                                         size="large"
                                         fullWidth
-                                        startIcon={
-                                            !loading && (
-                                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                </svg>
-                                            )
-                                        }
+                                        startIcon={!loading && <CheckCircle2 className="w-5 h-5" />}
                                     >
                                         {loading ? "Reservando..." : "Reservar Turno"}
                                     </Button>

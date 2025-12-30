@@ -19,6 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 )}
                 <input
                     ref={ref}
+                    suppressHydrationWarning
                     className={`
                         px-4 py-3
                         bg-white
