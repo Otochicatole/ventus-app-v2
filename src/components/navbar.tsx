@@ -2,14 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Calendar, Info, Scissors, Users, Package } from "lucide-react";
+import { Home, Calendar, Scissors, Users, Package } from "lucide-react";
 
 const pages = [
     { name: "Inicio", href: "/", icon: Home },
     { name: "Servicios", href: "/services", icon: Package },
     { name: "Reservar", href: "/shifts", icon: Calendar },
     { name: "Turnos", href: "/confirmed-shifts", icon: Users },
-    { name: "Nosotros", href: "/#nosotros", icon: Info },
 ];
 
 export default function Navbar() {
@@ -48,12 +47,6 @@ export default function Navbar() {
                             >
                                 Turnos Confirmados
                             </Link>
-                            <Link
-                                href="/#nosotros"
-                                className="text-gray-700 font-semibold hover:text-blue-600 transition-colors"
-                            >
-                                Nosotros
-                            </Link>
                         </div>
 
                         <Link
@@ -68,7 +61,7 @@ export default function Navbar() {
             </nav>
 
             <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg">
-                <div className="grid grid-cols-5 h-16">
+                <div className="grid grid-cols-4 h-16">
                     {pages.map((page) => {
                         const isActive = pathname === page.href || (page.href !== "/" && pathname?.startsWith(page.href));
                         const Icon = page.icon;
