@@ -31,13 +31,6 @@ export default async function LoginPage() {
 
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-xl">
                     <LoginForm />
-
-                    <div className="mt-6 sm:mt-8 pt-6 border-t border-gray-200 text-center">
-                        <p className="text-xs text-gray-500 leading-relaxed">
-                            Credenciales de prueba: <br className="sm:hidden" />
-                            <span className="text-gray-700 font-medium">admin@ventus.com</span> / <span className="text-gray-700 font-medium">admin123</span>
-                        </p>
-                    </div>
                 </div>
 
                 <div className="text-center">

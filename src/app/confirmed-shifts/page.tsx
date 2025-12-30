@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock, Users, Search } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Chip from "@/components/ui/chip";
 import Input from "@/components/ui/input";
+import { motion } from "framer-motion";
 
 type ConfirmedShift = {
     id: string;
@@ -83,16 +84,26 @@ export default function ConfirmedShiftsPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-12 px-4">
             <div className="container mx-auto max-w-6xl">
-                <div className="text-center mb-8">
+                <motion.div 
+                    className="text-center mb-8"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                         Turnos Confirmados
                     </h1>
                     <p className="text-lg text-gray-600">
                         Consultá los turnos confirmados desde hoy en adelante
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="mb-8 max-w-2xl mx-auto">
+                <motion.div 
+                    className="mb-8 max-w-2xl mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                >
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <Input
@@ -104,28 +115,39 @@ export default function ConfirmedShiftsPage() {
                         />
                     </div>
                     {searchTerm && (
-                        <p className="mt-3 text-sm text-gray-600 text-center">
+                        <motion.p 
+                            className="mt-3 text-sm text-gray-600 text-center"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                        >
                             {filteredShifts.length} resultado{filteredShifts.length !== 1 ? 's' : ''} encontrado{filteredShifts.length !== 1 ? 's' : ''}
-                        </p>
+                        </motion.p>
                     )}
-                </div>
+                </motion.div>
 
                 {filteredShifts.length === 0 ? (
-                    <Card>
-                        <CardContent>
-                            <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                                <Calendar className="w-16 h-16 text-gray-300" />
-                                <p className="text-center">
-                                    {searchTerm
-                                        ? "No se encontraron turnos con ese criterio"
-                                        : "No hay turnos confirmados en este momento"}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <Card>
+                            <CardContent>
+                                <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
+                                    <Calendar className="w-16 h-16 text-gray-300" />
+                                    <p className="text-center">
+                                        {searchTerm
+                                            ? "No se encontraron turnos con ese criterio"
+                                            : "No hay turnos confirmados en este momento"}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 ) : (
                     <div className="space-y-8">
-                        {sortedDates.map((dateStr) => {
+                        {sortedDates.map((dateStr, dateIndex) => {
                             const [year, month, day] = dateStr.split("-");
                             const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
                             const formattedDate = date.toLocaleDateString("es-AR", {
@@ -142,65 +164,96 @@ export default function ConfirmedShiftsPage() {
                             const isToday = shiftDate.getTime() === today.getTime();
 
                             return (
-                                <div key={dateStr}>
-                                    <div className="flex items-center gap-3 mb-4">
+                                <motion.div 
+                                    key={dateStr}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: dateIndex * 0.1 }}
+                                >
+                                    <motion.div 
+                                        className="flex items-center gap-3 mb-4"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.4, delay: dateIndex * 0.1 + 0.1 }}
+                                    >
                                         <Calendar className="w-6 h-6 text-blue-600" />
                                         <h2 className="text-2xl font-bold text-gray-900 capitalize">
                                             {formattedDate}
                                         </h2>
                                         {isToday && (
-                                            <Chip
-                                                label="Hoy"
-                                                color="primary"
-                                                variant="soft"
-                                                size="small"
-                                            />
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                                            >
+                                                <Chip
+                                                    label="Hoy"
+                                                    color="primary"
+                                                    variant="soft"
+                                                    size="small"
+                                                />
+                                            </motion.div>
                                         )}
-                                    </div>
+                                    </motion.div>
 
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                        {groupedShifts[dateStr].map((shift) => (
-                                            <Card key={shift.id} className="hover:shadow-md transition-shadow">
-                                                <CardContent className="p-6">
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                                            <span className="text-xl font-bold text-blue-600">
-                                                                {shift.name.charAt(0)}
-                                                                {shift.lastName.charAt(0)}
-                                                            </span>
-                                                        </div>
+                                        {groupedShifts[dateStr].map((shift, shiftIndex) => (
+                                            <motion.div
+                                                key={shift.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ 
+                                                    duration: 0.4, 
+                                                    delay: dateIndex * 0.1 + shiftIndex * 0.05 
+                                                }}
+                                                whileHover={{ scale: 1.02, y: -3 }}
+                                            >
+                                                <Card className="hover:shadow-md transition-shadow h-full">
+                                                    <CardContent className="p-6">
+                                                        <div className="flex items-start gap-4">
+                                                            <motion.div 
+                                                                className="shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center"
+                                                                whileHover={{ rotate: 360 }}
+                                                                transition={{ duration: 0.6 }}
+                                                            >
+                                                                <span className="text-xl font-bold text-blue-600">
+                                                                    {shift.name.charAt(0)}
+                                                                    {shift.lastName.charAt(0)}
+                                                                </span>
+                                                            </motion.div>
 
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className="font-semibold text-gray-900 mb-1">
-                                                                {shift.name} {shift.lastName}
-                                                            </h3>
-                                                            <p className="text-sm text-gray-500 mb-3">
-                                                                {shift.maskedEmail}
-                                                            </p>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="font-semibold text-gray-900 mb-1">
+                                                                    {shift.name} {shift.lastName}
+                                                                </h3>
+                                                                <p className="text-sm text-gray-500 mb-3">
+                                                                    {shift.maskedEmail}
+                                                                </p>
 
-                                                            <div className="space-y-2">
-                                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                                    <Clock className="w-4 h-4 shrink-0" />
-                                                                    <span className="font-medium">{shift.time}</span>
-                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                                        <Clock className="w-4 h-4 shrink-0" />
+                                                                        <span className="font-medium">{shift.time}</span>
+                                                                    </div>
 
-                                                                <div className="flex items-start gap-2 text-sm text-gray-600">
-                                                                    <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-                                                                    <div>
-                                                                        <div className="font-medium">{shift.location.name}</div>
-                                                                        <div className="text-xs text-gray-500">
-                                                                            {shift.location.address}
+                                                                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                                                                        <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
+                                                                        <div>
+                                                                            <div className="font-medium">{shift.location.name}</div>
+                                                                            <div className="text-xs text-gray-500">
+                                                                                {shift.location.address}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
+                                                    </CardContent>
+                                                </Card>
+                                            </motion.div>
                                         ))}
                                     </div>
-                                </div>
+                                </motion.div>
                             );
                         })}
                     </div>
