@@ -37,7 +37,7 @@ export default function Sidebar() {
 
     return (
         <>
-            <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
+            <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed top-16 left-0 overflow-y-auto">
                 <nav className="p-4 space-y-2">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;

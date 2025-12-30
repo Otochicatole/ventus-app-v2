@@ -29,8 +29,8 @@ export default function AdminNavbar({ admin }: AdminNavbarProps) {
     };
 
     return (
-        <nav className="h-16 bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-            <div className="h-full px-6 md:px-8 flex items-center justify-between max-w-screen-2xl mx-auto">
+        <nav className="h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 shadow-sm">
+            <div className="h-full px-6 md:px-8 flex items-center justify-between max-w-full mx-auto">
                 <div className="flex items-center gap-4">
                     <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
                         <Scissors className="w-5 h-5 text-white" />

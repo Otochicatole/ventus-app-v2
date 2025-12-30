@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Plus, Package, MapPin, Calendar } from "lucide-react";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/es";
+import { Search, Plus, Package, MapPin, Calendar, X } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Chip from "@/components/ui/chip";
@@ -31,6 +36,8 @@ export default function ShiftsPage() {
     const [deleting, setDeleting] = useState(false);
     const [confirmingId, setConfirmingId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState<"all" | "confirmed" | "pending">("all");
+    const [dateFilter, setDateFilter] = useState<Dayjs | null>(null);
 
     useEffect(() => {
         fetchShifts();
@@ -105,6 +112,15 @@ export default function ShiftsPage() {
     };
 
     const filteredShifts = shifts.filter((shift) => {
+        if (statusFilter === "confirmed" && !shift.confirmed) return false;
+        if (statusFilter === "pending" && shift.confirmed) return false;
+        
+        if (dateFilter) {
+            const filterDateStr = dateFilter.format("YYYY-MM-DD");
+            const shiftDateStr = shift.date.split("T")[0];
+            if (filterDateStr !== shiftDateStr) return false;
+        }
+        
         if (!searchTerm) return true;
         
         const search = searchTerm.toLowerCase();
@@ -126,6 +142,8 @@ export default function ShiftsPage() {
             shift.time.includes(search)
         );
     });
+
+    const hasActiveFilters = statusFilter !== "all" || dateFilter !== null;
 
     if (loading) {
         return (
@@ -150,22 +168,93 @@ export default function ShiftsPage() {
             </div>
 
             <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Todos los Turnos</h2>
-                        <p className="text-gray-600 text-sm mt-1">
-                            {filteredShifts.length} de {shifts.length} registro(s)
-                        </p>
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900">Todos los Turnos</h2>
+                            <p className="text-gray-600 text-sm mt-1">
+                                {filteredShifts.length} de {shifts.length} registro(s)
+                            </p>
+                        </div>
+                        <div className="relative w-full sm:w-80">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Buscar por nombre, email, teléfono..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
                     </div>
-                    <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por nombre, email, teléfono..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex gap-2 flex-wrap">
+                            <button
+                                onClick={() => setStatusFilter("all")}
+                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                    statusFilter === "all"
+                                        ? "bg-blue-600 text-white shadow-sm"
+                                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                }`}
+                            >
+                                Todos
+                            </button>
+                            <button
+                                onClick={() => setStatusFilter("confirmed")}
+                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                    statusFilter === "confirmed"
+                                        ? "bg-green-600 text-white shadow-sm"
+                                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                }`}
+                            >
+                                Confirmados
+                            </button>
+                            <button
+                                onClick={() => setStatusFilter("pending")}
+                                className={`px-4 py-2 rounded-xl font-medium text-sm ${
+                                    statusFilter === "pending"
+                                        ? "bg-amber-600 text-white shadow-sm"
+                                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                }`}
+                            >
+                                Pendientes
+                            </button>
+                        </div>
+
+                        <div className="flex gap-2 items-center w-full sm:w-auto sm:flex-1 sm:justify-end">
+                            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+                                <DatePicker
+                                    label="Filtrar por fecha"
+                                    value={dateFilter}
+                                    onChange={(newValue) => setDateFilter(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            sx: {
+                                                width: "100%",
+                                                minWidth: { xs: "auto", sm: 200 },
+                                                "& .MuiOutlinedInput-root": {
+                                                    borderRadius: "12px",
+                                                },
+                                            },
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={() => {
+                                        setStatusFilter("all");
+                                        setDateFilter(null);
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-2 font-medium text-sm shrink-0"
+                                >
+                                    <X className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Limpiar</span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -187,32 +276,31 @@ export default function ShiftsPage() {
                             return (
                                 <Card key={shift.id}>
                                     <CardContent>
-                                        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                                            <div className="flex items-center gap-4 flex-1">
-                                                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                                        <div className="flex flex-col gap-4">
+                                            <div className="flex items-center gap-3 sm:gap-4">
+                                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg shrink-0">
                                                     {shift.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-gray-900 font-semibold text-lg">
+                                                    <h3 className="text-gray-900 font-semibold text-base sm:text-lg truncate">
                                                         {shift.name} {shift.lastName}
                                                     </h3>
-                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-600 mt-1">
+                                                    <div className="flex flex-col text-xs sm:text-sm text-gray-600 mt-1 gap-0.5">
                                                         <span className="truncate">{shift.email}</span>
-                                                        <span className="hidden sm:inline text-gray-400">•</span>
                                                         <span>{shift.phone}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <MapPin className="w-5 h-5 text-gray-400" />
-                                                    <span className="text-gray-700 text-sm">{shift.location.name}</span>
+                                                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
+                                                    <span className="text-gray-700 truncate">{shift.location.name}</span>
                                                 </div>
 
                                                 <div className="flex items-center gap-2">
-                                                    <Calendar className="w-5 h-5 text-gray-400" />
-                                                    <div className="text-sm">
+                                                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
+                                                    <div>
                                                         <span className="text-gray-900 font-medium">{date.toLocaleDateString("es-AR")}</span>
                                                         <span className="text-gray-500 ml-2">{shift.time}</span>
                                                     </div>
@@ -222,20 +310,22 @@ export default function ShiftsPage() {
                                                     label={shift.confirmed ? "Confirmado" : "Pendiente"}
                                                     color={shift.confirmed ? "success" : "warning"}
                                                     variant="soft"
+                                                    size="small"
                                                 />
                                             </div>
 
-                                            <div className="flex gap-2 flex-wrap md:flex-nowrap">
+                                            <div className="flex gap-2 flex-wrap pt-2 border-t border-gray-200">
                                                 <Button
                                                     size="small"
                                                     variant="outlined"
                                                     onClick={() => toggleConfirmed(shift.id, shift.confirmed)}
                                                     disabled={confirmingId === shift.id}
+                                                    className="flex-1 sm:flex-none"
                                                 >
                                                     {shift.confirmed ? "Desconfirmar" : "Confirmar"}
                                                 </Button>
-                                                <Link href={`/admin/cms/shifts/${shift.id}`}>
-                                                    <Button size="small" variant="outlined" color="default">
+                                                <Link href={`/admin/cms/shifts/${shift.id}`} className="flex-1 sm:flex-none">
+                                                    <Button size="small" variant="outlined" color="default" fullWidth>
                                                         Ver
                                                     </Button>
                                                 </Link>
@@ -244,6 +334,7 @@ export default function ShiftsPage() {
                                                     variant="outlined"
                                                     color="error"
                                                     onClick={() => setDeleteId(shift.id)}
+                                                    className="flex-1 sm:flex-none"
                                                 >
                                                     Eliminar
                                                 </Button>
