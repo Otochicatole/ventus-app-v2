@@ -84,12 +84,9 @@ export default function ConfirmedShiftsPage() {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-12 px-4">
             <div className="container mx-auto max-w-6xl">
                 <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                        <Users className="w-10 h-10 text-blue-600" />
-                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                            Turnos Confirmados
-                        </h1>
-                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Turnos Confirmados
+                    </h1>
                     <p className="text-lg text-gray-600">
                         Consultá los turnos confirmados desde hoy en adelante
                     </p>

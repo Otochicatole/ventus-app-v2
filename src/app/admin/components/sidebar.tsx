@@ -44,26 +44,26 @@ export default function Sidebar() {
         <>
             <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed top-16 left-0 overflow-y-auto">
                 <nav className="p-4 space-y-2">
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.href;
                         const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
                                 className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 cursor-pointer ${
-                                    isActive
+                                isActive
                                         ? "bg-blue-600 text-white font-semibold shadow-sm"
                                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                                }`}
-                            >
+                            }`}
+                        >
                                 <Icon className="w-5 h-5 flex-shrink-0" />
                                 <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </aside>
+                        </Link>
+                    );
+                })}
+            </nav>
+        </aside>
 
             <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                 <div className="grid grid-cols-6 h-16">

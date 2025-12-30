@@ -31,7 +31,7 @@ export default function Home() {
                     ease: [0.6, -0.05, 0.01, 0.99],
                     opacity: { duration: hideTitle ? 0.5 : 0.8 }
                 }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[160px] md:text-[200px] font-black uppercase tracking-tighter"
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] sm:text-[80px] md:text-[120px] lg:text-[160px] xl:text-[200px] font-black uppercase tracking-tighter whitespace-nowrap"
                 style={{ zIndex: 0 }}
             >
                 VENTUS
@@ -71,7 +71,7 @@ export default function Home() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                                 transition={{ duration: 0.6, delay: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
-                                className="text-xl md:text-2xl font-light max-w-xl"
+                                className="text-xl md:text-2xl font-semibold max-w-xl"
                             >
                                 Experimentá el arte del barbering moderno. Cortes precisos,
                                 estilo único y atención personalizada.
@@ -92,7 +92,7 @@ export default function Home() {
                                 </Link>
                                 <Link
                                     href="/services"
-                                    className="inline-flex items-center justify-center px-8 py-4 border border-black/10 text-lg font-bold rounded-xl hover:bg-black/10 backdrop-blur-3xl transition-all"
+                                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl hover:bg-black/10 border border-black/30 hover:backdrop-blur-3xl transition-all"
                                 >
                                     Ver Servicios
                                 </Link>
