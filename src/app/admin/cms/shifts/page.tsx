@@ -108,6 +108,8 @@ export default function ShiftsPage() {
             });
 
             if (res.ok) {
+                const updatedShift = shifts.find(s => s.id === shiftId);
+                
                 setShifts(
                     shifts.map((shift) =>
                         shift.id === shiftId
@@ -115,6 +117,29 @@ export default function ShiftsPage() {
                             : shift
                     )
                 );
+
+                if (!currentStatus && updatedShift) {
+                    const dateStr = updatedShift.date.split("T")[0];
+                    const [year, month, day] = dateStr.split("-");
+                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    const formattedDate = date.toLocaleDateString("es-AR");
+                    
+                    const phone = updatedShift.phone.replace(/\D/g, '');
+                    const message = `Hola ${updatedShift.name}!
+
+Tu turno ha sido *confirmado con exito*
+
+*Fecha:* ${formattedDate}
+*Hora:* ${updatedShift.time}
+*Ubicacion:* ${updatedShift.location.name}
+
+Te esperamos!
+
+_Ventus Barberia_`;
+                    
+                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                }
             }
         } catch (error) {
             console.error("Error toggling confirmed:", error);

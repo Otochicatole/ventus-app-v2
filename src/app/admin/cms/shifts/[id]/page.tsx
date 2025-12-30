@@ -53,6 +53,8 @@ export default function ShiftDetailPage() {
 
     const toggleConfirmed = async () => {
         if (!shift) return;
+        
+        const wasConfirmed = shift.confirmed;
 
         try {
             const res = await fetch(`/api/admin/shifts/${shift.id}/confirm`, {
@@ -64,6 +66,29 @@ export default function ShiftDetailPage() {
             if (res.ok) {
                 const updated = await res.json();
                 setShift(updated);
+                
+                if (!wasConfirmed && updated.confirmed) {
+                    const dateStr = updated.date.split("T")[0];
+                    const [year, month, day] = dateStr.split("-");
+                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    const formattedDate = date.toLocaleDateString("es-AR");
+                    
+                    const phone = updated.phone.replace(/\D/g, '');
+                    const message = `Hola ${updated.name}!
+
+Tu turno ha sido *confirmado con exito*
+
+*Fecha:* ${formattedDate}
+*Hora:* ${updated.time}
+*Ubicacion:* ${updated.location.name}
+
+Te esperamos!
+
+_Ventus Barberia_`;
+                    
+                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                }
             }
         } catch (error) {
             console.error("Error toggling confirmed:", error);
