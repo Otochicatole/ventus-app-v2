@@ -33,6 +33,7 @@ type ClientPaidService = {
 type Service = {
     id: string;
     name: string;
+    price: number;
     active: boolean;
 };
 
@@ -136,12 +137,25 @@ export default function PaymentsPage() {
     };
 
     const handleToggleService = (serviceName: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            servicesPerformed: prev.servicesPerformed.includes(serviceName)
+        setFormData((prev) => {
+            const isRemoving = prev.servicesPerformed.includes(serviceName);
+            const newServices = isRemoving
                 ? prev.servicesPerformed.filter((s) => s !== serviceName)
-                : [...prev.servicesPerformed, serviceName],
-        }));
+                : [...prev.servicesPerformed, serviceName];
+
+            const svc = services.find((s) => s.name === serviceName);
+            const price = svc?.price ?? 0;
+            const currentPayment = parseFloat(prev.payment) || 0;
+            const newPayment = isRemoving
+                ? Math.max(0, currentPayment - price)
+                : currentPayment + price;
+
+            return {
+                ...prev,
+                servicesPerformed: newServices,
+                payment: newPayment.toString(),
+            };
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -512,7 +526,10 @@ export default function PaymentsPage() {
                                                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                                                 }`}
                                             >
-                                                {service.name}
+                                                {service.name}{" "}
+                                                <span className={selected ? "text-blue-200" : "text-gray-400"}>
+                                                    ${service.price.toLocaleString("es-AR")}
+                                                </span>
                                             </button>
                                         );
                                     })}
@@ -520,6 +537,14 @@ export default function PaymentsPage() {
                             ) : (
                                 <p className="text-sm text-gray-500">
                                     No hay servicios disponibles
+                                </p>
+                            )}
+                            {formData.servicesPerformed.length > 0 && (
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Estimado:{" "}
+                                    <span className="font-semibold text-green-600">
+                                        ${Number(formData.payment || 0).toLocaleString("es-AR")}
+                                    </span>
                                 </p>
                             )}
                         </div>
