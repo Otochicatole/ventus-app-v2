@@ -284,9 +284,9 @@ export default function PaymentsPage() {
                 <Alert severity={message.type}>{message.text}</Alert>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="flex flex-col justify-center sm:flex-row gap-4">
+                <div className="relative flex-1 h-fit">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                     <Input
                         type="text"
                         placeholder="Buscar por nombre, servicio, monto..."
@@ -295,7 +295,7 @@ export default function PaymentsPage() {
                         className="pl-12"
                     />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <input
                         type="date"
                         value={showAll ? "" : dateFilter}
@@ -328,7 +328,7 @@ export default function PaymentsPage() {
 
             <div className="grid grid-cols-2 gap-4">
                 <Card>
-                    <CardContent className="p-4">
+                    <CardContent className="flex flex-col items-center sm:items-start justify-center p-4">
                         <p className="text-sm text-gray-600">Registros</p>
                         <p className="text-2xl font-bold text-gray-900">
                             {filteredRecords.length}
@@ -336,9 +336,9 @@ export default function PaymentsPage() {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardContent className="p-4">
+                    <CardContent className="flex flex-col items-center sm:items-start justify-center p-4">
                         <p className="text-sm text-gray-600">Total Cobrado</p>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-xl font-bold text-green-600">
                             ${totalPayments.toLocaleString("es-AR")}
                         </p>
                     </CardContent>

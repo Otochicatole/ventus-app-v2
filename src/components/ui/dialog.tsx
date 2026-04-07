@@ -24,9 +24,9 @@ export default function Dialog({ open, onClose, title, maxWidth = "md", children
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer"
                 onClick={onClose}
             />
-            <div className={`relative bg-white border border-gray-200 rounded-2xl w-full ${maxWidthClasses[maxWidth]} shadow-2xl animate-fadeIn`}>
+            <div className={`relative bg-white border border-gray-200 rounded-2xl w-full ${maxWidthClasses[maxWidth]} shadow-2xl animate-fadeIn max-h-[calc(100vh-2rem)] flex flex-col`}>
                 {title && (
-                    <div className="px-8 py-6 border-b border-gray-200 flex items-center justify-between">
+                    <div className="px-8 py-6 border-b border-gray-200 flex items-center justify-between shrink-0">
                         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
                         <button
                             onClick={onClose}
@@ -36,7 +36,9 @@ export default function Dialog({ open, onClose, title, maxWidth = "md", children
                         </button>
                     </div>
                 )}
-                {children}
+                <div className="overflow-y-auto">
+                    {children}
+                </div>
             </div>
         </div>
     );
