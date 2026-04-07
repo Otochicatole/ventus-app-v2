@@ -10,6 +10,7 @@ import {
     DollarSign,
     Calendar,
     ListFilter,
+    ArrowUpDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Button from "@/components/ui/button";
@@ -49,6 +50,7 @@ export default function PaymentsPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [dateFilter, setDateFilter] = useState<string>(getTodayStr());
     const [showAll, setShowAll] = useState(false);
+    const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingRecord, setEditingRecord] = useState<ClientPaidService | null>(null);
@@ -218,16 +220,22 @@ export default function PaymentsPage() {
         }
     };
 
-    const filteredRecords = records.filter((record) => {
-        if (!searchTerm) return true;
-        const search = searchTerm.toLowerCase();
-        return (
-            record.fullName.toLowerCase().includes(search) ||
-            (record.description && record.description.toLowerCase().includes(search)) ||
-            record.servicesPerformed.some((s) => s.toLowerCase().includes(search)) ||
-            record.payment.toString().includes(search)
-        );
-    });
+    const filteredRecords = records
+        .filter((record) => {
+            if (!searchTerm) return true;
+            const search = searchTerm.toLowerCase();
+            return (
+                record.fullName.toLowerCase().includes(search) ||
+                (record.description && record.description.toLowerCase().includes(search)) ||
+                record.servicesPerformed.some((s) => s.toLowerCase().includes(search)) ||
+                record.payment.toString().includes(search)
+            );
+        })
+        .sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+        });
 
     const totalPayments = filteredRecords.reduce((sum, r) => sum + r.payment, 0);
 
@@ -306,6 +314,14 @@ export default function PaymentsPage() {
                         startIcon={<ListFilter className="w-4 h-4" />}
                     >
                         {showAll ? "Filtrar" : "Ver Todo"}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))}
+                        startIcon={<ArrowUpDown className="w-4 h-4" />}
+                    >
+                        {sortOrder === "desc" ? "Recientes" : "Antiguos"}
                     </Button>
                 </div>
             </div>
