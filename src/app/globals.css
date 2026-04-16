@@ -34,3 +34,11 @@ body {
 .animate-fadeIn {
     animation: fadeIn 0.5s ease-out;
 }
+
+@utility scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

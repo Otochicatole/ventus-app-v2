@@ -76,10 +76,7 @@ export default function Sidebar() {
         </aside>
 
             <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div
-                    className="grid h-16"
-                    style={{ gridTemplateColumns: `repeat(${menuItems.length}, minmax(0, 1fr))` }}
-                >
+                <div className="flex h-16 overflow-x-auto scrollbar-none">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href;
                         const Icon = item.icon;
@@ -88,10 +85,10 @@ export default function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex flex-col items-center justify-center gap-1 relative group"
+                                className="flex min-w-17 flex-1 flex-col items-center justify-center gap-1 relative group"
                             >
                                 {isActive && (
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-600 rounded-b-full" />
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-blue-600 rounded-b-full" />
                                 )}
                                 <Icon 
                                     className={`w-5 h-5 transition-colors ${
@@ -99,7 +96,7 @@ export default function Sidebar() {
                                     }`}
                                 />
                                 <span 
-                                    className={`text-[10px] font-medium transition-colors ${
+                                    className={`text-[10px] font-medium whitespace-nowrap transition-colors ${
                                         isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
                                     }`}
                                 >
