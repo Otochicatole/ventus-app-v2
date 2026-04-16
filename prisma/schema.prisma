@@ -109,3 +109,29 @@ model ClientPaidService {
   @@index([paidAt])
 }
 
+model FixedExpense {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  description String?
+  startsAt    DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([startsAt])
+  @@index([name])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  description String?
+  spentAt     DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([spentAt])
+  @@index([name])
+}
+
