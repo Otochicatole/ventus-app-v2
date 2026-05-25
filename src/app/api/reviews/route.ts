@@ -10,12 +10,12 @@ const reviewSchema = z.object({
         .optional()
         .transform((val) => (!val || val.trim() === "" ? "Anónimo" : val.trim())),
     rating: z
-        .number({ required_error: "La calificación es obligatoria" })
+        .number({ message: "La calificación es obligatoria" })
         .int("La calificación debe ser un número entero")
         .min(1, "La calificación mínima es 1 estrella")
         .max(5, "La calificación máxima es 5 estrellas"),
     comment: z
-        .string({ required_error: "El comentario es obligatorio" })
+        .string({ message: "El comentario es obligatorio" })
         .min(1, "El comentario no puede estar vacío")
         .max(500, "El comentario no puede superar los 500 caracteres")
         .transform((val) => val.trim()),
@@ -51,8 +51,7 @@ export async function POST(request: Request) {
         // Validación con Zod
         const parsedData = reviewSchema.safeParse(body);
         if (!parsedData.success) {
-            const issues = parsedData.error.issues || parsedData.error.errors || [];
-            const firstError = issues[0]?.message || "Datos de entrada inválidos";
+            const firstError = parsedData.error.issues[0]?.message || "Datos de entrada inválidos";
             return NextResponse.json({ error: firstError }, { status: 400 });
         }
 

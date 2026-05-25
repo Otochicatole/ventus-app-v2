@@ -140,7 +140,7 @@ export default function Home() {
     };
 
     // Definición de curvas de transición cinematográficas de Apple
-    const appleEase = [0.16, 1, 0.3, 1]; // Curva de desaceleración ultra-suave
+    const appleEase = [0.16, 1, 0.3, 1] as const; // Curva de desaceleración ultra-suave
 
     // Variantes de animación premium para el efecto de máquina de escribir y difuminado cinemático
     const containerVariants = {
@@ -161,7 +161,7 @@ export default function Home() {
             filter: "blur(20px)",
             transition: {
                 duration: 1.2,
-                ease: [0.6, -0.05, 0.01, 0.99]
+                ease: [0.6, -0.05, 0.01, 0.99] as const
             }
         }
     };

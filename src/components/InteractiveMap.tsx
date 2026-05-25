@@ -76,8 +76,7 @@ export default function InteractiveMap() {
             center: [defaultLng, defaultLat],
             zoom: 14.2,
             pitch: 45, // Inclinación tridimensional inicial
-            bearing: -10, // Orientación/Rotación inicial
-            antialias: true
+            bearing: -10 // Orientación/Rotación inicial
         });
 
         // Controles de navegación nativos (Zoom, Inclinación y Brújula)
