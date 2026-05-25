@@ -221,7 +221,7 @@ export default function Home() {
                                 transition={{ duration: 1.0, delay: 0.1, ease: appleEase }}
                                 className="text-xs font-bold tracking-[0.3em] text-[#0b3a60] uppercase"
                             >
-                                BARBERÍA PREMIUM / BUENOS AIRES
+                                BARBERÍA PREMIUM
                             </motion.p>
                             <motion.h2
                                 initial={{ opacity: 0, y: 30 }}
@@ -230,7 +230,7 @@ export default function Home() {
                                 className="text-5xl sm:text-7xl md:text-8xl font-light tracking-tight leading-[1.05] text-stone-900"
                             >
                                 Tu Estilo. <br />
-                                <span className="font-semibold text-[#0b3a60]">Nuestra Precisión.</span>
+                                <span className="font-semibold text-[#0b3a60]">Nuestra Pasión.</span>
                             </motion.h2>
                         </div>
 
