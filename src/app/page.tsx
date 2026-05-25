@@ -5,6 +5,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Scissors, Clock, ArrowRight } from "lucide-react";
 import AnimatedSpheres from "@/components/AnimatedSpheres";
 import CustomCursor from "@/components/CustomCursor";
+import dynamic from "next/dynamic";
+
+const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
+    ssr: false,
+    loading: () => (
+        <div className="bg-white border-t border-stone-200 py-24 px-6 sm:px-12 md:px-24">
+            <div className="max-w-7xl mx-auto space-y-12 animate-pulse">
+                <div className="flex flex-col md:flex-row justify-between gap-6 border-b border-stone-100 pb-8">
+                    <div className="space-y-4">
+                        <div className="h-4 bg-stone-200 w-32"></div>
+                        <div className="h-10 bg-stone-300 w-64"></div>
+                    </div>
+                    <div className="h-14 bg-stone-200 w-80"></div>
+                </div>
+                <div className="grid lg:grid-cols-12 gap-8 h-[600px]">
+                    <div className="lg:col-span-4 bg-stone-100 h-full"></div>
+                    <div className="lg:col-span-8 bg-stone-200 h-full"></div>
+                </div>
+            </div>
+        </div>
+    )
+});
 
 type Service = {
     id: string;
@@ -314,6 +336,9 @@ export default function Home() {
                         )}
                     </div>
                 </section>
+
+                {/* SECCIÓN DE MAPA INTERACTIVO DE LOCALES */}
+                <InteractiveMap />
 
                 {/* ANONYMOUS REVIEWS SECTION */}
                 <section id="reviews-section" className="bg-stone-50 border-t border-stone-200 py-24 px-6 sm:px-12 md:px-24 scroll-mt-16">

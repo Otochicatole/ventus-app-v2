@@ -18,6 +18,7 @@ Cada archivo documenta en profundidad un módulo o dominio específico del siste
 | [📊 6. CMS de Administración](file:///home/otochi/Desktop/works/ventus-app-v2/agent/cms-dashboard.md) | Panel de Control | Administración de turnos, ubicaciones, notas de clientes, bloqueos y endpoints de estadísticas. |
 | [⭐ 7. Sistema de Reseñas Anónimas](file:///home/otochi/Desktop/works/ventus-app-v2/agent/reviews-system.md) | Reseñas de Clientes | Canal de opiniones públicas anónimas con validaciones de Zod e inserción reactiva en el frontend. |
 | [🛠️ 8. Operaciones y Escalabilidad](file:///home/otochi/Desktop/works/ventus-app-v2/agent/operations.md) | Operaciones | Inicio en local (Bun), variables de entorno (.env), mantenimiento de la base de datos y estrategias de escalabilidad. |
+| [🗺️ 9. Mapa Interactivo](file:///home/otochi/Desktop/works/ventus-app-v2/agent/map-integration.md) | Ubicaciones / Mapas | Visualización tridimensional de sucursales con deck.gl y MapLibre GL JS, cálculos de centroide y flyTo. |
 
 ---
 
