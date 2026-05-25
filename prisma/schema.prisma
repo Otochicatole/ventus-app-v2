@@ -135,3 +135,14 @@ model Expense {
   @@index([name])
 }
 
+model Review {
+  id        String   @id @default(cuid())
+  author    String   @default("Anónimo")
+  rating    Int
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+

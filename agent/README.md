@@ -16,7 +16,8 @@ Cada archivo documenta en profundidad un módulo o dominio específico del siste
 | [📅 4. Asistente de Reserva de Turnos](file:///home/otochi/Desktop/works/ventus-app-v2/agent/booking-flow.md) | Reserva de Clientes | Flow paso a paso de `/shifts`, algoritmo de slots ocupados/libres, y slots en "Alta Demanda". |
 | [💼 5. Módulo Financiero y Clean Arch](file:///home/otochi/Desktop/works/ventus-app-v2/agent/finance-module.md) | Finanzas y Gastos | Lógica matemática para recurrencia de gastos fijos mensuales (`getFixedExpenseOccurrences`), balance financiero y estructura Clean. |
 | [📊 6. CMS de Administración](file:///home/otochi/Desktop/works/ventus-app-v2/agent/cms-dashboard.md) | Panel de Control | Administración de turnos, ubicaciones, notas de clientes, bloqueos y endpoints de estadísticas. |
-| [🛠️ 7. Operaciones y Escalabilidad](file:///home/otochi/Desktop/works/ventus-app-v2/agent/operations.md) | Operaciones | Inicio en local (Bun), variables de entorno (.env), mantenimiento de la base de datos y estrategias de escalabilidad. |
+| [⭐ 7. Sistema de Reseñas Anónimas](file:///home/otochi/Desktop/works/ventus-app-v2/agent/reviews-system.md) | Reseñas de Clientes | Canal de opiniones públicas anónimas con validaciones de Zod e inserción reactiva en el frontend. |
+| [🛠️ 8. Operaciones y Escalabilidad](file:///home/otochi/Desktop/works/ventus-app-v2/agent/operations.md) | Operaciones | Inicio en local (Bun), variables de entorno (.env), mantenimiento de la base de datos y estrategias de escalabilidad. |
 
 ---
 

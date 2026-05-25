@@ -67,7 +67,7 @@ Las vistas del panel de administración (CMS) consumen datos directamente de la 
 
 ### B. Páginas del Cliente (Client Components)
 Las páginas que requieren interacciones fluidas, animaciones o estados locales dinámicos se renderizan en el cliente:
-- **`src/app/page.tsx`**: Carga el lienzo de Three.js y maneja transiciones con Framer Motion.
+- **`src/app/page.tsx`**: Carga el lienzo de Three.js, maneja transiciones con Framer Motion, e integra el formulario interactivo de **reseñas anónimas y el historial** con inserciones reactivas en tiempo real.
 - **`src/app/shifts/page.tsx`**: El wizard de reserva del cliente administra múltiples peticiones asíncronas para actualizar selectores de horas a medida que cambia la ubicación y fecha.
 - **`src/features/expenses/ui/expenses-page.tsx`**: Utiliza hooks locales reactivos para gestionar diálogos interactivos de creación/edición de finanzas sin refrescar el navegador.
 
@@ -106,3 +106,4 @@ Reemplaza el cursor estándar del navegador por un elemento visual interactivo:
 
 - **Autenticación**: Para ver cómo se protegen las rutas que renderizan esta arquitectura, consulta la [Documentación del Sistema de Autenticación](file:///home/otochi/Desktop/works/ventus-app-v2/agent/auth-system.md).
 - **Base de Datos**: Para comprender el modelado subyacente que consume Prisma, visita la [Documentación del Esquema de Datos](file:///home/otochi/Desktop/works/ventus-app-v2/agent/database-schema.md).
+- **Reseñas Anónimas**: Para conocer en detalle la arquitectura de la API de opiniones y el flujo de estrellas interactivo, visita la [Documentación del Sistema de Reseñas](file:///home/otochi/Desktop/works/ventus-app-v2/agent/reviews-system.md).

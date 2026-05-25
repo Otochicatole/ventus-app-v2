@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Scissors, Clock, ArrowRight } from "lucide-react";
 import AnimatedSpheres from "@/components/AnimatedSpheres";
 import CustomCursor from "@/components/CustomCursor";
@@ -15,10 +15,30 @@ type Service = {
     active: boolean;
 };
 
+type Review = {
+    id: string;
+    author: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+};
+
 export default function Home() {
+    // Servicios
     const [showContent, setShowContent] = useState(false);
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Reseñas
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [formAuthor, setFormAuthor] = useState("");
+    const [formRating, setFormRating] = useState(5);
+    const [formComment, setFormComment] = useState("");
+    const [hoverRating, setHoverRating] = useState(0);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
     const handleLoadComplete = useCallback(() => {
         setShowContent(true);
@@ -40,8 +60,62 @@ export default function Home() {
             }
         };
 
+        const fetchReviews = async () => {
+            try {
+                const res = await fetch("/api/reviews", { cache: "no-store" });
+                if (res.ok) {
+                    const data = await res.json();
+                    setReviews(data);
+                }
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            } finally {
+                setReviewsLoading(false);
+            }
+        };
+
         fetchServices();
+        fetchReviews();
     }, []);
+
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formComment.trim()) return;
+
+        setSubmitLoading(true);
+        setSubmitError(null);
+        setSubmitSuccess(false);
+
+        try {
+            const res = await fetch("/api/reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    author: formAuthor,
+                    rating: formRating,
+                    comment: formComment,
+                }),
+            });
+
+            if (res.ok) {
+                const newReview = await res.json();
+                // Bucle de feedback instantáneo: insertar al inicio en tiempo real
+                setReviews((prev) => [newReview, ...prev]);
+                setFormAuthor("");
+                setFormRating(5);
+                setFormComment("");
+                setSubmitSuccess(true);
+                setTimeout(() => setSubmitSuccess(false), 4500);
+            } else {
+                const data = await res.json();
+                setSubmitError(data.error || "Ocurrió un error al publicar tu opinión");
+            }
+        } catch (error) {
+            setSubmitError("No se pudo conectar con el servidor. Intentalo de nuevo.");
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
 
     // Definición de curvas de transición cinematográficas de Apple
     const appleEase = [0.16, 1, 0.3, 1]; // Curva de desaceleración ultra-suave
@@ -195,6 +269,221 @@ export default function Home() {
                                 ))}
                             </div>
                         )}
+                    </div>
+                </section>
+
+                {/* ANONYMOUS REVIEWS SECTION */}
+                <section id="reviews-section" className="bg-stone-50 border-t border-stone-200 py-24 px-6 sm:px-12 md:px-24 scroll-mt-16">
+                    <div className="max-w-7xl mx-auto space-y-16">
+                        
+                        {/* Cabecera */}
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-stone-200 pb-10 gap-6">
+                            <div className="space-y-3">
+                                <span className="text-xs font-bold tracking-[0.25em] text-[#0b3a60] uppercase">
+                                    EXPERIENCIAS
+                                </span>
+                                <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-stone-950">
+                                    Opiniones de <span className="font-semibold text-[#0b3a60]">Clientes</span>
+                                </h2>
+                            </div>
+                            <p className="text-stone-500 max-w-md font-light text-sm leading-relaxed">
+                                Compartí tu opinión de forma totalmente anónima. Tu valoración nos ayuda a seguir perfeccionando nuestro servicio.
+                            </p>
+                        </div>
+
+                        {/* Contenedor Principal */}
+                        <div className="grid gap-12 lg:grid-cols-12 items-start">
+                            
+                            {/* Columna Formulario (Izquierda) */}
+                            <form 
+                                onSubmit={handleSubmitReview}
+                                className="lg:col-span-5 bg-white border border-stone-200 p-8 sm:p-10 space-y-6 shadow-sm"
+                            >
+                                <h3 className="text-lg font-bold tracking-tight text-stone-900">
+                                    Dejanos tu reseña
+                                </h3>
+
+                                {/* Alias / Nombre Opcional */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase tracking-wider text-stone-500">
+                                        Nombre / Alias
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        value={formAuthor} 
+                                        onChange={(e) => setFormAuthor(e.target.value)}
+                                        placeholder="Anónimo (opcional)" 
+                                        maxLength={30}
+                                        className="w-full border border-stone-200 p-3 text-sm font-light rounded-none bg-stone-50/50 focus:outline-none focus:border-[#0b3a60] transition-colors"
+                                    />
+                                </div>
+
+                                {/* Calificación por Estrellas */}
+                                <div className="space-y-2.5">
+                                    <label className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
+                                        Calificación
+                                    </label>
+                                    <div className="flex items-center gap-1.5">
+                                        {[1, 2, 3, 4, 5].map((star) => {
+                                            const isFilled = hoverRating ? star <= hoverRating : star <= formRating;
+                                            return (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setFormRating(star)}
+                                                    onMouseEnter={() => setHoverRating(star)}
+                                                    onMouseLeave={() => setHoverRating(0)}
+                                                    className="transition-transform duration-150 active:scale-90"
+                                                >
+                                                    <svg
+                                                        className={`w-8 h-8 transition-colors ${
+                                                            isFilled ? "text-[#0b3a60] fill-[#0b3a60]" : "text-stone-200 fill-transparent"
+                                                        }`}
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M11.48 3.499c.196-.391.768-.391.964 0l3.01 6.116 6.748.981c.43.063.602.592.292.897l-4.882 4.757 1.153 6.722c.073.43-.377.757-.763.553L12 20.354l-6.02 3.167c-.386.203-.836-.124-.763-.553l1.152-6.722-4.882-4.757c-.309-.305-.137-.834.292-.897l6.748-.981 3.01-6.116z"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Comentario */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold uppercase tracking-wider text-stone-500">
+                                            Tu Opinión
+                                        </label>
+                                        <span className="text-[10px] font-semibold text-stone-400">
+                                            {formComment.length}/500
+                                        </span>
+                                    </div>
+                                    <textarea
+                                        value={formComment}
+                                        onChange={(e) => setFormComment(e.target.value)}
+                                        placeholder="Contanos qué te pareció el servicio, los profesionales o el ambiente..."
+                                        maxLength={500}
+                                        required
+                                        rows={4}
+                                        className="w-full border border-stone-200 p-4 text-sm font-light rounded-none bg-stone-50/50 focus:outline-none focus:border-[#0b3a60] transition-colors resize-none leading-relaxed"
+                                    />
+                                </div>
+
+                                {/* Notificaciones */}
+                                {submitError && (
+                                    <div className="text-xs font-semibold text-red-600 bg-red-50 border-l-2 border-red-500 p-3 rounded-none">
+                                        {submitError}
+                                    </div>
+                                )}
+                                {submitSuccess && (
+                                    <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 border-l-2 border-emerald-500 p-3 rounded-none">
+                                        ¡Tu reseña fue publicada correctamente!
+                                    </div>
+                                )}
+
+                                {/* Botón de Enviar */}
+                                <button
+                                    type="submit"
+                                    disabled={submitLoading || !formComment.trim()}
+                                    className="w-full py-4 bg-stone-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-[#0b3a60] disabled:bg-stone-200 disabled:text-stone-400 transition-colors duration-300 rounded-none shadow-sm flex items-center justify-center gap-2"
+                                >
+                                    {submitLoading ? (
+                                        <>
+                                            <div className="animate-spin rounded-none h-4.5 w-4.5 border border-white border-t-transparent" />
+                                            Publicando...
+                                        </>
+                                    ) : (
+                                        "Publicar Reseña"
+                                    )}
+                                </button>
+                            </form>
+
+                            {/* Columna Historial (Derecha) */}
+                            <div className="lg:col-span-7 space-y-6">
+                                <h3 className="text-lg font-bold tracking-tight text-stone-900">
+                                    Historial de Reseñas
+                                </h3>
+
+                                {reviewsLoading ? (
+                                    <div className="flex items-center justify-center gap-3 py-16 bg-white border border-stone-200 shadow-sm">
+                                        <div className="animate-spin rounded-none h-6 w-6 border border-[#0b3a60] border-t-transparent"></div>
+                                        <p className="text-stone-500 text-sm font-medium uppercase tracking-widest">
+                                            Cargando opiniones...
+                                        </p>
+                                    </div>
+                                ) : reviews.length === 0 ? (
+                                    <div className="py-20 text-center border border-dashed border-stone-200 bg-white rounded-none flex flex-col items-center justify-center gap-3 shadow-sm">
+                                        <p className="text-stone-400 text-sm uppercase tracking-widest">
+                                            Aún no hay opiniones
+                                        </p>
+                                        <p className="text-stone-500 text-xs font-light max-w-xs">
+                                            ¡Sé el primero en compartir tu experiencia con nosotros!
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="max-h-[550px] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-stone-200 scrollbar-track-transparent">
+                                        <AnimatePresence initial={false}>
+                                            {reviews.map((review) => (
+                                                <motion.div 
+                                                    key={review.id}
+                                                    initial={{ opacity: 0, y: -20, height: 0 }}
+                                                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                                                    exit={{ opacity: 0, y: -20, height: 0 }}
+                                                    transition={{ duration: 0.4, ease: appleEase }}
+                                                    className="bg-white border border-stone-200 p-6 space-y-4 shadow-sm hover:border-[#0b3a60] transition-colors duration-300 rounded-none overflow-hidden"
+                                                >
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="space-y-1">
+                                                            <h4 className="text-sm font-bold text-stone-900">
+                                                                {review.author}
+                                                            </h4>
+                                                            <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
+                                                                {new Date(review.createdAt).toLocaleDateString('es-AR', {
+                                                                    day: 'numeric',
+                                                                    month: 'long',
+                                                                    year: 'numeric'
+                                                                })}
+                                                            </p>
+                                                        </div>
+                                                        {/* Estrellas estáticas */}
+                                                        <div className="flex gap-0.5">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <svg
+                                                                    key={star}
+                                                                    className={`w-4 h-4 ${
+                                                                        star <= review.rating ? "text-[#0b3a60] fill-[#0b3a60]" : "text-stone-200 fill-transparent"
+                                                                    }`}
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    <path
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                        d="M11.48 3.499c.196-.391.768-.391.964 0l3.01 6.116 6.748.981c.43.063.602.592.292.897l-4.882 4.757 1.153 6.722c.073.43-.377.757-.763.553L12 20.354l-6.02 3.167c-.386.203-.836-.124-.763-.553l1.152-6.722-4.882-4.757c-.309-.305-.137-.834.292-.897l6.748-.981 3.01-6.116z"
+                                                                    />
+                                                                </svg>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-stone-600 text-sm font-light leading-relaxed whitespace-pre-wrap break-words">
+                                                        {review.comment}
+                                                    </p>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
