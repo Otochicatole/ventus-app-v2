@@ -57,6 +57,12 @@ interface AnimatedSpheresProps {
 
 export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Utilizar ref para onLoadComplete para evitar re-iniciar el canvas al cambiar funciones padres
+  const onLoadCompleteRef = useRef(onLoadComplete);
+  useEffect(() => {
+    onLoadCompleteRef.current = onLoadComplete;
+  }, [onLoadComplete]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -79,26 +85,33 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const material = new THREE.MeshStandardMaterial({
-      color: "#93c5fd",
-      metalness: 0.2,
-      roughness: 0.5
+      color: "#1c1917", // Obsidian Glass
+      metalness: 0.9,
+      roughness: 0.1,
+      transparent: true,
+      opacity: 0.12
     });
     
     const group = new THREE.Group();
     const spheres: THREE.Mesh[] = [];
     const forces = new Map<string, THREE.Vector3>();
 
+    // OPTIMIZACIÓN CRÍTICA: Instanciar una única geometría maestra unitaria para evitar picos de CPU y RAM
+    const masterGeometry = new THREE.SphereGeometry(1, 32, 32);
+
     const initY = -25;
     const revolutionRadius = 4;
     const revolutionDuration = 2;
-    const breathingAmplitude = 0.1;
+    const breathingAmplitude = 0.15;
     const breathingSpeed = 0.002;
 
     positions.forEach((pos, index) => {
       const radius = radii[index];
-      const geometry = new THREE.SphereGeometry(radius, 64, 64);
-      const sphere = new THREE.Mesh(geometry, material);
+      const sphere = new THREE.Mesh(masterGeometry, material);
       sphere.position.set(pos.x, initY, pos.z);
+      
+      // Escalar la esfera de acuerdo a su radio correspondiente
+      sphere.scale.setScalar(radius);
       sphere.userData = { originalPosition: { ...pos }, radius };
       spheres.push(sphere);
       group.add(sphere);
@@ -119,6 +132,7 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
 
     let loadingComplete = false;
 
+    // RESTAURACIÓN DE LA ANIMACIÓN ORIGINAL REVOLUTIVA (OPTIMIZADA)
     const initLoadingAnimation = () => {
       spheres.forEach((sphere, i) => {
         const delay = i * 0.02;
@@ -164,7 +178,7 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
 
     setTimeout(() => {
       loadingComplete = true;
-      onLoadComplete?.();
+      onLoadCompleteRef.current?.();
     }, (revolutionDuration + 1) * 1000);
 
     const raycaster = new THREE.Raycaster();
@@ -266,8 +280,8 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(animationId);
       renderer.dispose();
+      masterGeometry.dispose();
       spheres.forEach(sphere => {
-        sphere.geometry.dispose();
         if (Array.isArray(sphere.material)) {
           sphere.material.forEach(mat => mat.dispose());
         } else {
@@ -275,7 +289,7 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
         }
       });
     };
-  }, [onLoadComplete]);
+  }, []); // El canvas se inicializa exactamente UNA VEZ al montar
 
   return (
     <canvas
@@ -285,4 +299,3 @@ export default function AnimatedSpheres({ onLoadComplete }: AnimatedSpheresProps
     />
   );
 }
-
