@@ -47,63 +47,43 @@ const menuItems = [
     },
 ];
 
-export default function Sidebar() {
+type SidebarProps = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
 
     return (
-        <>
-            <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed top-16 left-0 overflow-y-auto">
-                <nav className="p-4 space-y-2">
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 cursor-pointer ${isActive
-                                        ? "bg-blue-600 text-white font-semibold shadow-sm"
-                                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                                    }`}
-                            >
-                                <Icon className="w-5 h-5 shrink-0" />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </aside>
-
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div className="flex h-16 overflow-x-auto scrollbar-none">
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        const Icon = item.icon;
-
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="flex min-w-17 flex-1 flex-col items-center justify-center gap-1 relative group"
-                            >
-                                {isActive && (
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-blue-600 rounded-b-full" />
-                                )}
-                                <Icon
-                                    className={`w-5 h-5 transition-colors ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
-                                        }`}
-                                />
-                                <span
-                                    className={`text-[10px] font-medium whitespace-nowrap transition-colors ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
-                                        }`}
-                                >
-                                    {item.label}
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
+        <aside 
+            className={`w-64 bg-white border-r border-stone-200 h-[calc(100vh-4rem)] fixed top-16 left-0 overflow-y-auto z-40 transition-transform duration-300 ease-in-out md:translate-x-0 ${
+                isOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+        >
+            <nav className="p-4 space-y-1">
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={onClose}
+                            className={`flex items-center gap-4 px-4 py-3.5 rounded-none transition-all duration-200 cursor-pointer text-sm tracking-wide ${
+                                isActive
+                                    ? "bg-[#0b3a60] text-white font-medium shadow-sm"
+                                    : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                            }`}
+                        >
+                            <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                                isActive ? "text-white" : "text-stone-400 group-hover:text-stone-600"
+                            }`} />
+                            <span>{item.label}</span>
+                        </Link>
+                    );
+                })}
             </nav>
-        </>
+        </aside>
     );
 }

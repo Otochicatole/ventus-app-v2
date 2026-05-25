@@ -15,7 +15,7 @@ export default async function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        <div className="admin-login-root min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 bg-stone-50">
             <div className="w-full max-w-md space-y-6 sm:space-y-8">
                 <div className="text-center">
                     <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-2xl mb-4 sm:mb-6 shadow-lg">
