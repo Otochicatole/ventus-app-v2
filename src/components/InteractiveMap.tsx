@@ -55,7 +55,7 @@ export default function InteractiveMap() {
         fetchLocations();
     }, []);
 
-    // 2. Inicializar MapLibre GL
+    // 2. Inicializar MapLibre GL con 3D habilitado
     useEffect(() => {
         if (loading || locations.length === 0 || !mapContainerRef.current) return;
 
@@ -69,19 +69,81 @@ export default function InteractiveMap() {
         const defaultLat = sumLat / locations.length;
         const defaultLng = sumLng / locations.length;
 
-        // Inicializar instancia nativa de MapLibre GL
+        // Inicializar instancia nativa de MapLibre GL con perspectiva 3D
         const map = new maplibregl.Map({
             container: mapContainerRef.current,
             style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json", // CARTO Positron Light
             center: [defaultLng, defaultLat],
-            zoom: 13,
-            pitch: 0,
-            bearing: 0,
+            zoom: 14.2,
+            pitch: 45, // Inclinación tridimensional inicial
+            bearing: -10, // Orientación/Rotación inicial
             antialias: true
         });
 
-        // Controles de navegación nativos
-        map.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
+        // Controles de navegación nativos (Zoom, Inclinación y Brújula)
+        map.addControl(new maplibregl.NavigationControl({ showCompass: true, showZoom: true }), "top-right");
+
+        // Agregar capa 3D de edificios (fill-extrusion) de manera dinámica al cargarse el mapa
+        map.on("load", () => {
+            const style = map.getStyle();
+            const sources = style.sources;
+            
+            // Localizar el ID de la fuente de vector tiles activa en el basemap de CARTO
+            const vectorSourceId = Object.keys(sources).find(
+                (key) => sources[key].type === "vector"
+            );
+
+            if (vectorSourceId) {
+                // Identificar la primera capa de etiquetas de texto para posicionar la extrusión debajo de ellas
+                const layers = style.layers;
+                let labelLayerId;
+                for (let i = 0; i < layers.length; i++) {
+                    if (layers[i].type === "symbol" && layers[i].layout && (layers[i].layout as any)["text-field"]) {
+                        labelLayerId = layers[i].id;
+                        break;
+                    }
+                }
+
+                // Inyectar capa 3D fill-extrusion para levantar edificios urbanos
+                map.addLayer(
+                    {
+                        id: "3d-buildings",
+                        source: vectorSourceId,
+                        "source-layer": "building", // Nombre estándar de OpenMapTiles para edificios
+                        type: "fill-extrusion",
+                        minzoom: 14,
+                        paint: {
+                            // Color claro adaptado al diseño de piedra/stone del proyecto
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["get", "render_height"],
+                                0, "#e7e5e4", // stone-200
+                                50, "#d6d3d1", // stone-300
+                                100, "#a8a29e" // stone-400
+                            ],
+                            // Elevación fluida de edificios a medida que se realiza zoom
+                            "fill-extrusion-height": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                14, 0,
+                                14.5, ["get", "render_height"]
+                            ],
+                            "fill-extrusion-base": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                14, 0,
+                                14.5, ["get", "render_base_height"]
+                            ],
+                            "fill-extrusion-opacity": 0.65
+                        }
+                    },
+                    labelLayerId
+                );
+            }
+        });
 
         // Limpiar marcadores antiguos de la referencia
         Object.values(markersRef.current).forEach((marker) => marker.remove());
@@ -95,7 +157,7 @@ export default function InteractiveMap() {
             // Transición CSS para escala suave al seleccionar
             el.className = `custom-marker-${loc.id} cursor-pointer transition-all duration-300 ease-out origin-bottom transform select-none`;
             
-            // Estructura interna del pin con el SVG exacto de Lucide React MapPin y un aro de pulso en hover
+            // Estructura interna del pin con el SVG de Lucide React MapPin y un aro de pulso
             el.innerHTML = `
                 <div class="relative flex flex-col items-center group">
                     <!-- Efecto de pulso en hover -->
@@ -146,7 +208,7 @@ export default function InteractiveMap() {
             const isSelected = id === selectedId;
 
             if (isSelected) {
-                // Agrandar suavemente el pin activo (1.3x) y elevarlo un poco
+                // Agrandar suavemente el pin activo (1.25x) y elevarlo un poco
                 el.style.transform = "scale(1.25) translateY(-2px)";
                 el.style.zIndex = "10";
                 
@@ -191,9 +253,12 @@ export default function InteractiveMap() {
         setSelectedId(loc.id);
         
         if (mapRef.current && loc.longitude !== null && loc.latitude !== null) {
+            // Animación suave de planeo (flyTo) inclinando aún más la cámara para apreciar el relieve 3D
             mapRef.current.flyTo({
                 center: [loc.longitude, loc.latitude],
-                zoom: 16,
+                zoom: 16.5,
+                pitch: 55, // Inclinación en 3D acentuada al hacer zoom
+                bearing: -15, // Ligera rotación para apreciar las fachadas de los edificios
                 speed: 1.2,
                 curve: 1.4,
                 essential: true
@@ -204,7 +269,7 @@ export default function InteractiveMap() {
     const activeLocation = locations.find((l) => l.id === selectedId);
 
     return (
-        <section id="locales-section" className="bg-white border-t border-stone-200 py-24 px-6 sm:px-12 md:px-24">
+        <section id="locales-section" className="bg-white border-t border-stone-200 py-16 sm:py-24 px-6 sm:px-12 md:px-24">
             <div className="max-w-7xl mx-auto space-y-12">
                 
                 {/* Encabezado del Módulo */}
@@ -241,18 +306,18 @@ export default function InteractiveMap() {
                         <p className="text-stone-600 font-light">No hay locales registrados en el sistema.</p>
                     </div>
                 ) : (
-                    /* Interactive Grid Map UI */
-                    <div className="grid lg:grid-cols-12 gap-8 h-auto lg:h-[600px]">
+                    /* Interactive Grid Map UI (Totalmente Responsive) */
+                    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 h-auto lg:h-[600px]">
                         
-                        {/* 1. Panel de Barra Lateral (Sucursales Index) */}
-                        <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto h-[400px] lg:h-full pr-0 lg:pr-2 scrollbar-thin">
+                        {/* 1. Panel de Barra Lateral (Sucursales Index: Fila horizontal en Mobile, Columna en Desktop) */}
+                        <div className="lg:col-span-4 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto w-full lg:h-full pb-4 lg:pb-0 scrollbar-thin snap-x snap-mandatory">
                             {locations.map((loc) => {
                                 const isSelected = loc.id === selectedId;
                                 return (
                                     <div
                                         key={loc.id}
                                         onClick={() => handleSelectLocation(loc)}
-                                        className={`p-6 border transition-all duration-300 cursor-pointer rounded-none flex flex-col justify-between h-[180px] select-none ${
+                                        className={`p-6 border transition-all duration-300 cursor-pointer rounded-none flex flex-col justify-between h-[160px] lg:h-[180px] w-[290px] sm:w-[320px] lg:w-full flex-shrink-0 snap-start select-none ${
                                             isSelected
                                                 ? "border-[#0b3a60] bg-[#0b3a60]/[0.02]"
                                                 : "border-stone-200 bg-stone-50 hover:bg-stone-100/50 hover:border-stone-300"
@@ -260,19 +325,33 @@ export default function InteractiveMap() {
                                     >
                                         <div className="space-y-2">
                                             <div className="flex items-start justify-between gap-4">
-                                                <h3 className="font-semibold text-stone-900 tracking-tight text-lg">
+                                                <h3 className="font-semibold text-stone-900 tracking-tight text-base sm:text-lg">
                                                     {loc.name}
                                                 </h3>
                                                 <MapPin className={`w-5 h-5 flex-shrink-0 ${
                                                     isSelected ? "text-[#0b3a60]" : "text-stone-400"
                                                 }`} />
                                             </div>
-                                            <p className="text-sm font-light text-stone-500 line-clamp-2">
+                                            <p className="text-xs sm:text-sm font-light text-stone-500 line-clamp-2">
                                                 {loc.address}
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center justify-between border-t border-stone-200/50 pt-4">
+                                        {/* Información dinámica de contacto solo visible en el card móvil activo */}
+                                        {isSelected && (
+                                            <div className="flex flex-col gap-1 text-[11px] font-light text-stone-500 border-t border-stone-200/50 pt-2 mt-2 lg:hidden">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Clock className="w-3.5 h-3.5 text-[#0b3a60]" />
+                                                    <span>Lun a Sáb: 09:00 a 20:00 hs</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <Phone className="w-3.5 h-3.5 text-[#0b3a60]" />
+                                                    <span>+54 9 11 2345-6789</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="hidden lg:flex items-center justify-between border-t border-stone-200/50 pt-4">
                                             <span className="text-[10px] tracking-wider font-mono text-stone-400">
                                                 {loc.latitude?.toFixed(5)}, {loc.longitude?.toFixed(5)}
                                             </span>
@@ -293,14 +372,14 @@ export default function InteractiveMap() {
                         </div>
 
                         {/* 2. Ventana de Renderizado de Basemap + marcadores */}
-                        <div className="lg:col-span-8 relative h-[450px] lg:h-full border border-stone-200 overflow-hidden rounded-none shadow-sm">
+                        <div className="lg:col-span-8 relative h-[380px] sm:h-[450px] lg:h-full border border-stone-200 overflow-hidden rounded-none shadow-sm w-full">
                             
                             {/* Canvas del Mapa */}
                             <div ref={mapContainerRef} className="w-full h-full" />
 
-                            {/* Leyenda de la Sucursal Seleccionada flotante inferior */}
+                            {/* Leyenda de la Sucursal Seleccionada flotante (Habilitado estrictamente en pantallas de escritorio) */}
                             {activeLocation && (
-                                <div className="absolute bottom-6 left-6 right-6 lg:right-auto bg-white/95 backdrop-blur-md p-6 border border-stone-200 rounded-none shadow-2xl z-30 max-w-sm pointer-events-auto space-y-4">
+                                <div className="absolute bottom-6 left-6 right-6 lg:right-auto bg-white/95 backdrop-blur-md p-6 border border-stone-200 rounded-none shadow-2xl z-30 max-w-sm pointer-events-auto space-y-4 hidden lg:block">
                                     <div className="space-y-1">
                                         <span className="text-[9px] font-bold tracking-[0.2em] text-[#0b3a60] uppercase block">
                                             SUCURSAL SELECCIONADA
@@ -326,8 +405,8 @@ export default function InteractiveMap() {
                             )}
 
                             {/* Controles de vista de marca de agua minimalista (Esquina inferior derecha) */}
-                            <div className="absolute bottom-3 right-3 bg-stone-900/10 text-[9px] font-mono text-stone-500 py-0.5 px-2 pointer-events-none rounded-none">
-                                CARTO Positron / MapLibre GL
+                            <div className="absolute bottom-3 right-3 bg-stone-900/10 text-[9px] font-mono text-stone-500 py-0.5 px-2 pointer-events-none rounded-none z-10">
+                                CARTO Positron 3D / MapLibre GL
                             </div>
                         </div>
 

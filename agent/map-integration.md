@@ -1,12 +1,12 @@
-# 🗺️ Módulo de Mapa Interactivo (MapLibre GL JS + Lucide SVG Markers)
+# 🗺️ Módulo de Mapa Interactivo (MapLibre GL JS + 3D Building Extrusions)
 
-Este documento detalla la arquitectura, el diseño visual y el flujo técnico implementado para la sección de mapa de locales y sucursales en la página principal de Ventus.
+Este documento detalla la arquitectura, el diseño visual, el soporte responsivo avanzado y el flujo técnico implementado para la sección de mapa de locales y sucursales en la página principal de Ventus.
 
 ---
 
 ## 🏗️ 1. Arquitectura de la Integración
 
-Para lograr un rendimiento geoespacial fluido y evitar cualquier tipo de degradación de velocidad o incompatibilidad en el framework de Next.js, diseñamos una integración híbrida:
+Para lograr un rendimiento geoespacial tridimensional fluido y evitar cualquier tipo de degradación de velocidad o incompatibilidad en el framework de Next.js, diseñamos una integración híbrida:
 
 ```mermaid
 graph TD
@@ -15,6 +15,7 @@ graph TD
     C -->|Prisma Client| D[Database PostgreSQL]
     B -->|MapLibre GL GL-JS| E[CARTO Positron Basemap Canvas]
     B -->|custom HTML elements| F[High-Fidelity SVG MapPin Markers]
+    E -->|addLayer fill-extrusion| H[3D Building Models]
     E -->|addMarker| F
     F -->|SVG Custom Markers| G[Pulsing Navy Blue MapPin Icons]
 ```
@@ -39,12 +40,14 @@ El flujo de información geoespacial se ejecuta de forma completamente automáti
    $$\text{Centroide Lat} = \frac{\sum_{i=1}^{n} \text{Lat}_i}{n}$$
    $$\text{Centroide Lng} = \frac{\sum_{i=1}^{n} \text{Lng}_i}{n}$$
    Este promedio matemático se calcula en tiempo real al cargar los datos y se asigna como el `center` inicial en la configuración de MapLibre.
-4. **Cámara Interactiva (`flyTo`)**:
-   Al hacer clic en cualquier tarjeta de la barra lateral, se acciona una transición suave del viewport de MapLibre empleando cálculos de aceleración y desaceleración fluida:
+4. **Cámara Interactiva y Perspectiva 3D (`flyTo`)**:
+   Al hacer clic en cualquier tarjeta de la barra lateral, se acciona una transición suave del viewport de MapLibre empleando cálculos de aceleración y desaceleración fluida, inclinando y rotando la cámara para apreciar fachadas urbanas en relieve:
    ```typescript
    map.flyTo({
        center: [longitude, latitude],
-       zoom: 16,
+       zoom: 16.5,
+       pitch: 55, // Inclinación acentuada 3D
+       bearing: -15, // Ligera rotación
        speed: 1.2,
        curve: 1.4
    });
@@ -52,43 +55,35 @@ El flujo de información geoespacial se ejecuta de forma completamente automáti
 
 ---
 
-## 🎨 3. Estructura y Estética Visual (Estilo Premium)
+## 🏢 3. Capa de Extrusión de Edificios 3D (Relieve Urbano)
 
-- **Basemap Minimalista**: Consumimos la capa vectorial gratuita de **CARTO Positron** (`https://basemaps.cartocdn.com/gl/positron-gl-style/style.json`). Esta capa provee mapas minimalistas en tonos grises muy claros y tipografía fina que no compite visualmente con el diseño minimalista de la barbería y resalta de forma suprema los acentos de marca.
+Para dotar al mapa de una profundidad tridimensional increíble sin comprometer la velocidad, inyectamos dinámicamente un sombreador vectorial de extrusión en el evento de carga del mapa:
+
+- **Detección Dinámica de Fuentes**: Consultamos las fuentes activas del basemap para vincular de forma automática el ID de vector tiles (`openmaptiles` o equivalente de CARTO).
+- **Inyección por debajo de Etiquetas**: Localizamos el primer ID de la capa de símbolos de etiquetas y texto del mapa e inyectamos la extrusión **por debajo de ella**, garantizando que los nombres de las calles y locales sigan siendo 100% legibles.
+- **Rendimiento Visual Premium**:
+  - **Inclinación de Cámara**: Se pre-configuran parámetros de `pitch: 45` y `bearing: -10` por defecto en el mapa.
+  - **Color Stone Acoplado**: Pintamos las caras de los edificios tridimensionales con una interpolación lineal de colores según su altura en base a la paleta minimalista *stone* (desde `#e7e5e4` / `stone-200` para casas bajas hasta `#a8a29e` / `stone-400` para rascacielos) con una opacidad elegante del `65%`.
+
+---
+
+## 📱 4. Diseño Responsivo Avanzado (Mobile-First Masterclass)
+
+Para proveer una experiencia premium equivalente a las aplicaciones nativas de iOS (como Apple Maps) y evitar la saturación del viewport en dispositivos móviles, rediseñamos el layout en base al ancho de pantalla:
+
+| Elemento | Diseño en Escritorio (Desktop) | Diseño en Móviles (Mobile / Tablet) |
+| :--- | :--- | :--- |
+| **Distribución Grid** | Columnas estables: `lg:grid-cols-12` (4/12 para Sidebar, 8/12 para Mapa). | Dirección vertical fluida (`flex flex-col`). |
+| **Barra de Sucursales** | Listado de tarjetas apiladas en columna vertical (`flex-col`) con scroll vertical. | Fila horizontal (`flex-row overflow-x-auto`) con soporte nativo de **Snap Points (`snap-x snap-mandatory flex-shrink-0`)** para deslizar de forma táctil y fluida. |
+| **Información del Local** | Leyenda flotante elegante (`absolute z-30`) posicionada en la esquina inferior izquierda del mapa. | Oculta de forma interna en el mapa (`hidden lg:block`). En su lugar, el card activo del carrusel **se expande dinámicamente en altura** para renderizar teléfono y horarios inline (`lg:hidden`). |
+| **Viewport del Mapa** | Altura fija de 600px en armonía con la barra lateral. | Altura optimizada a `380px`/`450px` para dejar espacio libre para desplazamientos táctiles rápidos. |
+
+---
+
+## 🎨 5. Estructura y Estética Visual (Estilo Premium)
+
+- **Basemap Minimalista**: Consumimos la capa vectorial de **CARTO Positron Light** (`https://basemaps.cartocdn.com/gl/positron-gl-style/style.json`). Esta capa resalta de forma suprema los acentos de marca.
 - **Lucide SVG Markers**:
-  - Renderiza el pin exacto de la marca con bordes finos.
-  - **Estado Neutral (Inactivo)**: El pin se presenta en color gris suave (`#a8a29e` / `stone-400`) y con fondo transparente para mantener el mapa extremadamente limpio.
-  - **Estado Activo (Seleccionado)**: El pin escala suavemente a **`1.25x`**, se traslada ligeramente en el eje vertical (`translateY(-2px)`), se posiciona por encima de los demás (`zIndex: 10`), se rellena por completo en color **Azul Royal Premium (`#0b3a60`)**, y su círculo interior se tiñe de blanco para crear una visualización de altísima gama.
-- **Cero Redondeados (`rounded-none`)**: Todos los elementos (barra lateral, tarjetas de locales, e info cards flotantes en el mapa) conservan bordes rectos y minimalistas, en plena consistencia con el diseño de Apple y Three.js.
-
----
-
-## 🛠️ 4. Componentes y Servicios
-
-- **`src/components/InteractiveMap.tsx`**: Componente maestro auto-contenido y responsive.
-- **Filtro de SSR**: Cargado en `src/app/page.tsx` con Next.js dynamic loader:
-  ```typescript
-  const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
-      ssr: false,
-      loading: () => <ShimmerLoader />
-  });
-  ```
-- **Prisma Schema (`prisma/schema.prisma`)**:
-  ```prisma
-  model Location {
-    id        String   @id @default(cuid())
-    name      String
-    address   String
-    latitude  Float?
-    longitude Float?
-    // relaciones...
-  }
-  ```
-
----
-
-## 🚀 5. Posibles Mejoras Futuras
-
-1. **Agrupamiento (Clustering) Nativo**: Utilizar el agrupamiento de fuentes nativo de MapLibre en caso de tener cientos de sucursales geográficamente distantes.
-2. **Capa 3D de Edificios**: Activar la extrusión en 3D de los edificios del mapa circundante (`fill-extrusion` de MapLibre) para dotar de una profundidad urbana tridimensional increíble.
-3. **Pulsos Dinámicos CSS**: Agregar micro-animaciones CSS de expansión (`animate-ping`) al marcador seleccionado para darle mayor dinamismo.
+  - **Estado Neutral (Inactivo)**: El pin se presenta en color gris suave (`#a8a29e` / `stone-400`).
+  - **Estado Activo (Seleccionado)**: El pin escala suavemente a **`1.25x`**, se traslada ligeramente en el eje vertical (`translateY(-2px)`), se posiciona por encima (`zIndex: 10`), se rellena por completo en color **Azul Royal Premium (`#0b3a60`)**, y su círculo interior se tiñe de blanco.
+- **Cero Redondeados (`rounded-none`)**: Todos los elementos (barra lateral, tarjetas de locales, e info cards flotantes en el mapa) conservan bordes rectos y minimalistas.
