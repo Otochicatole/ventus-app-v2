@@ -120,35 +120,78 @@ export default function Home() {
     // Definición de curvas de transición cinematográficas de Apple
     const appleEase = [0.16, 1, 0.3, 1]; // Curva de desaceleración ultra-suave
 
+    // Variantes de animación premium para el efecto de máquina de escribir y difuminado cinemático
+    const containerVariants = {
+        hidden: { 
+            opacity: 0,
+        },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15, // Retraso secuencial entre letras
+                delayChildren: 0.2,    // Espera inicial antes de arrancar
+            }
+        },
+        exit: {
+            opacity: 0,
+            scale: 1.35,
+            y: -60,
+            filter: "blur(20px)",
+            transition: {
+                duration: 1.2,
+                ease: [0.6, -0.05, 0.01, 0.99]
+            }
+        }
+    };
+
+    const letterVariants = {
+        hidden: { 
+            opacity: 0, 
+            y: 25,
+            filter: "blur(6px)"
+        },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            filter: "blur(0px)",
+            transition: {
+                duration: 0.8,
+                ease: appleEase
+            }
+        }
+    };
+
     return (
         <div className="bg-stone-50 text-stone-900 font-sans min-h-screen selection:bg-[#0b3a60] selection:text-white">
-            <AnimatedSpheres onLoadComplete={handleLoadComplete} />
             <CustomCursor />
-
-            {/* Pantalla de carga animada de entrada con salida Blur-Scale Cinematográfica */}
-            <motion.h1
-                initial={{ opacity: 0, scale: 0.8, y: 50, filter: "blur(0px)" }}
-                animate={
-                    showContent
-                        ? { opacity: 0, scale: 1.35, y: -60, filter: "blur(20px)" }
-                        : { opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }
-                }
-                transition={{ 
-                    duration: 1.2, 
-                    ease: [0.6, -0.05, 0.01, 0.99]
-                }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] sm:text-[80px] md:text-[120px] lg:text-[160px] xl:text-[200px] font-black uppercase tracking-tighter whitespace-nowrap text-stone-900 select-none pointer-events-none"
-                style={{ zIndex: 0 }}
-            >
-                VENTUS
-            </motion.h1>
 
             {/* Contenido Principal con Animación y Transiciones Cohesionadas */}
             <div className="relative" style={{ zIndex: 10 }}>
                 
-                {/* HERO SECTION */}
-                <section className="min-h-screen flex items-center justify-start py-20 px-6 sm:px-12 md:px-24">
-                    <div className="max-w-4xl space-y-8">
+                {/* HERO SECTION - Animación 3D acotada a los primeros 100vh */}
+                <section className="relative min-h-screen flex items-center justify-start py-20 px-6 sm:px-12 md:px-24 overflow-hidden">
+                    <AnimatedSpheres onLoadComplete={handleLoadComplete} />
+
+                    {/* Pantalla de carga animada con efecto typing y salida Blur-Scale Cinematográfica */}
+                    <motion.h1
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate={showContent ? "exit" : "visible"}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] sm:text-[80px] md:text-[120px] lg:text-[160px] xl:text-[200px] font-black uppercase tracking-tighter whitespace-nowrap text-stone-900 select-none pointer-events-none flex"
+                        style={{ zIndex: 0 }}
+                    >
+                        {Array.from("VENTUS").map((letter, index) => (
+                            <motion.span
+                                key={index}
+                                variants={letterVariants}
+                                className="inline-block"
+                            >
+                                {letter}
+                            </motion.span>
+                        ))}
+                    </motion.h1>
+
+                    <div className="max-w-4xl space-y-8 relative z-10">
                         <div className="space-y-4">
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
