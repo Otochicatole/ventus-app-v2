@@ -60,7 +60,7 @@ export default function AdminNavbar({ admin, isMenuOpen, onToggleMenu }: AdminNa
                 </div>
 
                 {/* Lado derecho: Info de administrador + Cerrar Sesión */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-stone-50 rounded-none border border-stone-200">
                         <div className="w-8 h-8 bg-[#0b3a60] rounded-none flex items-center justify-center text-white font-bold text-sm">
                             {(admin.name || admin.email).charAt(0).toUpperCase()}
@@ -74,14 +74,14 @@ export default function AdminNavbar({ admin, isMenuOpen, onToggleMenu }: AdminNa
                     <button
                         onClick={handleLogout}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider rounded-none hover:bg-red-700 disabled:opacity-50 transition-all cursor-pointer border border-red-600"
+                        className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-red-600 text-white font-semibold text-xs uppercase tracking-wider rounded-none hover:bg-red-700 disabled:opacity-50 transition-all cursor-pointer border border-red-600"
                     >
                         {loading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                             <LogOut className="w-4 h-4" />
                         )}
-                        <span>Salir</span>
+                        <span className="hidden sm:inline">Salir</span>
                     </button>
                 </div>
             </div>

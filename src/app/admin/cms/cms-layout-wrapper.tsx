@@ -47,7 +47,7 @@ export default function CMSLayoutWrapper({
                 )}
 
                 {/* Área de Contenido Principal */}
-                <main className="md:ml-64 px-4 py-6 pb-20 md:px-6 md:py-8 lg:px-10 lg:py-10 md:pb-10 lg:pb-12 min-h-[calc(100vh-4rem)]">
+                <main className="md:ml-64 px-3 py-4 pb-8 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-10 lg:py-10 md:pb-10 lg:pb-12 min-h-[calc(100vh-4rem)]">
                     <div className="max-w-7xl mx-auto w-full">
                         {children}
                     </div>
