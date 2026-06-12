@@ -6,7 +6,6 @@ import { Home, Scissors, Package } from "lucide-react";
 
 const pages = [
     { name: "Inicio", href: "/", icon: Home },
-    { name: "Servicios", href: "/#services-section", icon: Package },
 ];
 
 export default function Navbar() {
@@ -50,8 +49,8 @@ export default function Navbar() {
                 </div>
             </nav>
 
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-sm">
-                <div className="grid grid-cols-2 h-16">
+            <nav className="md:hidden fixed flex justify-center items-center w-full bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-sm">
+                <div className="grid grid-cols-1 w-fit h-16">
                     {pages.map((page) => {
                         const isActive = pathname === page.href || (page.href !== "/" && pathname?.startsWith(page.href));
                         const Icon = page.icon;
