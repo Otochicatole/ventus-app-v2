@@ -249,8 +249,8 @@ export default function Home() {
               transition={{ duration: 1.1, delay: 0.35, ease: appleEase }}
               className="text-lg md:text-xl font-light text-stone-600 max-w-2xl leading-relaxed"
             >
-                Cada corte es una obra de arte. Técnicas ancestrales con un
-                enfoque contemporáneo para el hombre que valora los detalles.
+              Cada corte es una obra de arte. Técnicas ancestrales con un
+              enfoque contemporáneo para el hombre que valora los detalles.
             </motion.p>
 
             <motion.div

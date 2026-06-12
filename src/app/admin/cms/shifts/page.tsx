@@ -224,7 +224,7 @@ _Ventus Barberia_`;
                 </div>
                 <div className="flex gap-3">
                     <Link href="/admin/cms/history">
-                        <Button size="small" variant="outlined" startIcon={<History className="w-5 h-5" />}>
+                        <Button size="large" variant="outlined" startIcon={<History className="w-5 h-5" />}>
                             Historial
                         </Button>
                     </Link>

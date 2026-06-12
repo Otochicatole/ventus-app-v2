@@ -1,46 +1,47 @@
 @import "tailwindcss";
 
 html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    background: #f0f0f0;
-    color: #0a0a0a;
+  background: #f0f0f0;
+  color: #0a0a0a;
 }
 
 @keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {
-    animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.5s ease-out;
 }
 
 @utility scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        display: none;
-    }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Custom overrides to enforce premium flat aesthetic and Navy Blue (#0b3a60) branding across all admin interfaces */
@@ -48,7 +49,7 @@ body {
 .admin-login-root *,
 [class*="admin-cms-root"] *,
 [class*="admin-login-root"] * {
-    border-radius: 0px !important;
+  border-radius: 0px !important;
 }
 
 /* Background navy blue overlays for solid blue buttons/elements */
@@ -56,8 +57,8 @@ body {
 .admin-cms-root .bg-blue-500,
 .admin-login-root .bg-blue-600,
 .admin-login-root .bg-blue-500 {
-    background-color: #0b3a60 !important;
-    color: #ffffff !important; /* Force high contrast white text */
+  background-color: #0b3a60 !important;
+  color: #ffffff !important; /* Force high contrast white text */
 }
 
 /* Hover effects for solid blue buttons */
@@ -65,22 +66,22 @@ body {
 .admin-cms-root .hover\:bg-blue-600:hover,
 .admin-login-root .hover\:bg-blue-700:hover,
 .admin-login-root .hover\:bg-blue-600:hover {
-    background-color: #082a46 !important;
-    color: #ffffff !important; /* Keep white text visible */
+  background-color: #082a46 !important;
+  color: #ffffff !important; /* Keep white text visible */
 }
 
 /* Soft blue backgrounds (e.g. bg-blue-50, bg-blue-100) */
 .admin-cms-root .bg-blue-50,
 .admin-cms-root .bg-blue-100 {
-    background-color: rgba(11, 58, 96, 0.08) !important;
-    color: #0b3a60 !important;
+  background-color: rgba(11, 58, 96, 0.08) !important;
+  color: #0b3a60 !important;
 }
 
 /* Soft blue background hovers (maintains text visibility) */
 .admin-cms-root .hover\:bg-blue-100:hover,
 .admin-cms-root .hover\:bg-blue-50:hover,
 .admin-cms-root .hover\:bg-red-100:hover {
-    background-color: rgba(11, 58, 96, 0.15) !important;
+  background-color: rgba(11, 58, 96, 0.15) !important;
 }
 
 /* Text color navy blue */
@@ -88,14 +89,14 @@ body {
 .admin-cms-root .text-blue-500,
 .admin-login-root .text-blue-600,
 .admin-login-root .text-blue-500 {
-    color: #0b3a60 !important;
+  color: #0b3a60 !important;
 }
 
 /* Border color navy blue */
 .admin-cms-root .border-blue-600,
 .admin-cms-root .border-blue-500,
 .admin-login-root .border-blue-600 {
-    border-color: #0b3a60 !important;
+  border-color: #0b3a60 !important;
 }
 
 /* Focus state inputs outline */
@@ -103,41 +104,40 @@ body {
 .admin-cms-root select:focus,
 .admin-cms-root textarea:focus,
 .admin-login-root input:focus {
-    border-color: #0b3a60 !important;
-    box-shadow: 0 0 0 1px #0b3a60 !important;
-    --tw-ring-color: #0b3a60 !important;
+  border-color: #0b3a60 !important;
+  box-shadow: 0 0 0 1px #0b3a60 !important;
+  --tw-ring-color: #0b3a60 !important;
 }
 
 /* Focus and ring outlines */
 .admin-cms-root [class*="focus:ring-blue-"]:focus,
 .admin-cms-root [class*="focus-within:ring-blue-"]:focus-within,
 .admin-login-root [class*="focus:ring-blue-"]:focus {
-    border-color: #0b3a60 !important;
-    --tw-ring-color: #0b3a60 !important;
+  border-color: #0b3a60 !important;
+  --tw-ring-color: #0b3a60 !important;
 }
 
 /* Precise loading spinners styling (restricted to .animate-spin to avoid breaking button border-tops) */
 .admin-cms-root .animate-spin {
-    border-top-color: transparent !important;
-    border-left-color: #0b3a60 !important;
-    border-right-color: #0b3a60 !important;
-    border-bottom-color: #0b3a60 !important;
+  border-top-color: transparent !important;
+  border-left-color: #0b3a60 !important;
+  border-right-color: #0b3a60 !important;
+  border-bottom-color: #0b3a60 !important;
 }
 
 /* Explicit overrides for outlined primary buttons to guarantee perfect border-tops and high-contrast hovers */
 .admin-cms-root button.border-blue-600,
 .admin-cms-root button[class*="border-blue-"] {
-    border: 2px solid #0b3a60 !important;
-    border-top: 2px solid #0b3a60 !important; /* Ensure border-top is 100% visible */
-    color: #0b3a60 !important;
-    background-color: transparent !important;
+  border: 2px solid #0b3a60 !important;
+  border-top: 2px solid #0b3a60 !important; /* Ensure border-top is 100% visible */
+  color: #0b3a60 !important;
+  background-color: transparent !important;
 }
 
 .admin-cms-root button.border-blue-600:hover,
 .admin-cms-root button[class*="border-blue-"]:hover {
-    background-color: rgba(11, 58, 96, 0.08) !important;
-    color: #0b3a60 !important;
-    border: 2px solid #0b3a60 !important;
-    border-top: 2px solid #0b3a60 !important;
+  background-color: rgba(11, 58, 96, 0.08) !important;
+  color: #0b3a60 !important;
+  border: 2px solid #0b3a60 !important;
+  border-top: 2px solid #0b3a60 !important;
 }
-
