@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, Package, MapPin, Calendar } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,7 @@ type Shift = {
 };
 
 export default function HistoryPage() {
+    const router = useRouter();
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -91,9 +93,14 @@ export default function HistoryPage() {
 
     return (
         <div className="space-y-8 animate-fadeIn">
-            <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">Historial de Turnos</h1>
-                <p className="text-gray-600 text-lg">Turnos pasados y completados</p>
+            <div className="flex justify-between items-start flex-wrap gap-6">
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Historial de Turnos</h1>
+                    <p className="text-gray-600 text-lg">Turnos pasados y completados</p>
+                </div>
+                <Button size="small" variant="outlined" onClick={() => router.back()}>
+                    ← Volver
+                </Button>
             </div>
 
             <div className="space-y-4">

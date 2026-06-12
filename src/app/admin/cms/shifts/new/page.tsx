@@ -138,8 +138,12 @@ export default function NewShiftPage() {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div className="max-w-4xl mx-auto space-y-6">
+                <div className="flex sm:flex-row flex-col gap-3 justify-between sm:items-center">
                 <h1 className="text-4xl font-bold text-gray-900">Nuevo Turno</h1>
-
+                <Button size="small" className="w-fit" variant="outlined" onClick={() => router.back()}>
+                    ← Volver
+                </Button>
+                </div>
                 <Card>
                     <CardContent className="p-6">
                         <h2 className="text-xl font-bold text-white mb-6">

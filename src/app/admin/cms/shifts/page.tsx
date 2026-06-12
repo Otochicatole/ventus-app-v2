@@ -224,12 +224,12 @@ _Ventus Barberia_`;
                 </div>
                 <div className="flex gap-3">
                     <Link href="/admin/cms/history">
-                        <Button size="large" variant="outlined" startIcon={<History className="w-5 h-5" />}>
+                        <Button size="small" variant="outlined" startIcon={<History className="w-5 h-5" />}>
                             Historial
                         </Button>
                     </Link>
                     <Link href="/admin/cms/shifts/new">
-                        <Button size="large" startIcon={<Plus className="w-5 h-5" />}>
+                        <Button size="small" startIcon={<Plus className="w-5 h-5" />}>
                             Nuevo Turno
                         </Button>
                     </Link>
