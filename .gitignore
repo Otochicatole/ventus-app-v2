@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.agent
+.agents
 
 # testing
 /coverage
@@ -45,3 +47,4 @@ next-env.d.ts
 /src/generated/prisma
 *.db
 *.db-journal
+skills-lock.json
