@@ -24,6 +24,7 @@ import {
     Clock,
     Scissors,
     BarChart2,
+    ShoppingBag,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -35,6 +36,7 @@ interface DashboardData {
         pendingShifts: number;
         totalLocations: number;
         totalServices: number;
+        totalProducts?: number;
         totalReviews: number;
         avgRating: number;
         income: number;
@@ -235,11 +237,12 @@ export default function DashboardCharts() {
                         <StatCard label="Servicios" value={s.totalServices} icon={Scissors} sub={`${s.totalLocations} suc.`} />
                     </div>
 
-                    {/* ── Confirmation split — 1 col on mobile, 2 on sm, 4 on md ── */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                    {/* ── Confirmation split — 1 col on mobile, 2 on sm, 5 on md ── */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                         <StatCard label="Confirmados" value={s.confirmedShifts} icon={CheckCircle} sub="Verificados" />
                         <StatCard label="Pendientes" value={s.pendingShifts} icon={Clock} sub="Sin confirmar" />
                         <StatCard label="Sucursales" value={s.totalLocations} icon={MapPin} />
+                        <StatCard label="Productos" value={s.totalProducts ?? 0} icon={ShoppingBag} sub="Activos" />
                         <StatCard label="Reseñas" value={s.totalReviews} icon={Star} />
                     </div>
 

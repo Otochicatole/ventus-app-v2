@@ -45,7 +45,7 @@ export async function PUT(
 
         const { id } = await params;
         const body = await request.json();
-        const { fullName, payment, description, servicesPerformed, paidAt } = body;
+        const { fullName, payment, description, servicesPerformed, productsBought, paidAt } = body;
 
         const record = await prisma.clientPaidService.update({
             where: { id },
@@ -54,6 +54,7 @@ export async function PUT(
                 payment: parseFloat(payment),
                 description: description || null,
                 servicesPerformed: servicesPerformed || [],
+                productsBought: productsBought || [],
                 ...(paidAt && { paidAt: new Date(paidAt + "T12:00:00.000Z") }),
             },
         });

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         await requireAuth();
 
         const body = await request.json();
-        const { fullName, payment, description, servicesPerformed, paidAt } = body;
+        const { fullName, payment, description, servicesPerformed, productsBought, paidAt } = body;
 
         const record = await prisma.clientPaidService.create({
             data: {
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
                 payment: parseFloat(payment),
                 description: description || null,
                 servicesPerformed: servicesPerformed || [],
+                productsBought: productsBought || [],
                 paidAt: paidAt ? new Date(paidAt + "T12:00:00.000Z") : new Date(),
             },
         });

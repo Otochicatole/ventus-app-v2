@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, MapPin, Clock, CalendarX, Package, Receipt, Wallet } from "lucide-react";
+import { LayoutDashboard, Calendar, MapPin, Clock, CalendarX, Package, Receipt, Wallet, ShoppingBag } from "lucide-react";
 
 const menuItems = [
     {
@@ -29,6 +29,11 @@ const menuItems = [
         label: "Servicios",
         href: "/admin/cms/services",
         icon: Package,
+    },
+    {
+        label: "Productos",
+        href: "/admin/cms/products",
+        icon: ShoppingBag,
     },
     {
         label: "Ubicaciones",

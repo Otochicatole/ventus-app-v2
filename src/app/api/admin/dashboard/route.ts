@@ -77,6 +77,7 @@ export async function GET(request: Request) {
             pendingShifts,
             totalLocations,
             totalServices,
+            totalProducts,
             totalReviews,
             avgRating,
 
@@ -100,6 +101,7 @@ export async function GET(request: Request) {
             prisma.shift.count({ where: { confirmed: false, date: { gte: start, lte: end } } }),
             prisma.location.count(),
             prisma.service.count({ where: { active: true } }),
+            prisma.product.count({ where: { active: true } }),
             prisma.review.count(),
             prisma.review.aggregate({ _avg: { rating: true } }),
 
@@ -193,6 +195,7 @@ export async function GET(request: Request) {
                 pendingShifts,
                 totalLocations,
                 totalServices,
+                totalProducts,
                 totalReviews,
                 avgRating: Math.round((avgRating._avg.rating ?? 0) * 10) / 10,
                 income,
