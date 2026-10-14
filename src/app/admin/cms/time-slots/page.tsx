@@ -126,91 +126,115 @@ export default function TimeSlotsPage() {
     };
 
     return (
-        <div className="space-y-8 animate-fadeIn">
-            <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">Gestión de Horarios</h1>
-                <p className="text-gray-600 text-lg">Configuración de horarios disponibles por ubicación</p>
+        <div className="space-y-6 animate-fadeIn pb-12">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
+                <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Gestión de Horarios</h1>
+                    <p className="text-stone-500 text-sm mt-1">
+                        Configuración de franjas horarias disponibles para reserva de turnos por sede
+                    </p>
+                </div>
             </div>
 
-            <Card>
-                <CardContent>
-                    <Select
-                        label="Seleccionar Ubicación"
-                        value={selectedLocationId}
-                        onChange={(e) => setSelectedLocationId(e.target.value)}
-                        options={[
-                            { value: "", label: "Seleccionar ubicación" },
-                            ...locations.map((loc) => ({
-                                value: loc.id,
-                                label: `${loc.name} - ${loc.address}`,
-                            })),
-                        ]}
-                        fullWidth
-                    />
-                </CardContent>
-            </Card>
+            {/* Location Selector Card */}
+            <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs">
+                <Select
+                    label="Seleccionar Sede / Ubicación"
+                    value={selectedLocationId}
+                    onChange={(e) => setSelectedLocationId(e.target.value)}
+                    options={[
+                        { value: "", label: "Seleccionar una sede para ver sus horarios..." },
+                        ...locations.map((loc) => ({
+                            value: loc.id,
+                            label: `${loc.name} — ${loc.address}`,
+                        })),
+                    ]}
+                    fullWidth
+                />
+            </div>
 
             {selectedLocationId && (
-                <Card>
-                    <CardHeader className="flex flex-col gap-4">
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Horarios Disponibles</h2>
-                                <p className="text-gray-600">{timeSlots.length} horario(s) configurado(s)</p>
+                <div className="bg-white border border-stone-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h2 className="text-lg font-bold text-stone-900">Horarios Configurados</h2>
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700">
+                                    {timeSlots.length} horarios
+                                </span>
                             </div>
-                            <Button 
-                                onClick={() => setShowModal(true)} 
-                                startIcon={<Plus className="w-5 h-5" />}
-                                className="w-full lg:w-auto"
-                            >
-                                Agregar Horario
-                            </Button>
+                            <p className="text-xs text-stone-500 mt-1">
+                                Los clientes podrán reservar únicamente en estos turnos habilitados
+                            </p>
                         </div>
-                    </CardHeader>
+                        <Button 
+                            onClick={() => setShowModal(true)} 
+                            startIcon={<Plus className="w-4 h-4" />}
+                            className="w-full sm:w-auto"
+                        >
+                            Agregar Horario
+                        </Button>
+                    </div>
 
-                    <CardContent>
-                        {loading ? (
-                            <div className="flex justify-center py-12">
-                                <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+                    {loading ? (
+                        <div className="flex justify-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
+                        </div>
+                    ) : timeSlots.length === 0 ? (
+                        <div className="py-12 text-center">
+                            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-3">
+                                <Clock className="w-6 h-6 text-stone-400" />
                             </div>
-                        ) : timeSlots.length === 0 ? (
-                            <div className="py-12 text-center">
-                                <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                                <p className="text-gray-500">No hay horarios configurados para esta ubicación</p>
+                            <h3 className="text-sm font-semibold text-stone-900">No hay horarios configurados</h3>
+                            <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+                                Esta ubicación aún no tiene horarios disponibles para que los clientes elijan al reservar.
+                            </p>
+                            <div className="mt-4">
+                                <Button size="small" onClick={() => setShowModal(true)} startIcon={<Plus className="w-4 h-4" />}>
+                                    Crear primer horario
+                                </Button>
                             </div>
-                        ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {timeSlots.map((slot) => (
-                                    <div
-                                        key={slot.id}
-                                        className="flex items-center justify-between px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors group cursor-pointer"
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {timeSlots.map((slot) => (
+                                <div
+                                    key={slot.id}
+                                    className="flex items-center justify-between px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-lg hover:border-stone-300 hover:bg-stone-100/70 transition-all group"
+                                >
+                                    <span className="text-stone-900 font-semibold text-sm tracking-tight">{slot.time} hs</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setDeleteId(slot.id)}
+                                        className="text-stone-400 hover:text-red-600 transition-colors cursor-pointer p-1 rounded hover:bg-red-50"
+                                        title="Eliminar horario"
                                     >
-                                        <span className="text-gray-900 font-medium text-lg">{slot.time}</span>
-                                        <button
-                                            onClick={() => setDeleteId(slot.id)}
-                                            className="text-gray-400 hover:text-red-500 transition-colors md:opacity-0 md:group-hover:opacity-100 cursor-pointer"
-                                        >
-                                            <X className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             )}
 
-            <Dialog open={showModal} onClose={() => setShowModal(false)} title="Agregar Horario" maxWidth="sm">
+            <Dialog open={showModal} onClose={() => setShowModal(false)} title="Agregar Franja Horaria" maxWidth="sm">
                 <form onSubmit={handleAddTimeSlot}>
                     <DialogContent>
-                        <Input
-                            label="Horario"
-                            type="time"
-                            value={newTime}
-                            onChange={(e) => setNewTime(e.target.value)}
-                            required
-                            fullWidth
-                        />
+                        <div className="space-y-3">
+                            <Input
+                                label="Horario (formato 24hs)"
+                                type="time"
+                                value={newTime}
+                                onChange={(e) => setNewTime(e.target.value)}
+                                required
+                                fullWidth
+                            />
+                            <p className="text-xs text-stone-500">
+                                Por ejemplo: 09:00, 10:30, 15:00.
+                            </p>
+                        </div>
                     </DialogContent>
                     <DialogActions>
                         <Button
@@ -223,7 +247,7 @@ export default function TimeSlotsPage() {
                         <Button
                             type="submit"
                             loading={loading}
-                            disabled={loading}
+                            disabled={loading || !newTime}
                         >
                             Agregar
                         </Button>
@@ -236,7 +260,7 @@ export default function TimeSlotsPage() {
                 onClose={() => setDeleteId(null)}
                 onConfirm={handleDelete}
                 title="Eliminar Horario"
-                message="¿Estás seguro de eliminar este horario?"
+                message="¿Estás seguro de que deseás eliminar este horario? No estará más disponible para reservas futuras."
                 confirmText="Eliminar"
                 loading={deleting}
             />

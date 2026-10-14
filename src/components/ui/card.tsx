@@ -7,7 +7,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export function Card({ children, className = "", ...props }: CardProps) {
     return (
         <div
-            className={`bg-white border border-gray-200 rounded-2xl shadow-sm ${className}`}
+            className={`bg-white border border-stone-200 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${className}`}
             {...props}
         >
             {children}
@@ -17,7 +17,7 @@ export function Card({ children, className = "", ...props }: CardProps) {
 
 export function CardHeader({ children, className = "", ...props }: CardProps) {
     return (
-        <div className={`px-8 py-6 border-b border-gray-200 ${className}`} {...props}>
+        <div className={`px-5 py-4 sm:px-6 sm:py-5 border-b border-stone-100 ${className}`} {...props}>
             {children}
         </div>
     );
@@ -25,7 +25,7 @@ export function CardHeader({ children, className = "", ...props }: CardProps) {
 
 export function CardContent({ children, className = "", ...props }: CardProps) {
     return (
-        <div className={`px-8 py-6 ${className}`} {...props}>
+        <div className={`p-4 sm:p-6 ${className}`} {...props}>
             {children}
         </div>
     );
@@ -33,7 +33,7 @@ export function CardContent({ children, className = "", ...props }: CardProps) {
 
 export function CardActions({ children, className = "", ...props }: CardProps) {
     return (
-        <div className={`px-8 py-6 border-t border-gray-200 flex gap-4 ${className}`} {...props}>
+        <div className={`px-5 py-3.5 sm:px-6 sm:py-4 border-t border-stone-100 flex gap-3 ${className}`} {...props}>
             {children}
         </div>
     );

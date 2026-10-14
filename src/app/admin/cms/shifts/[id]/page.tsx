@@ -2,9 +2,8 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Calendar, Clock, MapPin, User, Mail, Phone, MessageSquare, CheckCircle2, Clock3 } from "lucide-react";
 import Button from "@/components/ui/button";
-import Chip from "@/components/ui/chip";
-import { Card, CardContent } from "@/components/ui/card";
 
 type Shift = {
     id: string;
@@ -120,16 +119,19 @@ _Ventus Barberia_`;
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
             </div>
         );
     }
 
     if (!shift) {
         return (
-            <div className="text-center py-12">
-                <p className="text-gray-500">Turno no encontrado</p>
+            <div className="text-center py-16">
+                <p className="text-stone-500 text-sm">Turno no encontrado</p>
+                <Button size="small" variant="outlined" onClick={() => router.back()} className="mt-4">
+                    ← Volver a turnos
+                </Button>
             </div>
         );
     }
@@ -137,110 +139,168 @@ _Ventus Barberia_`;
     const dateStr = shift.date.split("T")[0];
     const [year, month, day] = dateStr.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const cleanPhone = shift.phone.replace(/\D/g, "");
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold text-gray-900">Detalles</h1>
-                <Button onClick={() => router.back()}>← Volver</Button>
+        <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn pb-12">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
+                <div>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Detalle de Turno</h1>
+                        <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                shift.confirmed
+                                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                    : "bg-amber-50 text-amber-800 border border-amber-200"
+                            }`}
+                        >
+                            {shift.confirmed ? (
+                                <>
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                    Confirmado
+                                </>
+                            ) : (
+                                <>
+                                    <Clock3 className="w-3 h-3 text-amber-600" />
+                                    Pendiente
+                                </>
+                            )}
+                        </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">
+                        Turno agendado por {shift.name} {shift.lastName}
+                    </p>
+                </div>
+                <Button variant="outlined" size="small" onClick={() => router.back()}>
+                    ← Volver
+                </Button>
             </div>
 
-            <div className="space-y-6">
-                <Card>
-                    <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-6">
-                            Información del Cliente
-                        </h2>
-                        <div className="flex gap-6 items-start mb-6">
-                            <p className="text-gray-700">Estado del turno:</p>
-                            <Chip
-                                label={shift.confirmed ? "Confirmado" : "Pendiente"}
-                                color={shift.confirmed ? "success" : "warning"}
-                                variant="soft"
-                                size="small"
-                            />
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Nombre Completo</p>
-                                <p className="text-lg font-semibold text-gray-900">
-                                    {shift.name} {shift.lastName}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Email</p>
-                                <p className="text-lg font-semibold text-gray-900">{shift.email}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Teléfono</p>
-                                <p className="text-lg font-semibold text-gray-900">{shift.phone}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Fecha de Registro</p>
-                                <p className="text-lg font-semibold text-gray-900">
-                                    {new Date(shift.createdAt).toLocaleString("es-AR")}
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* Shift & Time Details */}
+            <div className="bg-white border border-stone-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-5">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+                    <h2 className="text-base font-bold text-stone-900">Datos de la Reserva</h2>
+                    <span className="text-xs text-stone-400 tabular-nums">
+                        Registrado el {new Date(shift.createdAt).toLocaleDateString("es-AR")}
+                    </span>
+                </div>
 
-                <Card>
-                    <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-6">
-                            Información del Turno
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Ubicación</p>
-                                <p className="text-lg font-semibold text-gray-900">{shift.location.name}</p>
-                                <p className="text-sm text-gray-500">{shift.location.address}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Fecha y Hora</p>
-                                <p className="text-lg font-semibold text-gray-900 capitalize">
-                                    {date.toLocaleDateString("es-AR", {
-                                        weekday: "long",
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })}
-                                </p>
-                                <p className="text-sm text-gray-500">{shift.time}</p>
-                            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-stone-50 border border-stone-200 rounded-lg space-y-1">
+                        <div className="flex items-center gap-2 text-stone-500 text-xs font-semibold uppercase tracking-wider">
+                            <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                            Fecha y Hora
                         </div>
-                        <Button variant="contained" onClick={toggleConfirmed}>
-                            {shift.confirmed
-                                ? "Marcar como Pendiente"
-                                : "Marcar como Confirmado"}
+                        <p className="text-base font-bold text-stone-900 capitalize">
+                            {date.toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                        </p>
+                        <p className="text-sm font-semibold text-[#0b3a60] flex items-center gap-1.5 pt-0.5 tabular-nums">
+                            <Clock className="w-4 h-4" />
+                            {shift.time} hs
+                        </p>
+                    </div>
+
+                    <div className="p-4 bg-stone-50 border border-stone-200 rounded-lg space-y-1">
+                        <div className="flex items-center gap-2 text-stone-500 text-xs font-semibold uppercase tracking-wider">
+                            <MapPin className="w-3.5 h-3.5 text-stone-400" />
+                            Sede y Dirección
+                        </div>
+                        <p className="text-base font-bold text-stone-900">
+                            {shift.location.name}
+                        </p>
+                        <p className="text-xs text-stone-500">
+                            {shift.location.address}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <Button
+                        variant={shift.confirmed ? "outlined" : "contained"}
+                        onClick={toggleConfirmed}
+                    >
+                        {shift.confirmed ? "Marcar como Pendiente" : "Confirmar Turno y Notificar"}
+                    </Button>
+
+                    {cleanPhone && (
+                        <a
+                            href={`https://wa.me/${cleanPhone}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                        >
+                            <MessageSquare className="w-4 h-4" />
+                            <span>Abrir WhatsApp</span>
+                        </a>
+                    )}
+                </div>
+            </div>
+
+            {/* Client Information */}
+            <div className="bg-white border border-stone-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+                <h2 className="text-base font-bold text-stone-900 border-b border-stone-100 pb-3">
+                    Información del Cliente
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                        <span className="text-xs text-stone-500 flex items-center gap-1.5 font-medium">
+                            <User className="w-3.5 h-3.5 text-stone-400" />
+                            Nombre
+                        </span>
+                        <p className="text-sm font-semibold text-stone-900">
+                            {shift.name} {shift.lastName}
+                        </p>
+                    </div>
+
+                    <div className="space-y-1">
+                        <span className="text-xs text-stone-500 flex items-center gap-1.5 font-medium">
+                            <Phone className="w-3.5 h-3.5 text-stone-400" />
+                            Teléfono
+                        </span>
+                        <p className="text-sm font-semibold text-stone-900 tabular-nums">
+                            {shift.phone}
+                        </p>
+                    </div>
+
+                    <div className="space-y-1">
+                        <span className="text-xs text-stone-500 flex items-center gap-1.5 font-medium">
+                            <Mail className="w-3.5 h-3.5 text-stone-400" />
+                            Email
+                        </span>
+                        <p className="text-sm font-semibold text-stone-900 truncate">
+                            {shift.email}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Internal Admin Notes */}
+            <div className="bg-white border border-stone-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+                <h2 className="text-base font-bold text-stone-900 border-b border-stone-100 pb-3">
+                    Notas Internas
+                </h2>
+
+                <form onSubmit={handleSaveNotes} className="space-y-3">
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        rows={3}
+                        placeholder="Escribir notas de seguimiento para este cliente o turno..."
+                        className="w-full px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all resize-none"
+                    />
+                    <div className="flex justify-end">
+                        <Button
+                            type="submit"
+                            size="small"
+                            loading={savingNotes}
+                            disabled={savingNotes}
+                        >
+                            {savingNotes ? "Guardando..." : "Guardar Notas"}
                         </Button>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">
-                            Notas del Admin
-                        </h2>
-                        <form onSubmit={handleSaveNotes}>
-                            <textarea
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                rows={4}
-                                placeholder="Agregar notas sobre el turno..."
-                                className="w-full px-4 py-2.5 mb-4 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                loading={savingNotes}
-                                disabled={savingNotes}
-                            >
-                                {savingNotes ? "Guardando..." : "Guardar Notas"}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+                    </div>
+                </form>
             </div>
         </div>
     );

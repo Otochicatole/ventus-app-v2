@@ -44,12 +44,48 @@ body {
   }
 }
 
+/* Browser surfaces theming: text selection, caret, and custom scrollbars */
+::selection {
+  background-color: #0b3a60;
+  color: #ffffff;
+}
+
+input,
+textarea {
+  caret-color: #0b3a60;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
 /* Custom overrides to enforce premium flat aesthetic and Navy Blue (#0b3a60) branding across all admin interfaces */
 .admin-cms-root *,
 .admin-login-root *,
 [class*="admin-cms-root"] *,
 [class*="admin-login-root"] * {
   border-radius: 0px !important;
+}
+
+/* Exceptions: loading spinners and notification dots must retain circular geometry */
+.admin-cms-root .animate-spin,
+.admin-login-root .animate-spin,
+.animate-spin {
+  border-radius: 9999px !important;
 }
 
 /* Background navy blue overlays for solid blue buttons/elements */

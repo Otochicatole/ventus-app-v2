@@ -12,7 +12,7 @@ interface ChipProps extends HTMLAttributes<HTMLDivElement> {
 export default function Chip({
     label,
     color = "default",
-    size = "medium",
+    size = "small",
     variant = "soft",
     onDelete,
     onClick,
@@ -20,31 +20,31 @@ export default function Chip({
     ...props
 }: ChipProps) {
     const sizeStyles = {
-        small: "px-3 py-1.5 text-xs min-h-[28px]",
-        medium: "px-4 py-2 text-sm min-h-[32px]",
+        small: "px-2.5 py-0.5 text-xs",
+        medium: "px-3 py-1 text-xs sm:text-sm",
     };
 
     const colorStyles = {
         filled: {
-            default: "bg-gray-900 text-white",
-            primary: "bg-blue-600 text-white",
-            success: "bg-green-600 text-white",
+            default: "bg-stone-900 text-white",
+            primary: "bg-[#0b3a60] text-white",
+            success: "bg-emerald-700 text-white",
             error: "bg-red-600 text-white",
             warning: "bg-amber-600 text-white",
         },
         outlined: {
-            default: "border-2 border-gray-300 text-gray-700 bg-transparent",
-            primary: "border-2 border-blue-600 text-blue-600 bg-transparent",
-            success: "border-2 border-green-600 text-green-600 bg-transparent",
-            error: "border-2 border-red-600 text-red-600 bg-transparent",
-            warning: "border-2 border-amber-600 text-amber-600 bg-transparent",
+            default: "border border-stone-300 text-stone-700 bg-transparent",
+            primary: "border border-[#0b3a60] text-[#0b3a60] bg-transparent",
+            success: "border border-emerald-600 text-emerald-700 bg-transparent",
+            error: "border border-red-500 text-red-600 bg-transparent",
+            warning: "border border-amber-500 text-amber-700 bg-transparent",
         },
         soft: {
-            default: "bg-gray-100 text-gray-700 border border-gray-200",
-            primary: "bg-blue-50 text-blue-700 border border-blue-200",
-            success: "bg-green-50 text-green-700 border border-green-200",
+            default: "bg-stone-100 text-stone-700 border border-stone-200",
+            primary: "bg-[#0b3a60]/10 text-[#0b3a60] border border-[#0b3a60]/20",
+            success: "bg-emerald-50 text-emerald-800 border border-emerald-200",
             error: "bg-red-50 text-red-700 border border-red-200",
-            warning: "bg-amber-50 text-amber-700 border border-amber-200",
+            warning: "bg-amber-50 text-amber-800 border border-amber-200",
         },
     };
 
@@ -52,7 +52,7 @@ export default function Chip({
 
     return (
         <div
-            className={`inline-flex items-center gap-2 rounded-lg font-medium transition-all ${sizeStyles[size]} ${colorStyles[variant][color]} ${cursorClass} ${className}`}
+            className={`inline-flex items-center gap-1.5 rounded-md font-medium transition-colors ${sizeStyles[size]} ${colorStyles[variant][color]} ${cursorClass} ${className}`}
             onClick={onClick}
             {...props}
         >
@@ -64,9 +64,10 @@ export default function Chip({
                         e.stopPropagation();
                         onDelete();
                     }}
-                    className="hover:opacity-70 transition-opacity cursor-pointer"
+                    className="hover:opacity-75 transition-opacity cursor-pointer p-0.5 rounded hover:bg-black/5"
+                    title="Eliminar"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                 </button>
             )}
         </div>

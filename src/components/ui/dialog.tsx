@@ -19,20 +19,21 @@ export default function Dialog({ open, onClose, title, maxWidth = "md", children
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer"
+                className="absolute inset-0 bg-stone-950/50 backdrop-blur-xs cursor-pointer transition-opacity"
                 onClick={onClose}
             />
-            <div className={`relative bg-white border border-gray-200 rounded-2xl w-full ${maxWidthClasses[maxWidth]} shadow-2xl animate-fadeIn max-h-[calc(100vh-2rem)] flex flex-col`}>
+            <div className={`relative bg-white border border-stone-200 rounded-xl w-full ${maxWidthClasses[maxWidth]} shadow-2xl max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden`}>
                 {title && (
-                    <div className="px-8 py-6 border-b border-gray-200 flex items-center justify-between shrink-0">
-                        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+                    <div className="px-6 py-4 border-b border-stone-100 flex items-center justify-between shrink-0 bg-stone-50/50">
+                        <h2 className="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">{title}</h2>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                            aria-label="Cerrar modal"
+                            className="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
                 )}
@@ -45,12 +46,12 @@ export default function Dialog({ open, onClose, title, maxWidth = "md", children
 }
 
 export function DialogContent({ children, className = "" }: { children: ReactNode; className?: string }) {
-    return <div className={`px-8 py-6 ${className}`}>{children}</div>;
+    return <div className={`p-5 sm:p-6 ${className}`}>{children}</div>;
 }
 
 export function DialogActions({ children, className = "" }: { children: ReactNode; className?: string }) {
     return (
-        <div className={`px-8 py-6 border-t border-gray-200 flex justify-end gap-4 ${className}`}>
+        <div className={`px-6 py-3.5 border-t border-stone-100 flex justify-end gap-3 bg-stone-50/50 ${className}`}>
             {children}
         </div>
     );

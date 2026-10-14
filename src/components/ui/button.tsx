@@ -1,7 +1,8 @@
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { ButtonHTMLAttributes, AnchorHTMLAttributes, forwardRef } from "react";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface BaseButtonProps {
     variant?: "contained" | "outlined" | "text";
     color?: "primary" | "success" | "error" | "warning" | "default";
     size?: "small" | "medium" | "large";
@@ -9,9 +10,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     startIcon?: React.ReactNode;
     endIcon?: React.ReactNode;
     loading?: boolean;
+    href?: string;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+export type ButtonProps = BaseButtonProps &
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof BaseButtonProps> &
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof BaseButtonProps>;
+
+const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
     (
         {
             children,
@@ -24,55 +30,76 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             loading = false,
             className = "",
             disabled,
+            href,
             ...props
         },
         ref
     ) => {
-        const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98]";
+        const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b3a60] focus-visible:ring-offset-1 select-none";
 
         const sizeStyles = {
-            small: "px-4 py-2 text-sm gap-2 min-h-[36px]",
-            medium: "px-6 py-3 text-base gap-2.5 min-h-[44px]",
-            large: "px-8 py-4 text-lg gap-3 min-h-[52px]",
+            small: "px-3.5 py-1.5 text-xs gap-1.5 min-h-[34px]",
+            medium: "px-5 py-2.5 text-sm gap-2 min-h-[40px]",
+            large: "px-7 py-3.5 text-base gap-2.5 min-h-[48px]",
         };
 
         const variantStyles = {
             contained: {
-                default: "bg-gray-900 text-white hover:bg-gray-800 shadow-sm",
-                primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
-                success: "bg-green-600 text-white hover:bg-green-700 shadow-sm",
+                default: "bg-stone-900 text-white hover:bg-stone-800 shadow-sm",
+                primary: "bg-[#0b3a60] text-white hover:bg-[#072844] shadow-sm",
+                success: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm",
                 error: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
                 warning: "bg-amber-600 text-white hover:bg-amber-700 shadow-sm",
             },
             outlined: {
-                default: "border-2 border-gray-300 text-gray-700 hover:bg-gray-50",
-                primary: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50",
-                success: "border-2 border-green-600 text-green-600 hover:bg-green-50",
-                error: "border-2 border-red-600 text-red-600 hover:bg-red-50",
-                warning: "border-2 border-amber-600 text-amber-600 hover:bg-amber-50",
+                default: "border border-stone-300 text-stone-700 hover:bg-stone-50 hover:border-stone-400",
+                primary: "border border-[#0b3a60] text-[#0b3a60] hover:bg-blue-50/50",
+                success: "border border-emerald-600 text-emerald-700 hover:bg-emerald-50",
+                error: "border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400",
+                warning: "border border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400",
             },
             text: {
-                default: "text-gray-700 hover:bg-gray-100",
-                primary: "text-blue-600 hover:bg-blue-50",
-                success: "text-green-600 hover:bg-green-50",
+                default: "text-stone-700 hover:bg-stone-100",
+                primary: "text-[#0b3a60] hover:bg-blue-50",
+                success: "text-emerald-700 hover:bg-emerald-50",
                 error: "text-red-600 hover:bg-red-50",
-                warning: "text-amber-600 hover:bg-amber-50",
+                warning: "text-amber-700 hover:bg-amber-50",
             },
         };
 
         const widthStyle = fullWidth ? "w-full" : "";
+        const combinedClassName = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant][color]} ${widthStyle} ${className}`;
+
+        const innerContent = (
+            <>
+                {loading && <Loader2 className="w-4 h-4 animate-spin shrink-0" />}
+                {!loading && startIcon && <span className="shrink-0">{startIcon}</span>}
+                {children}
+                {endIcon && <span className="shrink-0">{endIcon}</span>}
+            </>
+        );
+
+        if (href) {
+            return (
+                <Link
+                    href={href}
+                    ref={ref as React.Ref<HTMLAnchorElement>}
+                    className={combinedClassName}
+                    {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
+                >
+                    {innerContent}
+                </Link>
+            );
+        }
 
         return (
             <button
-                ref={ref}
-                className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant][color]} ${widthStyle} ${className}`}
+                ref={ref as React.Ref<HTMLButtonElement>}
+                className={combinedClassName}
                 disabled={disabled || loading}
-                {...props}
+                {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
             >
-                {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-                {!loading && startIcon && startIcon}
-                {children}
-                {endIcon && endIcon}
+                {innerContent}
             </button>
         );
     }

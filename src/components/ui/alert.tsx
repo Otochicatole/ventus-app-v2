@@ -8,26 +8,26 @@ interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 
 export default function Alert({ severity = "info", children, className = "", ...props }: AlertProps) {
     const styles = {
-        success: "bg-green-50 border-green-200 text-green-700",
-        error: "bg-red-50 border-red-200 text-red-700",
-        warning: "bg-amber-50 border-amber-200 text-amber-700",
-        info: "bg-blue-50 border-blue-200 text-blue-700",
+        success: "bg-emerald-50 border-emerald-200 text-emerald-900",
+        error: "bg-red-50 border-red-200 text-red-900",
+        warning: "bg-amber-50 border-amber-200 text-amber-900",
+        info: "bg-[#0b3a60]/5 border-[#0b3a60]/20 text-[#0b3a60]",
     };
 
     const icons = {
-        success: <CheckCircle2 className="w-5 h-5 text-green-600" />,
-        error: <XCircle className="w-5 h-5 text-red-600" />,
-        warning: <AlertTriangle className="w-5 h-5 text-amber-600" />,
-        info: <Info className="w-5 h-5 text-blue-600" />,
+        success: <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />,
+        error: <XCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />,
+        warning: <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />,
+        info: <Info className="w-4 h-4 text-[#0b3a60] shrink-0 mt-0.5" />,
     };
 
     return (
         <div
-            className={`flex items-start gap-3 px-4 py-3 border-2 rounded-xl ${styles[severity]} ${className}`}
+            className={`flex items-start gap-2.5 px-4 py-3 border rounded-xl text-sm ${styles[severity]} ${className}`}
             role="alert"
             {...props}
         >
-            <div className="shrink-0 mt-0.5">{icons[severity]}</div>
+            {icons[severity]}
             <div className="flex-1 font-medium">{children}</div>
         </div>
     );

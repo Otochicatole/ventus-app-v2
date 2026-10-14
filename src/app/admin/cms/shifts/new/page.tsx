@@ -2,15 +2,11 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
+import { Calendar, Clock, MapPin, User, Mail, Phone } from "lucide-react";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
 import Alert from "@/components/ui/alert";
-import { Card, CardContent } from "@/components/ui/card";
 
 type Location = {
   id: string;
@@ -22,6 +18,11 @@ type TimeSlot = {
   id: string;
   time: string;
 };
+
+function getTodayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export default function NewShiftPage() {
   const router = useRouter();
@@ -37,9 +38,9 @@ export default function NewShiftPage() {
     email: "",
     phone: "",
     locationId: "",
-    date: "",
+    date: getTodayStr(),
     time: "",
-    confirmed: false,
+    confirmed: true,
     notes: "",
   });
 
@@ -60,6 +61,9 @@ export default function NewShiftPage() {
       });
       const data = await res.json();
       setLocations(data);
+      if (data.length > 0 && !formData.locationId) {
+        setFormData((prev) => ({ ...prev, locationId: data[0].id }));
+      }
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
@@ -85,6 +89,11 @@ export default function NewShiftPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!formData.time) {
+      setError("Por favor seleccioná un horario para el turno.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -136,30 +145,38 @@ export default function NewShiftPage() {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex sm:flex-row flex-col gap-3 justify-between sm:items-center">
-          <h1 className="text-4xl font-bold text-gray-900">Nuevo Turno</h1>
-          <Button
-            size="small"
-            className="w-fit"
-            variant="outlined"
-            onClick={() => router.back()}
-          >
-            ← Volver
-          </Button>
+    <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn pb-12">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Nuevo Turno</h1>
+          <p className="text-stone-500 text-sm mt-1">
+            Agendar manualmente una reserva para un cliente
+          </p>
         </div>
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-xl font-bold text-white mb-6">
-              Información del Turno
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={() => router.back()}
+        >
+          ← Volver
+        </Button>
+      </div>
+
+      <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-xs">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && <Alert severity="error">{error}</Alert>}
+
+          {/* Sede y Fecha */}
+          <div className="space-y-4">
+            <h2 className="text-base font-bold text-stone-900 flex items-center gap-2 border-b border-stone-100 pb-2.5">
+              <MapPin className="w-4 h-4 text-[#0b3a60]" />
+              Sede y Fecha
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && <Alert severity="error">{error}</Alert>}
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
-                label="Ubicación"
+                label="Sede / Ubicación"
                 value={formData.locationId}
                 onChange={(e) =>
                   setFormData({
@@ -179,166 +196,181 @@ export default function NewShiftPage() {
                 fullWidth
               />
 
-              <DatePicker
-                label="Fecha"
-                value={formData.date ? dayjs(formData.date) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    date: date ? date.format("YYYY-MM-DD") : "",
-                    time: "",
-                  })
-                }
-                minDate={dayjs()}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: true,
-                  },
-                }}
-              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                  Fecha del Turno
+                </label>
+                <input
+                  type="date"
+                  min={getTodayStr()}
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      date: e.target.value,
+                      time: "",
+                    })
+                  }
+                  required
+                  className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
+                />
+              </div>
+            </div>
 
-              {formData.date && formData.locationId && (
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-3">
-                    Horario <span className="text-red-500">*</span>
-                  </label>
-                  {loadingSlots ? (
-                    <div className="flex justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    </div>
-                  ) : availableSlots.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {availableSlots.map((slot) => (
+            {/* Selector de Horarios Disponibles */}
+            {formData.date && formData.locationId && (
+              <div className="pt-2">
+                <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                  <Clock className="w-3.5 h-3.5 text-[#0b3a60]" />
+                  Horario Disponible <span className="text-red-500">*</span>
+                </label>
+                {loadingSlots ? (
+                  <div className="flex items-center gap-2 py-4 text-xs text-stone-500">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#0b3a60] border-t-transparent"></div>
+                    Buscando horarios libres...
+                  </div>
+                ) : availableSlots.length > 0 ? (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                    {availableSlots.map((slot) => {
+                      const isSelected = formData.time === slot.time;
+                      return (
                         <button
                           key={slot.id}
                           type="button"
                           onClick={() =>
                             setFormData({ ...formData, time: slot.time })
                           }
-                          className={`px-4 py-2 rounded-md font-semibold transition-all ${
-                            formData.time === slot.time
-                              ? "bg-blue-600 text-white"
-                              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 border-2 border-neutral-700"
+                          className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
+                            isSelected
+                              ? "bg-[#0b3a60] text-white border-[#0b3a60] shadow-xs"
+                              : "bg-white text-stone-700 border-stone-300 hover:bg-stone-50 hover:border-stone-400"
                           }`}
                         >
-                          {slot.time}
+                          {slot.time} hs
                         </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-neutral-500">
-                      No hay horarios disponibles
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <div className="border-t border-neutral-700 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-white">
-                  Datos del Paciente
-                </h3>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Input
-                    label="Nombre"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                    fullWidth
-                  />
-                  <Input
-                    label="Apellido"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
-                    required
-                    fullWidth
-                  />
-                </div>
-
-                <Input
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  fullWidth
-                />
-
-                <Input
-                  label="Teléfono"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  required
-                  fullWidth
-                />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    No hay horarios disponibles para la sede y fecha seleccionada.
+                  </div>
+                )}
               </div>
+            )}
+          </div>
 
-              <div className="border-t border-neutral-700 pt-6 space-y-4">
-                <label className="flex items-center gap-2 text-neutral-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.confirmed}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        confirmed: e.target.checked,
-                      })
-                    }
-                    className="w-5 h-5 rounded border-gray-300 bg-white text-blue-600 focus:ring-2 focus:ring-blue-600"
-                  />
-                  <span className="font-medium text-gray-900">
-                    Marcar como confirmado
-                  </span>
-                </label>
+          {/* Datos del Cliente */}
+          <div className="space-y-4 pt-4 border-t border-stone-200">
+            <h2 className="text-base font-bold text-stone-900 flex items-center gap-2 border-b border-stone-100 pb-2.5">
+              <User className="w-4 h-4 text-[#0b3a60]" />
+              Datos del Cliente
+            </h2>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Notas (opcional)
-                  </label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                    rows={3}
-                    placeholder="Notas adicionales sobre el turno..."
-                    className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all resize-none"
-                  />
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Nombre"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+                fullWidth
+                placeholder="Ej. Lucas"
+              />
+              <Input
+                label="Apellido"
+                value={formData.lastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
+                required
+                fullWidth
+                placeholder="Ej. Gómez"
+              />
+            </div>
 
-              <div className="flex gap-3 justify-end pt-4">
-                <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => router.back()}
-                  disabled={loading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  loading={loading}
-                  disabled={loading || !formData.time}
-                >
-                  {loading ? "Creando..." : "Crear Turno"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Teléfono / WhatsApp"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                required
+                fullWidth
+                placeholder="Ej. 11 3456-7890"
+              />
+
+              <Input
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+                fullWidth
+                placeholder="Ej. cliente@gmail.com"
+              />
+            </div>
+          </div>
+
+          {/* Opciones y Notas */}
+          <div className="space-y-4 pt-4 border-t border-stone-200">
+            <label className="flex items-center gap-2 text-stone-800 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.confirmed}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    confirmed: e.target.checked,
+                  })
+                }
+                className="w-4 h-4 rounded border-stone-300 text-[#0b3a60] focus:ring-[#0b3a60]"
+              />
+              <span className="text-sm font-medium">
+                Crear turno ya confirmado
+              </span>
+            </label>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                Notas internas (opcional)
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+                rows={2}
+                placeholder="Detalles sobre cortes anteriores, preferencias del cliente..."
+                className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all resize-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200">
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={() => router.back()}
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              loading={loading}
+              disabled={loading || !formData.time}
+            >
+              {loading ? "Creando..." : "Crear Turno"}
+            </Button>
+          </div>
+        </form>
       </div>
-    </LocalizationProvider>
+    </div>
   );
 }

@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
-import { Search, Calendar as CalendarIcon, Trash2, Plus, Ban } from "lucide-react";
+import { Search, Calendar as CalendarIcon, Trash2, Plus, Ban, AlertCircle } from "lucide-react";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Dialog, { DialogContent, DialogActions } from "@/components/ui/dialog";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 
@@ -24,6 +19,11 @@ type UnavailableDate = {
     locationId: string;
 };
 
+function getTodayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default function BlockedDatesPage() {
     const [locations, setLocations] = useState<Location[]>([]);
     const [blockedDates, setBlockedDates] = useState<UnavailableDate[]>([]);
@@ -34,6 +34,7 @@ export default function BlockedDatesPage() {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [dateError, setDateError] = useState("");
 
     useEffect(() => {
         fetchLocations();
@@ -83,10 +84,25 @@ export default function BlockedDatesPage() {
         }
     };
 
+    const handleDateChange = (val: string) => {
+        setNewDate(val);
+        if (!val) {
+            setDateError("");
+            return;
+        }
+        const isAlreadyBlocked = blockedDates.some((b) => b.date.split("T")[0] === val);
+        if (isAlreadyBlocked) {
+            setDateError("Esta fecha ya se encuentra bloqueada para esta sede.");
+        } else {
+            setDateError("");
+        }
+    };
+
     const handleAddBlockedDate = async (e: FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        if (!newDate || dateError) return;
 
+        setLoading(true);
         try {
             const res = await fetch("/api/unavailable-dates", {
                 method: "POST",
@@ -99,6 +115,7 @@ export default function BlockedDatesPage() {
 
             if (res.ok) {
                 setNewDate("");
+                setDateError("");
                 setShowModal(false);
                 fetchBlockedDates();
             }
@@ -129,14 +146,6 @@ export default function BlockedDatesPage() {
         }
     };
 
-    const shouldDisableDate = (date: Dayjs) => {
-        const dateStr = date.format("YYYY-MM-DD");
-        return blockedDates.some((blocked) => {
-            const blockedDateStr = blocked.date.split("T")[0];
-            return blockedDateStr === dateStr;
-        });
-    };
-
     const filteredBlockedDates = blockedDates.filter((blocked) => {
         if (!searchTerm) return true;
         
@@ -151,174 +160,192 @@ export default function BlockedDatesPage() {
     });
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <div className="space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn pb-12">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
                 <div>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Fechas Bloqueadas</h1>
-                    <p className="text-gray-600 text-lg">Gestión de fechas no disponibles para reservas</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Fechas Bloqueadas</h1>
+                    <p className="text-stone-500 text-sm mt-1">
+                        Días festivos, feriados o no laborables donde no se permitirán reservas
+                    </p>
                 </div>
+            </div>
 
-                <Card>
-                    <CardContent>
-                        <Select
-                            label="Seleccionar Ubicación"
-                            value={selectedLocationId}
-                            onChange={(e) => setSelectedLocationId(e.target.value)}
-                            options={[
-                                { value: "", label: "Seleccionar ubicación" },
-                                ...locations.map((loc) => ({
-                                    value: loc.id,
-                                    label: `${loc.name} - ${loc.address}`,
-                                })),
-                            ]}
-                            fullWidth
-                        />
-                    </CardContent>
-                </Card>
-
-                {selectedLocationId && (
-                    <div className="space-y-4">
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Fechas Bloqueadas</h2>
-                                <p className="text-gray-600 text-sm">
-                                    {filteredBlockedDates.length} de {blockedDates.length} fecha(s) bloqueada(s)
-                                </p>
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                                <div className="relative flex-1 sm:w-80">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar por fecha o día..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                    />
-                                </div>
-                                <Button 
-                                    onClick={() => setShowModal(true)} 
-                                    startIcon={<Plus className="w-5 h-5" />}
-                                    className="w-full sm:w-auto whitespace-nowrap"
-                                >
-                                    Bloquear Fecha
-                                </Button>
-                            </div>
-                        </div>
-
-                        {loading ? (
-                            <Card>
-                                <CardContent>
-                                    <div className="flex justify-center py-12">
-                                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : filteredBlockedDates.length === 0 ? (
-                            <Card>
-                                <CardContent>
-                                    <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                                        <CalendarIcon className="w-16 h-16 text-gray-300" />
-                                        <p>{searchTerm ? "No se encontraron fechas con ese criterio" : "No hay fechas bloqueadas para esta ubicación"}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <div className="grid grid-cols-1 gap-4">
-                                {filteredBlockedDates.map((blocked) => {
-                                    const dateStr = blocked.date.split("T")[0];
-                                    const [year, month, day] = dateStr.split("-");
-                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    return (
-                                        <Card key={blocked.id}>
-                                            <CardContent>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center shrink-0">
-                                                        <CalendarIcon className="w-6 h-6 text-red-600" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="text-gray-900 font-semibold text-lg mb-1">
-                                                            {date.toLocaleDateString("es-AR")}
-                                                        </h3>
-                                                        <p className="text-gray-600 text-sm capitalize">
-                                                            {date.toLocaleDateString("es-AR", {
-                                                                weekday: "long",
-                                                            })}
-                                                        </p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setDeleteId(blocked.id)}
-                                                        className="w-10 h-10 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 transition-all flex items-center justify-center group shrink-0 cursor-pointer"
-                                                    >
-                                                        <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                                    </button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                <Dialog open={showModal} onClose={() => setShowModal(false)} title="Bloquear Fecha" maxWidth="sm">
-                    <form onSubmit={handleAddBlockedDate}>
-                        <DialogContent>
-                            <div className="space-y-4">
-                                <DatePicker
-                                    label="Fecha a Bloquear"
-                                    value={newDate ? dayjs(newDate) : null}
-                                    onChange={(date) => setNewDate(date ? date.format("YYYY-MM-DD") : "")}
-                                    shouldDisableDate={shouldDisableDate}
-                                    minDate={dayjs()}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                            required: true,
-                                        }
-                                    }}
-                                />
-                                <p className="text-sm text-neutral-500">
-                                    Esta fecha no estará disponible para reservar turnos en esta ubicación.
-                                </p>
-                                {blockedDates.length > 0 && (
-                                    <p className="text-xs text-red-400 flex items-center gap-2">
-                                        <Ban className="w-4 h-4" />
-                                        Las fechas bloqueadas aparecen tachadas en rojo
-                                    </p>
-                                )}
-                            </div>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button
-                                variant="outlined"
-                                onClick={() => setShowModal(false)}
-                                disabled={loading}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                type="submit"
-                                loading={loading}
-                                disabled={loading}
-                            >
-                                Bloquear
-                            </Button>
-                        </DialogActions>
-                    </form>
-                </Dialog>
-
-                <ConfirmDialog
-                    isOpen={deleteId !== null}
-                    onClose={() => setDeleteId(null)}
-                    onConfirm={handleDelete}
-                    title="Desbloquear Fecha"
-                    message="¿Estás seguro de desbloquear esta fecha? Volverá a estar disponible para reservas."
-                    confirmText="Desbloquear"
-                    loading={deleting}
+            {/* Location Selector Card */}
+            <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs">
+                <Select
+                    label="Seleccionar Sede / Ubicación"
+                    value={selectedLocationId}
+                    onChange={(e) => setSelectedLocationId(e.target.value)}
+                    options={[
+                        { value: "", label: "Seleccionar una sede para ver fechas bloqueadas..." },
+                        ...locations.map((loc) => ({
+                            value: loc.id,
+                            label: `${loc.name} — ${loc.address}`,
+                        })),
+                    ]}
+                    fullWidth
                 />
             </div>
-        </LocalizationProvider>
+
+            {selectedLocationId && (
+                <div className="bg-white border border-stone-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h2 className="text-lg font-bold text-stone-900">Días No Habilitados</h2>
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                                    {blockedDates.length} fechas bloqueadas
+                                </span>
+                            </div>
+                            <p className="text-xs text-stone-500 mt-1">
+                                En estos días el calendario público de reservas no mostrará turnos
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2.5">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por fecha o día..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-9 pr-3.5 py-2 bg-stone-50 border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
+                                />
+                            </div>
+                            <Button 
+                                onClick={() => {
+                                    setNewDate("");
+                                    setDateError("");
+                                    setShowModal(true);
+                                }} 
+                                startIcon={<Plus className="w-4 h-4" />}
+                                className="whitespace-nowrap"
+                            >
+                                Bloquear Fecha
+                            </Button>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex justify-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
+                        </div>
+                    ) : filteredBlockedDates.length === 0 ? (
+                        <div className="py-12 text-center">
+                            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-3">
+                                <CalendarIcon className="w-6 h-6 text-stone-400" />
+                            </div>
+                            <h3 className="text-sm font-semibold text-stone-900">No hay fechas bloqueadas</h3>
+                            <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+                                {searchTerm
+                                    ? "No se encontraron fechas que coincidan con la búsqueda."
+                                    : "Todos los días hábiles se encuentran disponibles para reserva."}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            {filteredBlockedDates.map((blocked) => {
+                                const dateStr = blocked.date.split("T")[0];
+                                const [year, month, day] = dateStr.split("-");
+                                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                return (
+                                    <div
+                                        key={blocked.id}
+                                        className="flex items-center justify-between p-3.5 bg-red-50/40 border border-red-200/70 rounded-xl hover:border-red-300 transition-all"
+                                    >
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-9 h-9 rounded-lg bg-red-100 text-red-700 flex items-center justify-center shrink-0">
+                                                <Ban className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold text-stone-900">
+                                                    {date.toLocaleDateString("es-AR")}
+                                                </p>
+                                                <p className="text-xs text-stone-500 capitalize">
+                                                    {date.toLocaleDateString("es-AR", { weekday: "long" })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDeleteId(blocked.id)}
+                                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors cursor-pointer shrink-0 ml-2"
+                                            title="Desbloquear fecha"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <Dialog
+                open={showModal}
+                onClose={() => setShowModal(false)}
+                title="Bloquear Nueva Fecha"
+                maxWidth="sm"
+            >
+                <form onSubmit={handleAddBlockedDate}>
+                    <DialogContent>
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                                    Fecha a Bloquear
+                                </label>
+                                <input
+                                    type="date"
+                                    min={getTodayStr()}
+                                    value={newDate}
+                                    onChange={(e) => handleDateChange(e.target.value)}
+                                    required
+                                    className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
+                                />
+                            </div>
+
+                            {dateError && (
+                                <p className="text-xs text-red-600 flex items-center gap-1.5 font-medium">
+                                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                    {dateError}
+                                </p>
+                            )}
+
+                            <p className="text-xs text-stone-500">
+                                Esta fecha quedará deshabilitada inmediatamente y ningún cliente podrá solicitar un turno en este día para la sede seleccionada.
+                            </p>
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setShowModal(false)}
+                            disabled={loading}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            loading={loading}
+                            disabled={loading || !newDate || Boolean(dateError)}
+                        >
+                            Bloquear
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+
+            <ConfirmDialog
+                isOpen={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                onConfirm={handleDelete}
+                title="Desbloquear Fecha"
+                message="¿Estás seguro de que deseás desbloquear esta fecha? Volverá a estar disponible inmediatamente para recibir reservas de clientes."
+                confirmText="Desbloquear"
+                loading={deleting}
+            />
+        </div>
     );
 }

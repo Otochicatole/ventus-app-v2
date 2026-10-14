@@ -85,116 +85,121 @@ export default function HistoryPage() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+            <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 animate-fadeIn">
-            <div className="flex justify-between items-start flex-wrap gap-6">
+        <div className="space-y-6 animate-fadeIn pb-12">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
                 <div>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Historial de Turnos</h1>
-                    <p className="text-gray-600 text-lg">Turnos pasados y completados</p>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Historial de Turnos</h1>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+                            {shifts.length} pasados
+                        </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">
+                        Archivo de turnos anteriores a la fecha actual y registros completados
+                    </p>
                 </div>
                 <Button size="small" variant="outlined" onClick={() => router.back()}>
                     ← Volver
                 </Button>
             </div>
 
-            <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Turnos Anteriores</h2>
-                        <p className="text-gray-600 text-sm mt-1">
-                            {filteredShifts.length} de {shifts.length} registro(s)
-                        </p>
-                    </div>
-                    <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por nombre, email, teléfono..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                    </div>
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="relative w-full sm:max-w-md">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+                    <input
+                        type="text"
+                        placeholder="Buscar por cliente, email, teléfono o sede..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
+                    />
                 </div>
+                <p className="text-xs text-stone-500 font-medium shrink-0">
+                    Mostrando {filteredShifts.length} de {shifts.length} turno(s) en histórico
+                </p>
+            </div>
 
-                {filteredShifts.length === 0 ? (
-                    <Card>
-                        <CardContent>
-                            <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                                <Package className="w-16 h-16 text-gray-300" />
-                                <p>{searchTerm ? "No se encontraron turnos con ese criterio" : "No hay turnos en el historial"}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid gap-4">
-                        {filteredShifts.map((shift) => {
-                            const dateStr = shift.date.split("T")[0];
-                            const [year, month, day] = dateStr.split("-");
-                            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                            
-                            return (
-                                <Card key={shift.id}>
-                                    <CardContent>
-                                        <div className="flex flex-col gap-4">
-                                            <div className="flex items-center gap-3 sm:gap-4">
-                                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-400 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg shrink-0">
-                                                    {shift.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="text-gray-900 font-semibold text-base sm:text-lg truncate">
-                                                        {shift.name} {shift.lastName}
-                                                    </h3>
-                                                    <div className="flex flex-col text-xs sm:text-sm text-gray-600 mt-1 gap-0.5">
-                                                        <span className="truncate">{shift.email}</span>
-                                                        <span>{shift.phone}</span>
-                                                    </div>
-                                                </div>
+            {filteredShifts.length === 0 ? (
+                <div className="bg-white border border-stone-200 rounded-xl p-12 text-center">
+                    <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-3">
+                        <Package className="w-6 h-6 text-stone-400" />
+                    </div>
+                    <h3 className="text-base font-semibold text-stone-900">Sin turnos en el historial</h3>
+                    <p className="text-sm text-stone-500 mt-1 max-w-sm mx-auto">
+                        {searchTerm ? "No se encontraron turnos con el criterio de búsqueda." : "No existen registros de turnos pasados."}
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {filteredShifts.map((shift) => {
+                        const dateStr = shift.date.split("T")[0];
+                        const [year, month, day] = dateStr.split("-");
+                        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        
+                        return (
+                            <div
+                                key={shift.id}
+                                className="bg-white border border-stone-200 rounded-xl p-4 sm:p-5 hover:border-stone-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+                            >
+                                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                                    <div className="w-10 h-10 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center font-bold text-sm shrink-0 border border-stone-200">
+                                        {shift.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h3 className="text-base font-bold text-stone-900 truncate">
+                                                {shift.name} {shift.lastName}
+                                            </h3>
+                                            <span
+                                                className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                                                    shift.confirmed
+                                                        ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                                        : "bg-stone-100 text-stone-600 border border-stone-200"
+                                                }`}
+                                            >
+                                                {shift.confirmed ? "Completado" : "No confirmado"}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500">
+                                            <span>{shift.phone}</span>
+                                            <span>•</span>
+                                            <span className="truncate">{shift.email}</span>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-stone-600">
+                                            <div className="flex items-center gap-1.5 tabular-nums">
+                                                <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                                                <span>{date.toLocaleDateString("es-AR")}</span>
+                                                <span className="font-semibold text-stone-900">{shift.time} hs</span>
                                             </div>
-
-                                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
-                                                <div className="flex items-center gap-2">
-                                                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
-                                                    <span className="text-gray-700 truncate">{shift.location.name}</span>
-                                                </div>
-
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-gray-900 font-medium">{date.toLocaleDateString("es-AR")}</span>
-                                                        <span className="text-gray-500">{shift.time}</span>
-                                                    </div>
-                                                </div>
-
-                                                <Chip
-                                                    label={shift.confirmed ? "Completado" : "No confirmado"}
-                                                    color={shift.confirmed ? "success" : "default"}
-                                                    variant="soft"
-                                                    size="small"
-                                                />
-                                            </div>
-
-                                            <div className="flex gap-2 pt-2 border-t border-gray-200">
-                                                <Link href={`/admin/cms/shifts/${shift.id}`} className="flex-1">
-                                                    <Button size="small" variant="outlined" color="default" fullWidth>
-                                                        Ver Detalles
-                                                    </Button>
-                                                </Link>
+                                            <div className="flex items-center gap-1.5">
+                                                <MapPin className="w-3.5 h-3.5 text-stone-400" />
+                                                <span>{shift.location.name}</span>
                                             </div>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                                    </div>
+                                </div>
+
+                                <div className="shrink-0 flex sm:flex-col justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100">
+                                    <Button href={`/admin/cms/shifts/${shift.id}`} size="small" variant="outlined">
+                                        Ver Detalles
+                                    </Button>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }

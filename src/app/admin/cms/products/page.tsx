@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, ShoppingBag, DollarSign, Layers } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Plus, Edit2, Trash2, Search, ShoppingBag, Layers, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Dialog, { DialogContent } from "@/components/ui/dialog";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Alert from "@/components/ui/alert";
-import Chip from "@/components/ui/chip";
 
 type Product = {
     id: string;
@@ -163,36 +162,41 @@ export default function ProductsPage() {
         }
     };
 
-    const filteredProducts = products.filter((product) => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-            product.name.toLowerCase().includes(searchLower) ||
-            (product.description && product.description.toLowerCase().includes(searchLower)) ||
-            product.price.toString().includes(searchLower)
-        );
-    });
+    const filteredProducts = useMemo(() => {
+        return products.filter((product) => {
+            const searchLower = searchTerm.toLowerCase();
+            return (
+                product.name.toLowerCase().includes(searchLower) ||
+                (product.description && product.description.toLowerCase().includes(searchLower)) ||
+                product.price.toString().includes(searchLower)
+            );
+        });
+    }, [products, searchTerm]);
+
+    const activeCount = useMemo(() => products.filter((p) => p.active).length, [products]);
 
     if (loading) {
         return (
-            <div className="flex items-center gap-3 py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
-                <p className="text-gray-600">Cargando productos...</p>
+            <div className="flex flex-col items-center justify-center gap-3 py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
+                <p className="text-xs uppercase tracking-widest text-stone-500 font-semibold">Cargando productos...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Productos</h1>
-                    <p className="text-gray-600 text-sm mt-1">
-                        Gestión de productos para la venta en el local
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">Productos</h1>
+                    <p className="text-stone-500 text-xs sm:text-sm mt-0.5">
+                        Línea de cosmética capilar, pomadas y cuidado de barba
                     </p>
                 </div>
                 <Button
                     onClick={() => handleOpenDialog()}
-                    startIcon={<Plus className="w-5 h-5" />}
+                    startIcon={<Plus className="w-4 h-4" />}
                 >
                     Agregar Producto
                 </Button>
@@ -204,87 +208,130 @@ export default function ProductsPage() {
                 </Alert>
             )}
 
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="bg-white border border-stone-200 rounded-xl p-3.5 sm:p-4">
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-400 block mb-1">Total Productos</span>
+                    <span className="text-xl sm:text-2xl font-extrabold text-stone-900">{products.length}</span>
+                </div>
+                <div className="bg-white border border-stone-200 rounded-xl p-3.5 sm:p-4">
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-1">Activos para la venta</span>
+                    <span className="text-xl sm:text-2xl font-extrabold text-emerald-700">{activeCount}</span>
+                </div>
+                <div className="bg-white border border-stone-200 rounded-xl p-3.5 sm:p-4 col-span-2 sm:col-span-1">
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-stone-400 block mb-1">Pausados / Inactivos</span>
+                    <span className="text-xl sm:text-2xl font-extrabold text-stone-500">{products.length - activeCount}</span>
+                </div>
+            </div>
+
+            {/* Search */}
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
+                <input
                     type="text"
-                    placeholder="Buscar productos..."
+                    placeholder="Buscar productos por nombre, marca o precio..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60] focus:border-transparent transition-all"
                 />
             </div>
 
+            {/* List */}
             {filteredProducts.length === 0 ? (
                 <Card>
                     <CardContent>
-                        <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                            <ShoppingBag className="w-16 h-16 text-gray-300" />
-                            <p>
+                        <div className="flex flex-col items-center gap-3 py-16 text-stone-400">
+                            <ShoppingBag className="w-12 h-12 text-stone-300" />
+                            <p className="text-xs uppercase tracking-wider font-semibold">
                                 {searchTerm
                                     ? "No se encontraron productos con ese criterio"
-                                    : "No hay productos registrados"}
+                                    : "No hay productos registrados en el inventario"}
                             </p>
                         </div>
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredProducts.map((product) => (
-                        <Card key={product.id}>
-                            <CardContent className="p-6">
-                                <div className="flex flex-col sm:flex-row items-start gap-4">
-                                    <div className="flex-1 w-full">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-xl font-semibold text-gray-900">
-                                                {product.name}
-                                            </h3>
-                                            <Chip
-                                                label={product.active ? "Activo" : "Inactivo"}
-                                                color={product.active ? "success" : "default"}
-                                                variant="soft"
-                                                size="small"
-                                            />
+                        <div
+                            key={product.id}
+                            className="bg-white border border-stone-200 rounded-xl p-5 flex flex-col justify-between transition-all hover:border-[#0b3a60] hover:shadow-xs space-y-4"
+                        >
+                            <div className="space-y-2.5">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100">
+                                            <ShoppingBag className="w-4 h-4" />
                                         </div>
-                                        {product.description && (
-                                            <p className="text-gray-600 mb-4">{product.description}</p>
+                                        <h3 className="text-base font-bold text-stone-900 leading-tight">
+                                            {product.name}
+                                        </h3>
+                                    </div>
+                                    <span
+                                        className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                            product.active
+                                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                                : "bg-stone-100 text-stone-500 border border-stone-200"
+                                        }`}
+                                    >
+                                        {product.active ? (
+                                            <>
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Activo
+                                            </>
+                                        ) : (
+                                            <>
+                                                <XCircle className="w-3 h-3" />
+                                                Inactivo
+                                            </>
                                         )}
-                                        <div className="flex flex-wrap gap-4 text-sm">
-                                            <div className="flex items-center gap-2 text-gray-700">
-                                                <DollarSign className="w-4 h-4 text-green-600" />
-                                                <span className="font-semibold text-base">
-                                                    ${product.price.toLocaleString("es-AR")}
-                                                </span>
-                                            </div>
-                                            {product.stock !== null && product.stock !== undefined && (
-                                                <div className="flex items-center gap-2 text-gray-700">
-                                                    <Layers className="w-4 h-4 text-blue-600" />
-                                                    <span>Stock: {product.stock} u.</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleOpenDialog(product)}
-                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
-                                        >
-                                            <Edit2 className="w-4 h-4" />
-                                            <span className="sm:hidden">Editar</span>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setDeleteId(product.id)}
-                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                            <span className="sm:hidden">Eliminar</span>
-                                        </button>
-                                    </div>
+                                    </span>
                                 </div>
-                            </CardContent>
-                        </Card>
+
+                                {product.description ? (
+                                    <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
+                                        {product.description}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs text-stone-400 italic">
+                                        Sin descripción cargada
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <span className="text-lg font-extrabold text-stone-900 tracking-tight block">
+                                        ${product.price.toLocaleString("es-AR")}
+                                    </span>
+                                    {product.stock !== null && product.stock !== undefined && (
+                                        <div className="flex items-center gap-1 text-[11px] text-stone-500">
+                                            <Layers className="w-3 h-3 text-stone-400" />
+                                            <span>Stock: {product.stock} un.</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-1.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleOpenDialog(product)}
+                                        className="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+                                        title="Editar producto"
+                                    >
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setDeleteId(product.id)}
+                                        className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                        title="Eliminar producto"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     ))}
                 </div>
             )}
@@ -292,7 +339,7 @@ export default function ProductsPage() {
             <Dialog
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                title={editingProduct ? "Editar Producto" : "Agregar Producto"}
+                title={editingProduct ? "Editar Producto" : "Nuevo Producto"}
             >
                 <DialogContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -302,19 +349,19 @@ export default function ProductsPage() {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required
                             fullWidth
-                            placeholder="Ej. Pomada Modeladora Mate, Aceite para Barba..."
+                            placeholder="Ej. Pomada Modeladora Mate 100g"
                         />
 
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-gray-700">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
                                 Descripción
                             </label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={3}
-                                className="px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all resize-none"
-                                placeholder="Descripción o detalles del producto (opcional)"
+                                className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60] focus:border-transparent transition-all resize-none"
+                                placeholder="Propiedades, aroma, fijación o contenido..."
                             />
                         </div>
 
@@ -328,10 +375,11 @@ export default function ProductsPage() {
                                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                 required
                                 fullWidth
+                                placeholder="0.00"
                             />
 
                             <Input
-                                label="Stock (unidades)"
+                                label="Stock disponible (unidades)"
                                 type="number"
                                 min="0"
                                 value={formData.stock}
@@ -341,20 +389,20 @@ export default function ProductsPage() {
                             />
                         </div>
 
-                        <div className="flex items-center gap-3 pt-2">
+                        <div className="flex items-center gap-2.5 pt-2">
                             <input
                                 type="checkbox"
                                 id="product-active"
                                 checked={formData.active}
                                 onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+                                className="w-4 h-4 rounded border-stone-300 text-[#0b3a60] focus:ring-[#0b3a60] cursor-pointer"
                             />
-                            <label htmlFor="product-active" className="text-sm font-medium text-gray-700">
-                                Producto activo para la venta
+                            <label htmlFor="product-active" className="text-xs font-semibold text-stone-700 cursor-pointer select-none">
+                                Producto activo y disponible para la venta
                             </label>
                         </div>
 
-                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 border-t border-stone-100">
                             <Button
                                 type="button"
                                 variant="outlined"
@@ -369,7 +417,7 @@ export default function ProductsPage() {
                                 loading={submitting}
                                 className="w-full sm:w-auto"
                             >
-                                {editingProduct ? "Actualizar" : "Crear"}
+                                {editingProduct ? "Actualizar Producto" : "Crear Producto"}
                             </Button>
                         </div>
                     </form>

@@ -94,25 +94,25 @@ function StatCard({
 }) {
     return (
         <div
-            className={`relative overflow-hidden border p-3 sm:p-4 transition-all hover:shadow-md ${
-                accent ? "bg-[#0b3a60] border-[#0b3a60] text-white" : "bg-white border-gray-200 text-gray-900"
+            className={`relative overflow-hidden border rounded-xl p-3.5 sm:p-4.5 transition-all hover:shadow-sm ${
+                accent ? "bg-[#0b3a60] border-[#0b3a60] text-white shadow-xs" : "bg-white border-stone-200 text-stone-900"
             }`}
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                    <p className={`text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-1 sm:mb-2 leading-tight ${accent ? "text-blue-200" : "text-gray-500"}`}>
+                    <p className={`text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-1 sm:mb-2 leading-tight ${accent ? "text-blue-200" : "text-stone-500"}`}>
                         {label}
                     </p>
-                    <p className={`text-xl sm:text-2xl font-bold truncate ${accent ? "text-white" : "text-gray-900"}`}>{value}</p>
+                    <p className={`text-xl sm:text-2xl font-bold truncate tabular-nums ${accent ? "text-white" : "text-stone-900"}`}>{value}</p>
                     {sub && (
-                        <p className={`text-[10px] sm:text-xs mt-1 flex items-center gap-1 leading-tight ${accent ? "text-blue-200" : positive === true ? "text-green-600" : positive === false ? "text-red-500" : "text-gray-400"}`}>
+                        <p className={`text-[10px] sm:text-xs mt-1.5 flex items-center gap-1 leading-tight ${accent ? "text-blue-200" : positive === true ? "text-emerald-600" : positive === false ? "text-red-500" : "text-stone-400"}`}>
                             {positive === true && <TrendingUp className="w-3 h-3 shrink-0" />}
                             {positive === false && <TrendingDown className="w-3 h-3 shrink-0" />}
                             <span className="truncate">{sub}</span>
                         </p>
                     )}
                 </div>
-                <div className={`p-1.5 sm:p-2 shrink-0 ${accent ? "bg-white/10" : "bg-gray-50 border border-gray-100"}`}>
+                <div className={`p-2 rounded-lg shrink-0 ${accent ? "bg-white/10" : "bg-stone-50 border border-stone-100"}`}>
                     <Icon className={`w-4 h-4 ${accent ? "text-white" : "text-[#0b3a60]"}`} />
                 </div>
             </div>
@@ -123,8 +123,8 @@ function StatCard({
 // ── Chart wrapper ─────────────────────────────────────────────────────────────
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="bg-white border border-gray-200 p-4 sm:p-6">
-            <h3 className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-3 sm:mb-4">{title}</h3>
+        <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6 shadow-xs">
+            <h3 className="text-xs font-bold tracking-widest uppercase text-stone-500 mb-3 sm:mb-4">{title}</h3>
             {children}
         </div>
     );
@@ -139,8 +139,8 @@ function CustomTooltip({ active, payload, label, currency = false }: {
 }) {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-white border border-gray-200 shadow-lg px-3 py-2 text-xs">
-            <p className="font-semibold text-gray-700 mb-1">{label}</p>
+        <div className="bg-white border border-stone-200 rounded-lg shadow-md px-3 py-2 text-xs tabular-nums">
+            <p className="font-semibold text-stone-700 mb-1">{label}</p>
             {payload.map((p, i) => (
                 <p key={i} style={{ color: p.color }} className="font-medium">
                     {p.name}: {currency ? fmt(p.value) : p.value}
@@ -198,16 +198,15 @@ export default function DashboardCharts() {
                         </span>
                     )}
                 </div>
-                {/* Period buttons — full-width row on mobile */}
-                <div className="grid grid-cols-5 gap-1">
+                <div className="flex flex-wrap gap-1 p-1 bg-stone-100 rounded-lg border border-stone-200">
                     {PERIODS.map((p) => (
                         <button
                             key={p.value}
                             onClick={() => setPeriod(p.value)}
-                            className={`py-2 text-[11px] sm:text-xs font-semibold tracking-wide border transition-all ${
+                            className={`flex-1 min-w-[50px] py-1.5 px-2 text-[11px] sm:text-xs font-semibold tracking-wide rounded-md transition-all cursor-pointer ${
                                 period === p.value
-                                    ? "bg-[#0b3a60] border-[#0b3a60] text-white"
-                                    : "bg-white border-gray-200 text-gray-600 hover:border-[#0b3a60] hover:text-[#0b3a60]"
+                                    ? "bg-[#0b3a60] text-white shadow-xs"
+                                    : "text-stone-600 hover:text-stone-900 hover:bg-white/60"
                             }`}
                         >
                             {p.label}
@@ -220,7 +219,7 @@ export default function DashboardCharts() {
             {loading && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="h-24 bg-gray-100 animate-pulse" />
+                        <div key={i} className="h-24 bg-stone-100 border border-stone-200 rounded-xl animate-pulse" />
                     ))}
                 </div>
             )}
@@ -313,20 +312,20 @@ export default function DashboardCharts() {
                         </ChartCard>
 
                         {/* Recent Reviews */}
-                        <div className="bg-white border border-gray-200 p-4 sm:p-6">
-                            <h3 className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-3 sm:mb-4">Últimas reseñas</h3>
+                        <div className="bg-white border border-stone-200 rounded-xl p-4 sm:p-6 shadow-xs">
+                            <h3 className="text-xs font-bold tracking-widest uppercase text-stone-500 mb-3 sm:mb-4">Últimas reseñas</h3>
                             {data.recentReviews.length === 0 ? (
-                                <div className="flex items-center justify-center h-32 text-gray-400 text-xs">Sin reseñas</div>
+                                <div className="flex items-center justify-center h-32 text-stone-400 text-xs">Sin reseñas</div>
                             ) : (
                                 <div className="space-y-3 sm:space-y-4">
                                     {data.recentReviews.map((r, i) => (
-                                        <div key={i} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                                        <div key={i} className="border-b border-stone-100 pb-3 last:border-0 last:pb-0">
                                             <div className="flex items-center justify-between mb-1 gap-2">
-                                                <span className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{r.author}</span>
+                                                <span className="text-xs sm:text-sm font-semibold text-stone-800 truncate">{r.author}</span>
                                                 <Stars rating={r.rating} />
                                             </div>
-                                            <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">{r.comment}</p>
-                                            <p className="text-[10px] text-gray-300 mt-1">
+                                            <p className="text-[11px] text-stone-600 line-clamp-2 leading-relaxed">{r.comment}</p>
+                                            <p className="text-[10px] text-stone-400 mt-1 tabular-nums">
                                                 {new Date(r.createdAt).toLocaleDateString("es-AR")}
                                             </p>
                                         </div>

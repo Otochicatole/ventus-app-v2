@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, ArrowRight, Package, MapPin, Calendar } from "lucide-react";
+import { Plus, ArrowRight, Package, MapPin, Calendar, Receipt } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Chip from "@/components/ui/chip";
@@ -31,34 +31,49 @@ export default async function CMSDashboard() {
         ]);
 
     const stats = [
-        { label: "Turnos Activos", value: totalShifts, color: "text-gray-900" },
-        { label: "Confirmados", value: confirmedShifts, color: "text-green-600" },
-        { label: "Pendientes", value: pendingShifts, color: "text-amber-600" },
-        { label: "Turnos Hoy", value: todayShifts, color: "text-[#0b3a60]" },
+        { label: "Turnos Activos", value: totalShifts, color: "text-stone-900", badge: "En agenda" },
+        { label: "Confirmados", value: confirmedShifts, color: "text-emerald-700", badge: "Verificados" },
+        { label: "Pendientes", value: pendingShifts, color: "text-amber-700", badge: "Por confirmar" },
+        { label: "Turnos Hoy", value: todayShifts, color: "text-[#0b3a60]", badge: "Día actual" },
     ];
 
     return (
-        <div className="space-y-6 sm:space-y-10 animate-fadeIn">
+        <div className="space-y-8 animate-in fade-in duration-200">
             {/* Header */}
-            <div className="flex justify-between items-start flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-6">
                 <div>
-                    <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-1 sm:mb-3">Dashboard</h1>
-                    <p className="text-gray-600 text-sm sm:text-lg">Gestión de turnos y estadísticas</p>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">Dashboard</h1>
+                    <p className="text-stone-500 text-xs sm:text-sm mt-0.5">Control de turnos, ingresos y catálogo de Ventus</p>
                 </div>
-                <Link href="/admin/cms/shifts/new" className="cursor-pointer shrink-0">
-                    <Button size="medium" startIcon={<Plus className="w-4 h-4" />}>
+                <div className="flex items-center gap-2.5">
+                    <Button
+                        href="/admin/cms/payments"
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Receipt className="w-3.5 h-3.5" />}
+                    >
+                        Cobros
+                    </Button>
+                    <Button
+                        href="/admin/cms/shifts/new"
+                        size="small"
+                        startIcon={<Plus className="w-3.5 h-3.5" />}
+                    >
                         Nuevo Turno
                     </Button>
-                </Link>
+                </div>
             </div>
 
             {/* Quick shift stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {stats.map((stat, index) => (
-                    <Card key={index} className="hover:border-gray-300 transition-colors">
-                        <CardContent className="space-y-2 sm:space-y-4 !p-3 sm:!p-5">
-                            <span className="text-xs sm:text-sm font-medium text-gray-600">{stat.label}</span>
-                            <p className={`text-3xl sm:text-5xl font-bold ${stat.color}`}>{stat.value}</p>
+                    <Card key={index} className="hover:border-stone-300 transition-colors">
+                        <CardContent className="space-y-1.5 p-3.5 sm:p-5">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-stone-500">{stat.label}</span>
+                                <span className="text-[10px] text-stone-400 font-medium hidden sm:inline">{stat.badge}</span>
+                            </div>
+                            <p className={`text-2xl sm:text-4xl font-extrabold tracking-tight tabular-nums ${stat.color}`}>{stat.value}</p>
                         </CardContent>
                     </Card>
                 ))}
@@ -68,30 +83,33 @@ export default async function CMSDashboard() {
             <DashboardCharts />
 
             {/* Recent shifts table */}
-            <div className="space-y-4">
+            <div className="space-y-4 pt-4 border-t border-stone-200">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Últimos Turnos Reservados</h2>
-                        <p className="text-gray-600 text-xs sm:text-sm mt-1">Actividad reciente del sistema</p>
+                        <h2 className="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">Últimos Turnos Reservados</h2>
+                        <p className="text-stone-500 text-xs mt-0.5">Actividad reciente registrada en el sistema</p>
                     </div>
-                    <Link href="/admin/cms/shifts" className="cursor-pointer shrink-0">
-                        <Button variant="outlined" size="small" endIcon={<ArrowRight className="w-4 h-4" />}>
-                            Ver todos
-                        </Button>
-                    </Link>
+                    <Button
+                        href="/admin/cms/shifts"
+                        variant="outlined"
+                        size="small"
+                        endIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                    >
+                        Ver todos
+                    </Button>
                 </div>
 
                 {recentShifts.length === 0 ? (
                     <Card>
                         <CardContent>
-                            <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                                <Package className="w-16 h-16 text-gray-300" />
-                                <p>No hay turnos recientes</p>
+                            <div className="flex flex-col items-center gap-3 py-12 text-stone-400">
+                                <Package className="w-12 h-12 text-stone-300" />
+                                <p className="text-xs uppercase tracking-wider font-semibold">No hay turnos recientes para mostrar</p>
                             </div>
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid gap-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
                         {recentShifts.map((shift) => {
                             const dateStr = shift.date.toISOString().split("T")[0];
                             const [year, month, day] = dateStr.split("-");
@@ -104,47 +122,43 @@ export default async function CMSDashboard() {
                             const isToday = shiftDate.getTime() === todayCheck.getTime();
 
                             return (
-                                <Link key={shift.id} href={`/admin/cms/shifts/${shift.id}`} className="cursor-pointer">
-                                    <Card className="hover:border-gray-300 transition-colors hover:shadow-md">
-                                        <CardContent>
-                                            <div className="flex flex-col gap-3">
-                                                {/* Top row: avatar + name + status chip */}
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#0b3a60] flex items-center justify-center text-white font-bold text-base shrink-0">
-                                                        {shift.name.charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="text-gray-900 font-semibold text-sm sm:text-base truncate">
-                                                            {shift.name} {shift.lastName}
-                                                        </h3>
-                                                        <p className="text-xs text-gray-500 truncate">{shift.email}</p>
-                                                    </div>
-                                                    <Chip
-                                                        label={shift.confirmed ? "Conf." : "Pend."}
-                                                        color={shift.confirmed ? "success" : "warning"}
-                                                        variant="soft"
-                                                        size="small"
-                                                    />
-                                                </div>
-                                                {/* Bottom row: location + date + phone */}
-                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pl-12 sm:pl-14">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                                        <span className="text-gray-600 text-xs">{shift.location.name}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                                        <span className="text-gray-700 text-xs font-medium">{date.toLocaleDateString("es-AR")}</span>
-                                                        <span className="text-gray-400 text-xs">{shift.time}</span>
-                                                        {isToday && (
-                                                            <Chip label="Hoy" color="primary" variant="filled" size="small" />
-                                                        )}
-                                                    </div>
-                                                    <span className="text-gray-500 text-xs">{shift.phone}</span>
-                                                </div>
+                                <Link key={shift.id} href={`/admin/cms/shifts/${shift.id}`} className="cursor-pointer group">
+                                    <div className="bg-white border border-stone-200 rounded-xl p-4 transition-all hover:border-[#0b3a60] hover:shadow-xs space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 bg-[#0b3a60] rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                                {shift.name.charAt(0).toUpperCase()}
                                             </div>
-                                        </CardContent>
-                                    </Card>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-stone-900 font-bold text-sm truncate group-hover:text-[#0b3a60] transition-colors">
+                                                    {shift.name} {shift.lastName}
+                                                </h3>
+                                                <p className="text-xs text-stone-500 truncate">{shift.email}</p>
+                                            </div>
+                                            <Chip
+                                                label={shift.confirmed ? "Confirmado" : "Pendiente"}
+                                                color={shift.confirmed ? "success" : "warning"}
+                                                variant="soft"
+                                                size="small"
+                                            />
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-600 pt-2 border-t border-stone-100">
+                                            <div className="flex items-center gap-1.5">
+                                                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                                                <span className="font-medium">{shift.location.name}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <Calendar className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                                                <span>{date.toLocaleDateString("es-AR")}</span>
+                                                <span className="text-stone-400 font-mono">•</span>
+                                                <span className="font-semibold text-stone-800">{shift.time}</span>
+                                                {isToday && (
+                                                    <span className="bg-[#0b3a60] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                                                        HOY
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Link>
                             );
                         })}

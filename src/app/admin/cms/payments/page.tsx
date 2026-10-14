@@ -344,25 +344,31 @@ export default function PaymentsPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center gap-3 py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
-                <p className="text-gray-600">Cargando cobros...</p>
+            <div className="flex items-center gap-3 py-16 justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
+                <p className="text-stone-600 font-medium text-sm">Cargando cobros...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-6 animate-fadeIn pb-12">
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-5">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Cobros</h1>
-                    <p className="text-gray-600 text-sm mt-1">
-                        Registro de servicios y productos cobrados a clientes
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">Cobros</h1>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+                            {records.length} registros
+                        </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">
+                        Historial y registro de ingresos por servicios y productos cobrados a clientes
                     </p>
                 </div>
                 <Button
                     onClick={() => handleOpenDialog()}
-                    startIcon={<Plus className="w-5 h-5" />}
+                    startIcon={<Plus className="w-4 h-4" />}
                 >
                     Registrar Cobro
                 </Button>
@@ -372,23 +378,24 @@ export default function PaymentsPage() {
                 <Alert severity={message.type}>{message.text}</Alert>
             )}
 
-            <div className="flex flex-col justify-center sm:flex-row gap-4">
-                <div className="relative flex-1 h-fit">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            {/* Filter Bar */}
+            <div className="flex flex-col lg:flex-row gap-3">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
                     <Input
                         type="text"
-                        placeholder="Buscar por nombre, servicio, producto, monto..."
+                        placeholder="Buscar por cliente, servicio, producto, notas o monto..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-12"
+                        className="pl-10"
                     />
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <input
                         type="date"
                         value={showAll ? "" : dateFilter}
                         onChange={(e) => handleFilterDate(e.target.value)}
-                        className="px-4 py-2.5 bg-white border-2 border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                        className="px-3.5 py-2 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
                     />
                     {!showAll && dateFilter !== getTodayStr() && (
                         <Button variant="outlined" size="small" onClick={handleFilterToday}>
@@ -401,7 +408,7 @@ export default function PaymentsPage() {
                         onClick={showAll ? handleFilterToday : handleShowAll}
                         startIcon={<ListFilter className="w-4 h-4" />}
                     >
-                        {showAll ? "Filtrar" : "Ver Todo"}
+                        {showAll ? "Filtrar por Día" : "Ver Todo el Historial"}
                     </Button>
                     <Button
                         variant="outlined"
@@ -414,40 +421,66 @@ export default function PaymentsPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <Card>
-                    <CardContent className="flex flex-col items-center sm:items-start justify-center p-4">
-                        <p className="text-sm text-gray-600">Registros</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {filteredRecords.length}
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardContent className="flex flex-col items-center sm:items-start justify-center p-4">
-                        <p className="text-sm text-gray-600">Total Cobrado</p>
-                        <p className="text-xl font-bold text-green-600">
-                            ${totalPayments.toLocaleString("es-AR")}
-                        </p>
-                    </CardContent>
-                </Card>
+            {/* Quick KPI Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
+                            Cobros Filtrados
+                        </span>
+                        <Receipt className="w-4 h-4 text-stone-400" />
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-bold text-stone-900 mt-2 tabular-nums">
+                        {filteredRecords.length}
+                    </p>
+                    <p className="text-xs text-stone-400 mt-1">
+                        {showAll ? "Mostrando la totalidad del histórico" : `Fecha seleccionada: ${dateFilter}`}
+                    </p>
+                </div>
+
+                <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                            Total Facturado
+                        </span>
+                        <DollarSign className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-bold text-emerald-700 mt-2 tabular-nums">
+                        ${totalPayments.toLocaleString("es-AR")}
+                    </p>
+                    <p className="text-xs text-stone-400 mt-1">
+                        Suma neta de los cobros en pantalla
+                    </p>
+                </div>
             </div>
 
+            {/* Records List */}
             {filteredRecords.length === 0 ? (
-                <Card>
-                    <CardContent>
-                        <div className="flex flex-col items-center gap-4 py-12 text-gray-500">
-                            <Receipt className="w-16 h-16 text-gray-300" />
-                            <p>
-                                {searchTerm
-                                    ? "No se encontraron cobros con ese criterio"
-                                    : "No hay cobros registrados"}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="bg-white border border-stone-200 rounded-xl p-12 text-center">
+                    <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-3">
+                        <Receipt className="w-6 h-6 text-stone-400" />
+                    </div>
+                    <h3 className="text-base font-semibold text-stone-900">Sin cobros para mostrar</h3>
+                    <p className="text-sm text-stone-500 mt-1 max-w-sm mx-auto">
+                        {searchTerm
+                            ? "No hay cobros que coincidan con la búsqueda actual."
+                            : "No se encontraron registros de cobro para el período o fecha seleccionada."}
+                    </p>
+                    <div className="mt-4 flex justify-center gap-2">
+                        {searchTerm && (
+                            <Button variant="outlined" size="small" onClick={() => setSearchTerm("")}>
+                                Limpiar búsqueda
+                            </Button>
+                        )}
+                        {!showAll && (
+                            <Button variant="outlined" size="small" onClick={handleShowAll}>
+                                Ver todo el historial
+                            </Button>
+                        )}
+                    </div>
+                </div>
             ) : (
-                <div className="grid gap-4">
+                <div className="space-y-3">
                     {filteredRecords.map((record) => {
                         const paidDate = record.paidAt.split("T")[0];
                         const [year, month, day] = paidDate.split("-");
@@ -458,124 +491,101 @@ export default function PaymentsPage() {
                         );
 
                         return (
-                            <Card key={record.id}>
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col sm:flex-row items-start gap-4">
-                                        <div className="flex-1 w-full">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div className="w-10 h-10 bg-[#0b3a60] rounded-lg flex items-center justify-center text-white font-bold shrink-0">
-                                                    {record.fullName
-                                                        .charAt(0)
-                                                        .toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900">
-                                                        {record.fullName}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                        <Calendar className="w-3.5 h-3.5" />
-                                                        <span>
-                                                            {date.toLocaleDateString(
-                                                                "es-AR"
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                            <div
+                                key={record.id}
+                                className="bg-white border border-stone-200 rounded-xl p-4 sm:p-5 hover:border-stone-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+                            >
+                                <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                                    <div className="w-10 h-10 rounded-lg bg-[#0b3a60] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                                        {record.fullName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 min-w-0 space-y-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h3 className="text-base font-bold text-stone-900 truncate">
+                                                {record.fullName}
+                                            </h3>
+                                            <span className="inline-flex items-center gap-1 text-xs text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md font-medium">
+                                                <Calendar className="w-3 h-3 text-stone-400" />
+                                                {date.toLocaleDateString("es-AR")}
+                                            </span>
+                                        </div>
 
-                                            {record.description && (
-                                                <p className="text-gray-600 text-sm mb-3">
-                                                    {record.description}
-                                                </p>
-                                            )}
+                                        {record.description && (
+                                            <p className="text-xs text-stone-600 line-clamp-2">
+                                                {record.description}
+                                            </p>
+                                        )}
 
+                                        <div className="flex flex-wrap items-center gap-2 pt-1">
                                             {/* Servicios realizados */}
                                             {record.servicesPerformed.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 items-center mb-2">
-                                                    <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 mr-1">
-                                                        <Scissors className="w-3 h-3 text-blue-600" />
-                                                        Servicios:
-                                                    </span>
-                                                    {record.servicesPerformed.map(
-                                                        (service, i) => (
-                                                            <Chip
-                                                                key={i}
-                                                                label={service}
-                                                                variant="soft"
-                                                                color="primary"
-                                                                size="small"
-                                                            />
-                                                        )
-                                                    )}
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    <Scissors className="w-3 h-3 text-[#0b3a60] shrink-0" />
+                                                    {record.servicesPerformed.map((service, i) => (
+                                                        <span
+                                                            key={i}
+                                                            className="inline-flex items-center text-[11px] font-medium bg-[#0b3a60]/10 text-[#0b3a60] px-2 py-0.5 rounded-md"
+                                                        >
+                                                            {service}
+                                                        </span>
+                                                    ))}
                                                 </div>
                                             )}
 
                                             {/* Productos comprados */}
                                             {record.productsBought && record.productsBought.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 items-center mb-3">
-                                                    <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1 mr-1">
-                                                        <ShoppingBag className="w-3 h-3 text-emerald-600" />
-                                                        Productos:
-                                                    </span>
-                                                    {record.productsBought.map(
-                                                        (prod, i) => (
-                                                            <Chip
-                                                                key={i}
-                                                                label={prod}
-                                                                variant="soft"
-                                                                color="success"
-                                                                size="small"
-                                                            />
-                                                        )
-                                                    )}
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    <ShoppingBag className="w-3 h-3 text-emerald-600 shrink-0" />
+                                                    {record.productsBought.map((prod, i) => (
+                                                        <span
+                                                            key={i}
+                                                            className="inline-flex items-center text-[11px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md"
+                                                        >
+                                                            {prod}
+                                                        </span>
+                                                    ))}
                                                 </div>
                                             )}
-
-                                            <div className="flex items-center gap-2 mt-2">
-                                                <DollarSign className="w-4 h-4 text-green-600" />
-                                                <span className="text-xl font-bold text-gray-900">
-                                                    $
-                                                    {record.payment.toLocaleString(
-                                                        "es-AR"
-                                                    )}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleOpenDialog(record)
-                                                }
-                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                                <span className="sm:hidden">
-                                                    Editar
-                                                </span>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setDeleteId(record.id)
-                                                }
-                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                <span className="sm:hidden">
-                                                    Eliminar
-                                                </span>
-                                            </button>
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+
+                                <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100">
+                                    <div className="text-left sm:text-right">
+                                        <span className="text-[11px] uppercase tracking-wider text-stone-400 font-semibold block">
+                                            Monto
+                                        </span>
+                                        <span className="text-xl font-bold text-stone-900 tabular-nums">
+                                            ${record.payment.toLocaleString("es-AR")}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleOpenDialog(record)}
+                                            className="p-2 text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors cursor-pointer"
+                                            title="Editar cobro"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDeleteId(record.id)}
+                                            className="p-2 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                                            title="Eliminar cobro"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         );
                     })}
                 </div>
             )}
 
+            {/* Modal de Registro / Edición */}
             <Dialog
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
@@ -615,7 +625,7 @@ export default function PaymentsPage() {
                             />
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-sm font-semibold text-gray-700">
+                                <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
                                     Fecha de cobro
                                 </label>
                                 <input
@@ -628,20 +638,20 @@ export default function PaymentsPage() {
                                         })
                                     }
                                     required
-                                    className="px-4 py-2.5 bg-white border-2 border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                    className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all"
                                 />
                             </div>
                         </div>
 
                         {/* SECCIÓN 1: SERVICIOS */}
-                        <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl space-y-2">
+                        <div className="p-3.5 bg-stone-50 border border-stone-200 rounded-xl space-y-2.5">
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
-                                    <Scissors className="w-4 h-4 text-blue-600" />
+                                <label className="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Scissors className="w-3.5 h-3.5 text-[#0b3a60]" />
                                     Servicios Realizados
                                 </label>
                                 {formData.servicesPerformed.length > 0 && (
-                                    <span className="text-xs font-semibold text-blue-700">
+                                    <span className="text-xs font-semibold text-[#0b3a60]">
                                         Subtotal: ${estimatedServicesTotal.toLocaleString("es-AR")}
                                     </span>
                                 )}
@@ -656,15 +666,15 @@ export default function PaymentsPage() {
                                                 key={service.id}
                                                 type="button"
                                                 onClick={() => handleToggleService(service.name)}
-                                                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer border flex items-center gap-1.5 ${
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border flex items-center gap-1.5 ${
                                                     selected
-                                                        ? "bg-[#0b3a60] text-white border-[#0b3a60] shadow-sm"
-                                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400"
+                                                        ? "bg-[#0b3a60] text-white border-[#0b3a60] shadow-xs"
+                                                        : "bg-white text-stone-700 border-stone-300 hover:bg-stone-100 hover:border-stone-400"
                                                 }`}
                                             >
                                                 {selected && <Check className="w-3.5 h-3.5" />}
                                                 <span>{service.name}</span>
-                                                <span className={selected ? "text-blue-200 font-semibold" : "text-gray-400 font-semibold"}>
+                                                <span className={selected ? "text-blue-100 font-semibold" : "text-stone-400 font-semibold"}>
                                                     ${service.price.toLocaleString("es-AR")}
                                                 </span>
                                             </button>
@@ -672,21 +682,21 @@ export default function PaymentsPage() {
                                     })}
                                 </div>
                             ) : (
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-stone-500">
                                     No hay servicios disponibles
                                 </p>
                             )}
                         </div>
 
                         {/* SECCIÓN 2: PRODUCTOS VENDIDOS (AUTOCOMPLETE + SELECCIÓN) */}
-                        <div className="p-3.5 bg-emerald-50/50 border border-emerald-200 rounded-xl space-y-2.5">
+                        <div className="p-3.5 bg-emerald-50/40 border border-emerald-200 rounded-xl space-y-2.5">
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
-                                    <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                                <label className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                                    <ShoppingBag className="w-3.5 h-3.5 text-emerald-700" />
                                     Productos Vendidos
                                 </label>
                                 {formData.productsBought.length > 0 && (
-                                    <span className="text-xs font-semibold text-emerald-700">
+                                    <span className="text-xs font-semibold text-emerald-800">
                                         Subtotal: ${estimatedProductsTotal.toLocaleString("es-AR")}
                                     </span>
                                 )}
@@ -695,7 +705,7 @@ export default function PaymentsPage() {
                             {/* Autocomplete Input */}
                             <div className="relative">
                                 <div className="relative">
-                                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                                     <input
                                         type="text"
                                         placeholder="Escribí para autocompletar y sumar producto..."
@@ -705,7 +715,7 @@ export default function PaymentsPage() {
                                             setIsProductDropdownOpen(true);
                                         }}
                                         onFocus={() => setIsProductDropdownOpen(true)}
-                                        className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-emerald-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all"
+                                        className="w-full pl-9 pr-8 py-2 text-sm bg-white border border-emerald-300 rounded-lg text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
                                     />
                                     {productSearch && (
                                         <button
@@ -714,7 +724,7 @@ export default function PaymentsPage() {
                                                 setProductSearch("");
                                                 setIsProductDropdownOpen(false);
                                             }}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -723,7 +733,7 @@ export default function PaymentsPage() {
 
                                 {/* Autocomplete Dropdown */}
                                 {isProductDropdownOpen && filteredProductOptions.length > 0 && (
-                                    <div className="absolute z-20 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg divide-y divide-gray-100">
+                                    <div className="absolute z-20 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-stone-200 rounded-lg shadow-lg divide-y divide-stone-100">
                                         {filteredProductOptions.map((prod) => {
                                             const isSelected = formData.productsBought.includes(prod.name);
                                             return (
@@ -735,9 +745,9 @@ export default function PaymentsPage() {
                                                 >
                                                     <div className="flex items-center gap-2">
                                                         <ShoppingBag className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                                        <span className="font-medium text-gray-900">{prod.name}</span>
+                                                        <span className="font-medium text-stone-900">{prod.name}</span>
                                                         {prod.stock !== null && prod.stock !== undefined && (
-                                                            <span className="text-[11px] text-gray-400">({prod.stock} disp.)</span>
+                                                            <span className="text-[11px] text-stone-400">({prod.stock} disp.)</span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -745,11 +755,11 @@ export default function PaymentsPage() {
                                                             +${prod.price.toLocaleString("es-AR")}
                                                         </span>
                                                         {isSelected ? (
-                                                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
+                                                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-medium">
                                                                 Agregado
                                                             </span>
                                                         ) : (
-                                                            <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                                                            <span className="text-[10px] text-stone-600 bg-stone-100 px-1.5 py-0.5 rounded font-medium">
                                                                 Sumar
                                                             </span>
                                                         )}
@@ -764,7 +774,7 @@ export default function PaymentsPage() {
                             {/* Quick selection chips for products */}
                             {products.length > 0 ? (
                                 <div className="space-y-1.5 pt-1">
-                                    <span className="text-[11px] text-emerald-900/70 font-medium block">
+                                    <span className="text-[11px] text-emerald-900/80 font-medium block">
                                         O hacé clic en un producto para sumarlo o quitarlo:
                                     </span>
                                     <div className="flex flex-wrap gap-2">
@@ -775,13 +785,13 @@ export default function PaymentsPage() {
                                                     key={product.id}
                                                     type="button"
                                                     onClick={() => handleToggleProduct(product.name)}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer border flex items-center gap-1.5 ${
+                                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border flex items-center gap-1.5 ${
                                                         selected
-                                                            ? "bg-emerald-700 text-white border-emerald-700 shadow-sm"
-                                                            : "bg-white text-gray-700 border-emerald-300 hover:bg-emerald-50 hover:border-emerald-400"
+                                                            ? "bg-emerald-700 text-white border-emerald-700 shadow-xs"
+                                                            : "bg-white text-stone-700 border-emerald-300 hover:bg-emerald-50 hover:border-emerald-400"
                                                     }`}
                                                 >
-                                                    {selected ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5 text-emerald-600" />}
+                                                    {selected ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3 text-emerald-600" />}
                                                     <span>{product.name}</span>
                                                     <span className={selected ? "text-emerald-100 font-semibold" : "text-emerald-700 font-semibold"}>
                                                         ${product.price.toLocaleString("es-AR")}
@@ -797,7 +807,7 @@ export default function PaymentsPage() {
                                 </p>
                             )}
 
-                            {/* Selected Products Chips with deletion */}
+                            {/* Selected Products Chips */}
                             {formData.productsBought.length > 0 && (
                                 <div className="pt-2 border-t border-emerald-200">
                                     <span className="text-xs font-semibold text-emerald-900 block mb-1.5">
@@ -824,26 +834,26 @@ export default function PaymentsPage() {
 
                         {/* LIVE TOTAL BREAKDOWN */}
                         {(formData.servicesPerformed.length > 0 || formData.productsBought.length > 0) && (
-                            <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm">
+                            <div className="flex items-center justify-between p-3.5 bg-stone-100 border border-stone-200 rounded-xl text-sm">
                                 <div className="space-y-0.5">
-                                    <span className="text-xs text-blue-900 font-medium block">
+                                    <span className="text-xs text-stone-700 font-medium block">
                                         Total calculado (servicios + productos):
                                     </span>
-                                    <div className="flex items-center gap-3 text-xs text-gray-600">
+                                    <div className="flex items-center gap-3 text-xs text-stone-500 tabular-nums">
                                         <span>Servicios: ${estimatedServicesTotal.toLocaleString("es-AR")}</span>
                                         <span>•</span>
                                         <span>Productos: ${estimatedProductsTotal.toLocaleString("es-AR")}</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-lg font-bold text-green-700">
+                                    <span className="text-lg font-bold text-stone-900 tabular-nums">
                                         ${totalEstimated.toLocaleString("es-AR")}
                                     </span>
                                     {formData.payment !== totalEstimated.toString() && (
                                         <button
                                             type="button"
                                             onClick={() => setFormData((prev) => ({ ...prev, payment: totalEstimated.toString() }))}
-                                            className="block text-[11px] text-blue-600 hover:underline cursor-pointer"
+                                            className="block text-[11px] text-[#0b3a60] font-semibold hover:underline cursor-pointer"
                                         >
                                             Aplicar a monto
                                         </button>
@@ -852,8 +862,8 @@ export default function PaymentsPage() {
                             </div>
                         )}
 
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-gray-700">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
                                 Descripción o notas
                             </label>
                             <textarea
@@ -865,12 +875,12 @@ export default function PaymentsPage() {
                                     })
                                 }
                                 rows={2}
-                                className="px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all resize-none"
+                                className="px-3.5 py-2.5 bg-white border border-stone-300 rounded-lg text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0b3a60]/20 focus:border-[#0b3a60] transition-all resize-none"
                                 placeholder="Notas adicionales del cobro (opcional)"
                             />
                         </div>
 
-                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-stone-200">
                             <Button
                                 type="button"
                                 variant="outlined"

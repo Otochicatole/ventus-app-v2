@@ -39,7 +39,7 @@ export default function AdminNavbar({ admin, isMenuOpen, onToggleMenu }: AdminNa
                     {/* Botón de Hamburguesa en responsive */}
                     <button
                         onClick={onToggleMenu}
-                        className="md:hidden p-2 text-stone-600 hover:bg-stone-50 hover:text-stone-900 border border-stone-200 rounded-none transition-colors cursor-pointer"
+                        className="md:hidden p-2 text-stone-600 hover:bg-stone-50 hover:text-stone-900 border border-stone-200 rounded-lg transition-colors cursor-pointer"
                         aria-label="Toggle menu"
                     >
                         {isMenuOpen ? (
@@ -50,38 +50,59 @@ export default function AdminNavbar({ admin, isMenuOpen, onToggleMenu }: AdminNa
                     </button>
 
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-[#0b3a60] rounded-none flex items-center justify-center">
-                            <Scissors className="w-5 h-5 text-white" />
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#0b3a60] rounded-lg flex items-center justify-center text-white shadow-xs">
+                            <Scissors className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
-                        <h1 className="text-base sm:text-lg font-bold tracking-tight text-stone-900">
-                            Ventus <span className="font-light text-[#0b3a60]">CMS</span>
-                        </h1>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-base sm:text-lg font-extrabold tracking-tight text-stone-900">
+                                    VENTUS
+                                </span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest bg-stone-100 text-[#0b3a60] px-1.5 py-0.5 rounded border border-stone-200">
+                                    CMS
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Lado derecho: Info de administrador + Cerrar Sesión */}
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-stone-50 rounded-none border border-stone-200">
-                        <div className="w-8 h-8 bg-[#0b3a60] rounded-none flex items-center justify-center text-white font-bold text-sm">
+                {/* Lado derecho: Enlace a sitio + Info admin + Salir */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <a
+                        href="/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-600 hover:text-[#0b3a60] hover:bg-stone-50 rounded-lg border border-stone-200 transition-colors cursor-pointer"
+                        title="Abrir sitio web público en una nueva pestaña"
+                    >
+                        <span>Ver Sitio</span>
+                        <span className="text-[10px] text-stone-400">↗</span>
+                    </a>
+
+                    <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-stone-50/80 rounded-lg border border-stone-200">
+                        <div className="w-7 h-7 bg-[#0b3a60] rounded-md flex items-center justify-center text-white font-bold text-xs">
                             {(admin.name || admin.email).charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <p className="text-xs font-semibold text-stone-900">{admin.name || admin.email}</p>
-                            <p className="text-[10px] text-stone-500 font-mono">{admin.email}</p>
+                        <div className="text-left">
+                            <p className="text-xs font-semibold text-stone-900 leading-tight truncate max-w-[140px]">
+                                {admin.name || admin.email}
+                            </p>
+                            <p className="text-[10px] text-stone-400 leading-tight">Admin</p>
                         </div>
                     </div>
                     
                     <button
                         onClick={handleLogout}
                         disabled={loading}
-                        className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-red-600 text-white font-semibold text-xs uppercase tracking-wider rounded-none hover:bg-red-700 disabled:opacity-50 transition-all cursor-pointer border border-red-600"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-stone-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200 font-semibold text-xs rounded-lg transition-all cursor-pointer border border-stone-200"
+                        title="Cerrar sesión"
                     >
                         {loading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-500" />
                         ) : (
-                            <LogOut className="w-4 h-4" />
+                            <LogOut className="w-3.5 h-3.5 text-stone-500 group-hover:text-red-600" />
                         )}
-                        <span className="hidden sm:inline">Salir</span>
+                        <span className="hidden sm:inline">Cerrar Sesión</span>
                     </button>
                 </div>
             </div>

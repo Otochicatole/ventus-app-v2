@@ -84,85 +84,93 @@ export default function EditLocationPage() {
 
     if (fetching) {
         return (
-            <div className="flex justify-center items-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#0b3a60] border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl font-bold text-gray-900">Editar Ubicación</h1>
+        <div className="max-w-2xl mx-auto space-y-6 animate-fadeIn pb-12">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-stone-900">Editar Ubicación</h1>
+                    <p className="text-xs text-stone-500 mt-1">
+                        Actualizar información de la sede física
+                    </p>
+                </div>
+                <Button
+                    type="button"
+                    variant="outlined"
+                    size="small"
+                    onClick={() => router.back()}
+                >
+                    ← Volver
+                </Button>
+            </div>
 
-            <Card>
-                <CardContent className="p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-6">
-                        Información de la Ubicación
-                    </h2>
+            <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-xs">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {error && (
+                        <Alert severity="error">
+                            {error}
+                        </Alert>
+                    )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {error && (
-                            <Alert severity="error">
-                                {error}
-                            </Alert>
-                        )}
+                    <Input
+                        label="Nombre de la Sede"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                        fullWidth
+                    />
 
+                    <Input
+                        label="Dirección física"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        required
+                        fullWidth
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                         <Input
-                            label="Nombre"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            required
+                            label="Latitud (opcional)"
+                            type="number"
+                            step="any"
+                            value={formData.latitude}
+                            onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                             fullWidth
                         />
-
                         <Input
-                            label="Dirección"
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            required
+                            label="Longitud (opcional)"
+                            type="number"
+                            step="any"
+                            value={formData.longitude}
+                            onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                             fullWidth
                         />
+                    </div>
 
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <Input
-                                label="Latitud (opcional)"
-                                type="number"
-                                step="any"
-                                value={formData.latitude}
-                                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                                fullWidth
-                            />
-                            <Input
-                                label="Longitud (opcional)"
-                                type="number"
-                                step="any"
-                                value={formData.longitude}
-                                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                fullWidth
-                            />
-                        </div>
-
-                        <div className="flex gap-3 justify-end pt-4">
-                            <Button
-                                type="button"
-                                variant="outlined"
-                                onClick={() => router.back()}
-                                disabled={loading}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                loading={loading}
-                                disabled={loading}
-                            >
-                                {loading ? "Guardando..." : "Guardar Cambios"}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
+                    <div className="flex items-center justify-end gap-3 pt-5 border-t border-stone-200">
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            onClick={() => router.back()}
+                            disabled={loading}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            loading={loading}
+                            disabled={loading}
+                        >
+                            {loading ? "Guardando..." : "Guardar Cambios"}
+                        </Button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

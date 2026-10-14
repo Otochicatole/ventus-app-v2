@@ -23,19 +23,19 @@ export default function ConfirmDialog({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer"
+                className="absolute inset-0 bg-stone-950/50 backdrop-blur-xs cursor-pointer"
                 onClick={onClose}
             />
-            <div className="relative bg-white border border-gray-200 rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fadeIn">
-                <div className="flex items-start gap-4 mb-6">
-                    <div className="flex-shrink-0 w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center border border-red-200">
-                        <AlertTriangle className="w-6 h-6 text-red-600" />
+            <div className="relative bg-white border border-stone-200 rounded-xl p-6 w-full max-w-md shadow-2xl">
+                <div className="flex items-start gap-3.5 mb-5">
+                    <div className="flex-shrink-0 w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center border border-red-100 text-red-600">
+                        <AlertTriangle className="w-5 h-5" />
                     </div>
-                    <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-                        <p className="text-gray-600">{message}</p>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg font-bold text-stone-900 mb-1">{title}</h3>
+                        <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">{message}</p>
                     </div>
                 </div>
 
