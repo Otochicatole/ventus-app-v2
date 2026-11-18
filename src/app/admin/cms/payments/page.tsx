@@ -13,16 +13,30 @@ import {
     ArrowUpDown,
     ShoppingBag,
     Scissors,
+    CreditCard,
     X,
     Check,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
 import Dialog, { DialogContent } from "@/components/ui/dialog";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Alert from "@/components/ui/alert";
 import Chip from "@/components/ui/chip";
+import {
+    PAYMENT_METHOD_OPTIONS,
+    getPaymentMethodLabel,
+    normalizeStoredPaymentMethods,
+    type PaymentMethodEntry,
+    type PaymentMethodType,
+} from "@/lib/payment-methods";
+
+type PaymentMethodFormRow = {
+    method: PaymentMethodType | "";
+    amount: string;
+};
 
 type ClientPaidService = {
     id: string;
@@ -31,6 +45,7 @@ type ClientPaidService = {
     description: string | null;
     servicesPerformed: string[];
     productsBought?: string[];
+    paymentMethods?: PaymentMethodEntry[] | null;
     paidAt: string;
     createdAt: string;
     updatedAt: string;
@@ -75,8 +90,10 @@ export default function PaymentsPage() {
         description: "",
         servicesPerformed: [] as string[],
         productsBought: [] as string[],
+        paymentMethods: [{ method: "", amount: "" }] as PaymentMethodFormRow[],
         paidAt: getTodayStr(),
     });
+    const [formError, setFormError] = useState<string | null>(null);
     const [productSearch, setProductSearch] = useState("");
     const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
     const [message, setMessage] = useState<{
@@ -133,7 +150,9 @@ export default function PaymentsPage() {
     const handleOpenDialog = (record?: ClientPaidService) => {
         setProductSearch("");
         setIsProductDropdownOpen(false);
+        setFormError(null);
         if (record) {
+            const storedMethods = normalizeStoredPaymentMethods(record.paymentMethods);
             setEditingRecord(record);
             setFormData({
                 fullName: record.fullName,
@@ -141,6 +160,13 @@ export default function PaymentsPage() {
                 description: record.description || "",
                 servicesPerformed: record.servicesPerformed || [],
                 productsBought: record.productsBought || [],
+                paymentMethods:
+                    storedMethods.length > 0
+                        ? storedMethods.map((item) => ({
+                              method: item.method,
+                              amount: item.amount.toString(),
+                          }))
+                        : [{ method: "", amount: "" }],
                 paidAt: record.paidAt.split("T")[0],
             });
         } else {
@@ -151,6 +177,7 @@ export default function PaymentsPage() {
                 description: "",
                 servicesPerformed: [],
                 productsBought: [],
+                paymentMethods: [{ method: "", amount: "" }],
                 paidAt: getTodayStr(),
             });
         }
@@ -162,12 +189,14 @@ export default function PaymentsPage() {
         setEditingRecord(null);
         setProductSearch("");
         setIsProductDropdownOpen(false);
+        setFormError(null);
         setFormData({
             fullName: "",
             payment: "",
             description: "",
             servicesPerformed: [],
             productsBought: [],
+            paymentMethods: [{ method: "", amount: "" }],
             paidAt: getTodayStr(),
         });
     };
@@ -247,10 +276,174 @@ export default function PaymentsPage() {
 
     const totalEstimated = estimatedServicesTotal + estimatedProductsTotal;
 
+    const totalPaymentNumber = parseFloat(formData.payment) || 0;
+    const isSplitPayment = formData.paymentMethods.length >= 2;
+    const splitMethodsSum = useMemo(() => {
+        return formData.paymentMethods.reduce((sum, row) => {
+            const val = parseFloat(row.amount);
+            return sum + (Number.isFinite(val) && val > 0 ? val : 0);
+        }, 0);
+    }, [formData.paymentMethods]);
+
+    const handlePaymentMethodChange = (index: number, method: PaymentMethodType | "") => {
+        setFormError(null);
+        setFormData((prev) => ({
+            ...prev,
+            paymentMethods: prev.paymentMethods.map((row, idx) =>
+                idx === index ? { ...row, method } : row
+            ),
+        }));
+    };
+
+    const handlePaymentMethodAmountChange = (index: number, amount: string) => {
+        setFormError(null);
+        setFormData((prev) => ({
+            ...prev,
+            paymentMethods: prev.paymentMethods.map((row, idx) =>
+                idx === index ? { ...row, amount } : row
+            ),
+        }));
+    };
+
+    const handleAddPaymentMethod = () => {
+        setFormError(null);
+        setFormData((prev) => {
+            if (prev.paymentMethods.length >= PAYMENT_METHOD_OPTIONS.length) {
+                return prev;
+            }
+
+            const usedMethods = new Set(prev.paymentMethods.map((r) => r.method).filter(Boolean));
+            const nextMethod =
+                PAYMENT_METHOD_OPTIONS.find((opt) => !usedMethods.has(opt.value))?.value ?? "";
+
+            const total = parseFloat(prev.payment) || 0;
+            if (prev.paymentMethods.length === 1 && total > 0) {
+                const firstHalf = Math.round((total / 2) * 100) / 100;
+                const secondHalf = Math.round((total - firstHalf) * 100) / 100;
+                return {
+                    ...prev,
+                    paymentMethods: [
+                        { ...prev.paymentMethods[0], amount: firstHalf.toString() },
+                        { method: nextMethod, amount: secondHalf.toString() },
+                    ],
+                };
+            }
+
+            const currentAssigned = prev.paymentMethods.reduce((sum, row) => {
+                const val = parseFloat(row.amount);
+                return sum + (Number.isFinite(val) && val > 0 ? val : 0);
+            }, 0);
+            const remaining = Math.max(0, Math.round((total - currentAssigned) * 100) / 100);
+
+            return {
+                ...prev,
+                paymentMethods: [
+                    ...prev.paymentMethods,
+                    { method: nextMethod, amount: remaining > 0 ? remaining.toString() : "" },
+                ],
+            };
+        });
+    };
+
+    const handleRemovePaymentMethod = (index: number) => {
+        setFormError(null);
+        setFormData((prev) => {
+            if (prev.paymentMethods.length <= 1) return prev;
+            const remainingRows = prev.paymentMethods.filter((_, idx) => idx !== index);
+            if (remainingRows.length === 1) {
+                return {
+                    ...prev,
+                    paymentMethods: [{ method: remainingRows[0].method, amount: prev.payment }],
+                };
+            }
+            return {
+                ...prev,
+                paymentMethods: remainingRows,
+            };
+        });
+    };
+
+    const handleSplitEvenly = () => {
+        setFormError(null);
+        setFormData((prev) => {
+            const total = parseFloat(prev.payment) || 0;
+            const count = prev.paymentMethods.length;
+            if (count < 2 || total <= 0) return prev;
+
+            const baseAmount = Math.floor((total / count) * 100) / 100;
+            const lastAmount = Math.round((total - baseAmount * (count - 1)) * 100) / 100;
+
+            return {
+                ...prev,
+                paymentMethods: prev.paymentMethods.map((row, idx) => ({
+                    ...row,
+                    amount: (idx === count - 1 ? lastAmount : baseAmount).toString(),
+                })),
+            };
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSubmitting(true);
+        setFormError(null);
         setMessage(null);
+
+        const parsedTotal = parseFloat(formData.payment);
+        if (!Number.isFinite(parsedTotal) || parsedTotal < 0) {
+            setFormError("Ingresá un monto total válido.");
+            return;
+        }
+
+        const hasLegacyUnset =
+            Boolean(editingRecord) &&
+            normalizeStoredPaymentMethods(editingRecord?.paymentMethods).length === 0 &&
+            formData.paymentMethods.length === 1 &&
+            !formData.paymentMethods[0].method;
+
+        let payloadPaymentMethods: PaymentMethodEntry[] | undefined;
+
+        if (!hasLegacyUnset) {
+            if (formData.paymentMethods.some((row) => !row.method)) {
+                setFormError("Seleccioná un método de pago en cada fila.");
+                return;
+            }
+
+            if (formData.paymentMethods.length === 1) {
+                payloadPaymentMethods = [
+                    {
+                        method: formData.paymentMethods[0].method as PaymentMethodType,
+                        amount: parsedTotal,
+                    },
+                ];
+            } else {
+                const splitEntries: PaymentMethodEntry[] = [];
+                for (const row of formData.paymentMethods) {
+                    const amount = parseFloat(row.amount);
+                    if (!Number.isFinite(amount) || amount <= 0) {
+                        setFormError(
+                            `Ingresá un monto mayor a 0 para ${getPaymentMethodLabel(row.method)}.`
+                        );
+                        return;
+                    }
+                    splitEntries.push({
+                        method: row.method as PaymentMethodType,
+                        amount,
+                    });
+                }
+
+                const splitSum = splitEntries.reduce((sum, item) => sum + item.amount, 0);
+                if (Math.abs(splitSum - parsedTotal) > 0.01) {
+                    setFormError(
+                        `La suma por métodos ($${splitSum.toLocaleString("es-AR")}) debe coincidir con el monto total ($${parsedTotal.toLocaleString("es-AR")}).`
+                    );
+                    return;
+                }
+
+                payloadPaymentMethods = splitEntries;
+            }
+        }
+
+        setSubmitting(true);
 
         try {
             const url = editingRecord
@@ -261,7 +454,15 @@ export default function PaymentsPage() {
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    payment: formData.payment,
+                    description: formData.description,
+                    servicesPerformed: formData.servicesPerformed,
+                    productsBought: formData.productsBought,
+                    paidAt: formData.paidAt,
+                    ...(payloadPaymentMethods ? { paymentMethods: payloadPaymentMethods } : {}),
+                }),
             });
 
             if (!res.ok) {
@@ -279,10 +480,7 @@ export default function PaymentsPage() {
             handleCloseDialog();
             fetchRecords();
         } catch (error) {
-            setMessage({
-                type: "error",
-                text: error instanceof Error ? error.message : "Error al guardar cobro",
-            });
+            setFormError(error instanceof Error ? error.message : "Error al guardar cobro");
         } finally {
             setSubmitting(false);
         }
@@ -311,11 +509,13 @@ export default function PaymentsPage() {
         .filter((record) => {
             if (!searchTerm) return true;
             const search = searchTerm.toLowerCase();
+            const storedMethods = normalizeStoredPaymentMethods(record.paymentMethods);
             return (
                 record.fullName.toLowerCase().includes(search) ||
                 (record.description && record.description.toLowerCase().includes(search)) ||
                 record.servicesPerformed.some((s) => s.toLowerCase().includes(search)) ||
                 (record.productsBought && record.productsBought.some((p) => p.toLowerCase().includes(search))) ||
+                storedMethods.some((pm) => getPaymentMethodLabel(pm.method).toLowerCase().includes(search)) ||
                 record.payment.toString().includes(search)
             );
         })
@@ -384,7 +584,7 @@ export default function PaymentsPage() {
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
                     <Input
                         type="text"
-                        placeholder="Buscar por cliente, servicio, producto, notas o monto..."
+                        placeholder="Buscar por cliente, servicio, producto, método, notas o monto..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -489,6 +689,7 @@ export default function PaymentsPage() {
                             parseInt(month) - 1,
                             parseInt(day)
                         );
+                        const paymentMethods = normalizeStoredPaymentMethods(record.paymentMethods);
 
                         return (
                             <div
@@ -546,6 +747,23 @@ export default function PaymentsPage() {
                                                     ))}
                                                 </div>
                                             )}
+
+                                            {/* Métodos de pago */}
+                                            {paymentMethods.length > 0 && (
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    <CreditCard className="w-3 h-3 text-amber-700 shrink-0" />
+                                                    {paymentMethods.map((pm, i) => (
+                                                        <span
+                                                            key={`${pm.method}-${i}`}
+                                                            className="inline-flex items-center text-[11px] font-medium bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-md tabular-nums"
+                                                        >
+                                                            {paymentMethods.length > 1
+                                                                ? `${getPaymentMethodLabel(pm.method)}: $${pm.amount.toLocaleString("es-AR")}`
+                                                                : getPaymentMethodLabel(pm.method)}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -593,6 +811,12 @@ export default function PaymentsPage() {
             >
                 <DialogContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {formError && (
+                            <div role="alert" aria-live="polite">
+                                <Alert severity="error">{formError}</Alert>
+                            </div>
+                        )}
+
                         <Input
                             label="Nombre completo del cliente"
                             value={formData.fullName}
@@ -642,6 +866,149 @@ export default function PaymentsPage() {
                                 />
                             </div>
                         </div>
+
+                        {/* SECCIÓN: MÉTODO DE PAGO */}
+                        <fieldset className="p-3.5 bg-stone-50 border border-stone-200 rounded-xl space-y-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                <legend className="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1.5">
+                                    <CreditCard className="w-3.5 h-3.5 text-[#0b3a60]" />
+                                    Método de Pago
+                                </legend>
+                                {formData.paymentMethods.length < PAYMENT_METHOD_OPTIONS.length && (
+                                    <button
+                                        type="button"
+                                        onClick={handleAddPaymentMethod}
+                                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#0b3a60] hover:underline cursor-pointer"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" />
+                                        Agregar otro método
+                                    </button>
+                                )}
+                            </div>
+
+                            {!isSplitPayment ? (
+                                <Select
+                                    fullWidth
+                                    value={formData.paymentMethods[0]?.method ?? ""}
+                                    options={PAYMENT_METHOD_OPTIONS}
+                                    onChange={(e) =>
+                                        handlePaymentMethodChange(
+                                            0,
+                                            e.target.value as PaymentMethodType | ""
+                                        )
+                                    }
+                                />
+                            ) : (
+                                <div className="space-y-2.5">
+                                    {formData.paymentMethods.map((row, idx) => {
+                                        const selectedByOthers = new Set(
+                                            formData.paymentMethods
+                                                .filter((_, i) => i !== idx)
+                                                .map((r) => r.method)
+                                                .filter(Boolean)
+                                        );
+                                        const availableOptions = PAYMENT_METHOD_OPTIONS.filter(
+                                            (opt) =>
+                                                opt.value === row.method ||
+                                                !selectedByOthers.has(opt.value)
+                                        );
+
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-2 items-end"
+                                            >
+                                                <Select
+                                                    label={idx === 0 ? "Método" : undefined}
+                                                    fullWidth
+                                                    value={row.method}
+                                                    options={availableOptions}
+                                                    onChange={(e) =>
+                                                        handlePaymentMethodChange(
+                                                            idx,
+                                                            e.target.value as PaymentMethodType | ""
+                                                        )
+                                                    }
+                                                />
+                                                <Input
+                                                    label={idx === 0 ? "Monto ($)" : undefined}
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0"
+                                                    value={row.amount}
+                                                    onChange={(e) =>
+                                                        handlePaymentMethodAmountChange(
+                                                            idx,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    fullWidth
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemovePaymentMethod(idx)}
+                                                    aria-label="Quitar método de pago"
+                                                    title="Quitar método"
+                                                    className="h-[42px] px-2.5 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+
+                                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-200 text-xs">
+                                        <div className="flex flex-wrap items-center gap-2 tabular-nums">
+                                            <span className="text-stone-600 font-medium">
+                                                Asignado: ${splitMethodsSum.toLocaleString("es-AR")}
+                                            </span>
+                                            {totalPaymentNumber > 0 && (
+                                                <span
+                                                    className={`font-semibold ${
+                                                        Math.abs(splitMethodsSum - totalPaymentNumber) <= 0.01
+                                                            ? "text-emerald-700"
+                                                            : "text-amber-700"
+                                                    }`}
+                                                >
+                                                    {Math.abs(splitMethodsSum - totalPaymentNumber) <= 0.01
+                                                        ? "• Total cubierto"
+                                                        : splitMethodsSum < totalPaymentNumber
+                                                            ? `• Falta: $${(totalPaymentNumber - splitMethodsSum).toLocaleString("es-AR")}`
+                                                            : `• Excede: $${(splitMethodsSum - totalPaymentNumber).toLocaleString("es-AR")}`}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            {totalPaymentNumber > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSplitEvenly}
+                                                    className="text-[#0b3a60] font-semibold hover:underline cursor-pointer"
+                                                >
+                                                    Dividir en partes iguales
+                                                </button>
+                                            )}
+                                            {splitMethodsSum > 0 &&
+                                                Math.abs(splitMethodsSum - totalPaymentNumber) > 0.01 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setFormData((prev) => ({
+                                                                ...prev,
+                                                                payment: splitMethodsSum.toString(),
+                                                            }))
+                                                        }
+                                                        className="text-emerald-700 font-semibold hover:underline cursor-pointer"
+                                                    >
+                                                        Aplicar suma al total
+                                                    </button>
+                                                )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </fieldset>
 
                         {/* SECCIÓN 1: SERVICIOS */}
                         <div className="p-3.5 bg-stone-50 border border-stone-200 rounded-xl space-y-2.5">

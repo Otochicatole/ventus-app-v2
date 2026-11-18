@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-guard";
+import { parsePaymentMethodsInput } from "@/lib/payment-methods";
 
 export async function GET(request: Request) {
     try {
@@ -43,15 +44,37 @@ export async function POST(request: Request) {
         await requireAuth();
 
         const body = await request.json();
-        const { fullName, payment, description, servicesPerformed, productsBought, paidAt } = body;
+        const {
+            fullName,
+            payment,
+            description,
+            servicesPerformed,
+            productsBought,
+            paymentMethods,
+            paidAt,
+        } = body;
+
+        const parsedPayment = parseFloat(payment);
+        if (!Number.isFinite(parsedPayment) || parsedPayment < 0) {
+            return NextResponse.json(
+                { error: "El monto total a cobrar es inválido" },
+                { status: 400 }
+            );
+        }
+
+        const parsedMethods = parsePaymentMethodsInput(paymentMethods, parsedPayment);
+        if (parsedMethods.error) {
+            return NextResponse.json({ error: parsedMethods.error }, { status: 400 });
+        }
 
         const record = await prisma.clientPaidService.create({
             data: {
                 fullName,
-                payment: parseFloat(payment),
+                payment: parsedPayment,
                 description: description || null,
                 servicesPerformed: servicesPerformed || [],
                 productsBought: productsBought || [],
+                ...(parsedMethods.value ? { paymentMethods: parsedMethods.value } : {}),
                 paidAt: paidAt ? new Date(paidAt + "T12:00:00.000Z") : new Date(),
             },
         });

@@ -102,6 +102,7 @@ model ClientPaidService {
   description       String?
   servicesPerformed String[]
   productsBought    String[] @default([])
+  paymentMethods    Json?
   paidAt            DateTime @default(now())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
