@@ -17,7 +17,6 @@ import {
     X,
     Check,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";

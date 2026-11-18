@@ -172,15 +172,15 @@ export default function ShiftsPage() {
         formData.phone;
 
     return (
-        <div className="min-h-screen py-12 px-4 bg-gray-50">
+        <div className="min-h-dvh py-14 px-4 bg-stone-50">
             <div className="container mx-auto max-w-3xl">
-                <Card>
-                    <CardContent className="p-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            Reservar Turno
+                <Card className="rounded-none">
+                    <CardContent className="p-6 sm:p-10">
+                        <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-stone-950 mb-2">
+                            Reservar turno
                         </h1>
-                        <p className="text-gray-600 mb-8">
-                            Completá el formulario para reservar tu turno
+                        <p className="text-stone-600 text-sm sm:text-base mb-8">
+                            Elegí tu sucursal, fecha y horario disponible para confirmar tu reserva.
                         </p>
 
                         {message && (
@@ -241,7 +241,7 @@ export default function ShiftsPage() {
                                                                     borderColor: 'rgb(156, 163, 175)',
                                                                 },
                                                                 '&.Mui-focused fieldset': {
-                                                                    borderColor: 'rgb(37, 99, 235)',
+                                                                    borderColor: '#0b3a60',
                                                                     borderWidth: '2px',
                                                                 },
                                                             },
@@ -312,17 +312,17 @@ export default function ShiftsPage() {
                                                             }`}
                                                         />
                                                         {slot.isHighDemand && (
-                                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-                                                            </span>
+                                                            <span
+                                                                title="Alta demanda"
+                                                                className="absolute -top-1 -right-1 flex h-2.5 w-2.5 bg-amber-600"
+                                                            />
                                                         )}
                                                     </div>
                                                 ))}
                                             </div>
                                             {availableSlots.some(slot => slot.isHighDemand) && (
                                                 <Alert severity="warning" className="mt-4">
-                                                    Los horarios marcados con 🔴 tienen alta demanda ({availableSlots.filter(s => s.isHighDemand).length} horario{availableSlots.filter(s => s.isHighDemand).length > 1 ? 's' : ''} con múltiples solicitudes pendientes)
+                                                    Los horarios marcados en naranja tienen alta demanda ({availableSlots.filter(s => s.isHighDemand).length} horario{availableSlots.filter(s => s.isHighDemand).length > 1 ? 's' : ''} con múltiples solicitudes pendientes)
                                                 </Alert>
                                             )}
                                         </>
@@ -335,10 +335,10 @@ export default function ShiftsPage() {
                             )}
 
                             {formData.time && (
-                                <div className="space-y-6 pt-6 border-t border-gray-200">
-                                    <h2 className="text-2xl font-bold text-gray-900">
+                                <fieldset className="space-y-6 pt-4">
+                                    <legend className="text-2xl font-bold text-stone-900">
                                         Datos Personales
-                                    </h2>
+                                    </legend>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <Input
@@ -393,7 +393,7 @@ export default function ShiftsPage() {
                                     >
                                         {loading ? "Reservando..." : "Reservar Turno"}
                                     </Button>
-                                </div>
+                                </fieldset>
                             )}
                         </form>
                     </CardContent>

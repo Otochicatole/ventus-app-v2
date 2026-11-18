@@ -6,6 +6,11 @@ import LayoutWrapper from "@/components/layout-wrapper";
 export const metadata: Metadata = {
   title: "Ventus Barbería - Tu Estilo, Nuestra Pasión",
   description: "Barbería moderna en Buenos Aires. Reservá tu turno online para cortes, barba y styling premium.",
+  icons: {
+    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

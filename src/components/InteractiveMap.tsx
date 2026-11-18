@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Navigation, Phone, Clock } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -97,7 +96,8 @@ export default function InteractiveMap() {
                 const layers = style.layers;
                 let labelLayerId;
                 for (let i = 0; i < layers.length; i++) {
-                    if (layers[i].type === "symbol" && layers[i].layout && (layers[i].layout as any)["text-field"]) {
+                    const layout = layers[i].layout as Record<string, unknown> | undefined;
+                    if (layers[i].type === "symbol" && layout && layout["text-field"]) {
                         labelLayerId = layers[i].id;
                         break;
                     }
@@ -153,21 +153,15 @@ export default function InteractiveMap() {
 
         locations.forEach((loc) => {
             const el = document.createElement("div");
-            // Transición CSS para escala suave al seleccionar
-            el.className = `custom-marker-${loc.id} cursor-pointer transition-all duration-300 ease-out origin-bottom transform select-none`;
-            
-            // Estructura interna del pin con el SVG de Lucide React MapPin y un aro de pulso
+            el.className = `custom-marker-${loc.id} cursor-pointer transition-transform duration-300 ease-out origin-bottom select-none`;
+
             el.innerHTML = `
                 <div class="relative flex flex-col items-center group">
-                    <!-- Efecto de pulso en hover -->
-                    <div class="absolute -inset-2 rounded-full bg-[#0b3a60]/10 blur-sm scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                    <!-- Icono Lucide MapPin SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-pin-svg filter drop-shadow-md transition-all duration-300">
+                    <div class="absolute -inset-2 rounded-full bg-[#0b3a60]/10 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-[opacity,transform] duration-300"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-pin-svg transition-transform duration-300">
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                         <circle cx="12" cy="10" r="3"/>
                     </svg>
-                    <!-- Pequeña sombra de apoyo del pin -->
-                    <div class="w-1.5 h-0.5 bg-black/20 rounded-full blur-[0.5px] mt-0.5 transition-transform duration-300 group-hover:scale-x-150"></div>
                 </div>
             `;
 
@@ -268,129 +262,120 @@ export default function InteractiveMap() {
     const activeLocation = locations.find((l) => l.id === selectedId);
 
     return (
-        <section id="locales-section" className="bg-white border-t border-stone-200 py-16 sm:py-24 px-6 sm:px-12 md:px-24">
+        <section id="locales-section" className="bg-stone-100 py-20 sm:py-28 px-6 sm:px-12 md:px-24">
             <div className="max-w-7xl mx-auto space-y-12">
                 
                 {/* Encabezado del Módulo */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-100 pb-8">
-                    <div className="space-y-4">
-                        <p className="text-xs font-bold tracking-[0.3em] text-[#0b3a60] uppercase">
-                            UBICACIONES EXCLUSIVAS
-                        </p>
-                        <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-stone-900">
-                            Nuestros <span className="font-semibold text-[#0b3a60]">Locales</span>
-                        </h2>
-                    </div>
-                    <p className="text-stone-500 font-light max-w-md leading-relaxed text-sm">
-                        Encontrá la sucursal de Ventus más cercana y experimentá la excelencia en barbería clásica con una ambientación refinada.
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-stone-900">
+                        Nuestros locales
+                    </h2>
+                    <p className="text-stone-600 max-w-md leading-relaxed text-sm sm:text-base">
+                        Encontrá la sucursal de Ventus más cercana para tu próximo turno.
                     </p>
                 </div>
 
                 {loading ? (
-                    /* Shimmer Loading State */
-                    <div className="grid lg:grid-cols-12 gap-8 h-[600px] animate-pulse">
-                        <div className="lg:col-span-4 bg-stone-50 border border-stone-100 h-full"></div>
-                        <div className="lg:col-span-8 bg-stone-100 h-full"></div>
+                    <div className="grid lg:grid-cols-12 gap-8 h-[600px]">
+                        <div className="lg:col-span-4 bg-white h-full" />
+                        <div className="lg:col-span-8 bg-stone-200 h-full" />
                     </div>
                 ) : error ? (
-                    /* Error State */
-                    <div className="flex flex-col items-center justify-center h-[350px] border border-dashed border-stone-200 p-8 text-center">
-                        <MapPin className="w-12 h-12 text-stone-300 mb-4" />
-                        <p className="text-stone-600 font-light">{error}</p>
+                    <div className="flex flex-col items-center justify-center h-[350px] bg-white p-8 text-center">
+                        <MapPin className="w-10 h-10 text-stone-400 mb-3" />
+                        <p className="text-stone-700 text-sm">{error}</p>
                     </div>
                 ) : locations.length === 0 ? (
-                    /* Empty State */
-                    <div className="flex flex-col items-center justify-center h-[350px] border border-dashed border-stone-200 p-8 text-center">
-                        <MapPin className="w-12 h-12 text-stone-300 mb-4" />
-                        <p className="text-stone-600 font-light">No hay locales registrados en el sistema.</p>
+                    <div className="flex flex-col items-center justify-center h-[350px] bg-white p-8 text-center">
+                        <MapPin className="w-10 h-10 text-stone-400 mb-3" />
+                        <p className="text-stone-700 text-sm">No hay locales registrados en el sistema.</p>
                     </div>
                 ) : (
-                    /* Interactive Grid Map UI (Totalmente Responsive) */
-                    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 h-auto lg:h-[600px]">
+                    <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 h-auto lg:h-[580px]">
                         
-                        {/* 1. Panel de Barra Lateral (Sucursales Index: Fila horizontal en Mobile, Columna en Desktop) */}
-                        <div className="lg:col-span-4 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto w-full lg:h-full pb-4 lg:pb-0 scrollbar-thin snap-x snap-mandatory">
+                        {/* Panel de Sucursales */}
+                        <div className="lg:col-span-4 flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto w-full lg:h-full pb-2 lg:pb-0 snap-x snap-mandatory">
                             {locations.map((loc) => {
                                 const isSelected = loc.id === selectedId;
                                 return (
-                                    <div
+                                    <button
                                         key={loc.id}
+                                        type="button"
                                         onClick={() => handleSelectLocation(loc)}
-                                        className={`p-6 border transition-all duration-300 cursor-pointer rounded-none flex flex-col justify-between h-[160px] lg:h-[180px] w-[290px] sm:w-[320px] lg:w-full flex-shrink-0 snap-start select-none ${
+                                        aria-pressed={isSelected}
+                                        className={`text-left p-6 transition-colors duration-200 cursor-pointer flex flex-col justify-between min-h-[156px] w-[280px] sm:w-[310px] lg:w-full flex-shrink-0 snap-start ${
                                             isSelected
-                                                ? "border-[#0b3a60] bg-[#0b3a60]/[0.02]"
-                                                : "border-stone-200 bg-stone-50 hover:bg-stone-100/50 hover:border-stone-300"
+                                                ? "bg-[#0b3a60] text-white"
+                                                : "bg-white text-stone-900 hover:bg-stone-50"
                                         }`}
                                     >
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 w-full">
                                             <div className="flex items-start justify-between gap-4">
-                                                <h3 className="font-semibold text-stone-900 tracking-tight text-base sm:text-lg">
+                                                <h3 className="font-semibold tracking-tight text-base sm:text-lg">
                                                     {loc.name}
                                                 </h3>
-                                                <MapPin className={`w-5 h-5 flex-shrink-0 ${
-                                                    isSelected ? "text-[#0b3a60]" : "text-stone-400"
-                                                }`} />
+                                                <MapPin
+                                                    className={`w-5 h-5 flex-shrink-0 ${
+                                                        isSelected ? "text-blue-200" : "text-stone-500"
+                                                    }`}
+                                                />
                                             </div>
-                                            <p className="text-xs sm:text-sm font-light text-stone-500 line-clamp-2">
+                                            <p
+                                                className={`text-xs sm:text-sm line-clamp-2 ${
+                                                    isSelected ? "text-blue-100" : "text-stone-600"
+                                                }`}
+                                            >
                                                 {loc.address}
                                             </p>
                                         </div>
 
-                                        {/* Información dinámica de contacto solo visible en el card móvil activo */}
                                         {isSelected && (
-                                            <div className="flex flex-col gap-1 text-[11px] font-light text-stone-500 border-t border-stone-200/50 pt-2 mt-2 lg:hidden">
+                                            <div className="flex flex-col gap-1 text-xs text-blue-100 pt-3 mt-3 lg:hidden">
                                                 <div className="flex items-center gap-1.5">
-                                                    <Clock className="w-3.5 h-3.5 text-[#0b3a60]" />
+                                                    <Clock className="w-3.5 h-3.5" />
                                                     <span>Lun a Sáb: 09:00 a 20:00 hs</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <Phone className="w-3.5 h-3.5 text-[#0b3a60]" />
+                                                    <Phone className="w-3.5 h-3.5" />
                                                     <span>+54 9 11 2345-6789</span>
                                                 </div>
                                             </div>
                                         )}
 
-                                        <div className="hidden lg:flex items-center justify-between border-t border-stone-200/50 pt-4">
-                                            <span className="text-[10px] tracking-wider font-mono text-stone-400">
-                                                {loc.latitude?.toFixed(5)}, {loc.longitude?.toFixed(5)}
-                                            </span>
-                                            <button
-                                                className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors ${
-                                                    isSelected
-                                                        ? "text-[#0b3a60]"
-                                                        : "text-stone-500 hover:text-stone-950"
+                                        <div className="hidden lg:flex items-center justify-between pt-4 w-full">
+                                            <span
+                                                className={`text-xs font-medium ${
+                                                    isSelected ? "text-blue-100" : "text-stone-600"
                                                 }`}
                                             >
-                                                VER EN MAPA
-                                                <Navigation className="w-3.5 h-3.5" />
-                                            </button>
+                                                {isSelected ? "Sucursal seleccionada" : "Ver en mapa"}
+                                            </span>
+                                            <Navigation
+                                                className={`w-4 h-4 ${
+                                                    isSelected ? "text-white" : "text-stone-500"
+                                                }`}
+                                            />
                                         </div>
-                                    </div>
+                                    </button>
                                 );
                             })}
                         </div>
 
-                        {/* 2. Ventana de Renderizado de Basemap + marcadores */}
-                        <div className="lg:col-span-8 relative h-[380px] sm:h-[450px] lg:h-full border border-stone-200 overflow-hidden rounded-none shadow-sm w-full">
-                            
-                            {/* Canvas del Mapa */}
+                        {/* Contenedor del Mapa */}
+                        <div className="lg:col-span-8 relative h-[380px] sm:h-[450px] lg:h-full bg-white overflow-clip w-full">
                             <div ref={mapContainerRef} className="w-full h-full" />
 
-                            {/* Leyenda de la Sucursal Seleccionada flotante (Habilitado estrictamente en pantallas de escritorio) */}
                             {activeLocation && (
-                                <div className="absolute bottom-6 left-6 right-6 lg:right-auto bg-white/95 backdrop-blur-md p-6 border border-stone-200 rounded-none shadow-2xl z-30 max-w-sm pointer-events-auto space-y-4 hidden lg:block">
+                                <div className="absolute bottom-6 left-6 bg-white p-6 z-30 max-w-sm space-y-3 hidden lg:block">
                                     <div className="space-y-1">
-                                        <span className="text-[9px] font-bold tracking-[0.2em] text-[#0b3a60] uppercase block">
-                                            SUCURSAL SELECCIONADA
-                                        </span>
                                         <h4 className="font-semibold text-stone-900 text-lg">
                                             {activeLocation.name}
                                         </h4>
-                                        <p className="text-xs font-light text-stone-500 leading-relaxed">
+                                        <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
                                             {activeLocation.address}
                                         </p>
                                     </div>
-                                    <div className="border-t border-stone-100 pt-3 flex flex-col gap-2 text-xs font-light text-stone-600">
+                                    <div className="flex flex-col gap-1.5 text-xs text-stone-700 pt-1">
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-3.5 h-3.5 text-[#0b3a60]" />
                                             <span>Lunes a Sábados: 09:00 a 20:00 hs</span>
@@ -402,11 +387,6 @@ export default function InteractiveMap() {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Controles de vista de marca de agua minimalista (Esquina inferior derecha) */}
-                            <div className="absolute bottom-3 right-3 bg-stone-900/10 text-[9px] font-mono text-stone-500 py-0.5 px-2 pointer-events-none rounded-none z-10">
-                                CARTO Positron 3D / MapLibre GL
-                            </div>
                         </div>
 
                     </div>
