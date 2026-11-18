@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { MapPin, Navigation, Phone, Clock } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MapPin, Navigation } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { isValidCoordinates } from "@/lib/coordinates";
 
 // Interface para las ubicaciones obtenidas de la base de datos
 interface LocationData {
@@ -26,22 +27,27 @@ export default function InteractiveMap() {
     const [error, setError] = useState<string | null>(null);
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
+    const mappableLocations = useMemo(
+        () => locations.filter((loc) => isValidCoordinates(loc.latitude, loc.longitude)),
+        [locations]
+    );
+
     // 1. Obtener ubicaciones desde la base de datos
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch("/api/locations");
+                const res = await fetch("/api/locations", { cache: "no-store" });
                 if (!res.ok) throw new Error("Error al consultar ubicaciones");
                 const data: LocationData[] = await res.json();
-                
-                // Filtrar solo aquellas sucursales que tengan latitud y longitud válidas
-                const validLocations = data.filter(
-                    (loc) => loc.latitude !== null && loc.longitude !== null
+
+                setLocations(data);
+                const firstMappable = data.find((loc) =>
+                    isValidCoordinates(loc.latitude, loc.longitude)
                 );
-                
-                setLocations(validLocations);
-                if (validLocations.length > 0) {
-                    setSelectedId(validLocations[0].id);
+                if (firstMappable) {
+                    setSelectedId(firstMappable.id);
+                } else if (data.length > 0) {
+                    setSelectedId(data[0].id);
                 }
             } catch (err) {
                 console.error("Error al cargar ubicaciones del mapa:", err);
@@ -56,153 +62,198 @@ export default function InteractiveMap() {
 
     // 2. Inicializar MapLibre GL con 3D habilitado
     useEffect(() => {
-        if (loading || locations.length === 0 || !mapContainerRef.current) return;
+        if (loading || mappableLocations.length === 0 || !mapContainerRef.current) return;
 
-        // Calcular el centroide promedio de todas las sucursales cargadas
+        const container = mapContainerRef.current;
+        let disposed = false;
+        let map: maplibregl.Map | null = null;
+        let resizeObserver: ResizeObserver | null = null;
+
+        // Calcular el centroide promedio de todas las sucursales con coordenadas válidas
         let sumLat = 0;
         let sumLng = 0;
-        locations.forEach((loc) => {
+        mappableLocations.forEach((loc) => {
             sumLat += loc.latitude!;
             sumLng += loc.longitude!;
         });
-        const defaultLat = sumLat / locations.length;
-        const defaultLng = sumLng / locations.length;
+        const defaultLat = sumLat / mappableLocations.length;
+        const defaultLng = sumLng / mappableLocations.length;
 
-        // Inicializar instancia nativa de MapLibre GL con perspectiva 3D
-        const map = new maplibregl.Map({
-            container: mapContainerRef.current,
-            style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json", // CARTO Positron Light
-            center: [defaultLng, defaultLat],
-            zoom: 14.2,
-            pitch: 45, // Inclinación tridimensional inicial
-            bearing: -10 // Orientación/Rotación inicial
-        });
+        if (!isValidCoordinates(defaultLat, defaultLng)) {
+            return;
+        }
 
-        // Controles de navegación nativos (Zoom, Inclinación y Brújula)
-        map.addControl(new maplibregl.NavigationControl({ showCompass: true, showZoom: true }), "top-right");
-
-        // Agregar capa 3D de edificios (fill-extrusion) de manera dinámica al cargarse el mapa
-        map.on("load", () => {
-            const style = map.getStyle();
-            const sources = style.sources;
-            
-            // Localizar el ID de la fuente de vector tiles activa en el basemap de CARTO
-            const vectorSourceId = Object.keys(sources).find(
-                (key) => sources[key].type === "vector"
-            );
-
-            if (vectorSourceId) {
-                // Identificar la primera capa de etiquetas de texto para posicionar la extrusión debajo de ellas
-                const layers = style.layers;
-                let labelLayerId;
-                for (let i = 0; i < layers.length; i++) {
-                    const layout = layers[i].layout as Record<string, unknown> | undefined;
-                    if (layers[i].type === "symbol" && layout && layout["text-field"]) {
-                        labelLayerId = layers[i].id;
-                        break;
-                    }
-                }
-
-                // Inyectar capa 3D fill-extrusion para levantar edificios urbanos
-                map.addLayer(
-                    {
-                        id: "3d-buildings",
-                        source: vectorSourceId,
-                        "source-layer": "building", // Nombre estándar de OpenMapTiles para edificios
-                        type: "fill-extrusion",
-                        minzoom: 14,
-                        paint: {
-                            // Color claro adaptado al diseño de piedra/stone del proyecto
-                            "fill-extrusion-color": [
-                                "interpolate",
-                                ["linear"],
-                                ["get", "render_height"],
-                                0, "#e7e5e4", // stone-200
-                                50, "#d6d3d1", // stone-300
-                                100, "#a8a29e" // stone-400
-                            ],
-                            // Elevación fluida de edificios a medida que se realiza zoom
-                            "fill-extrusion-height": [
-                                "interpolate",
-                                ["linear"],
-                                ["zoom"],
-                                14, 0,
-                                14.5, ["get", "render_height"]
-                            ],
-                            "fill-extrusion-base": [
-                                "interpolate",
-                                ["linear"],
-                                ["zoom"],
-                                14, 0,
-                                14.5, ["get", "render_base_height"]
-                            ],
-                            "fill-extrusion-opacity": 0.65
-                        }
-                    },
-                    labelLayerId
-                );
+        const initMap = () => {
+            if (disposed || map || container.clientWidth === 0 || container.clientHeight === 0) {
+                return;
             }
-        });
 
-        // Limpiar marcadores antiguos de la referencia
-        Object.values(markersRef.current).forEach((marker) => marker.remove());
-        markersRef.current = {};
+            try {
+                map = new maplibregl.Map({
+                    container,
+                    style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json", // CARTO Positron Light
+                    center: [defaultLng, defaultLat],
+                    zoom: mappableLocations.length === 1 ? 15.2 : 14.2,
+                    pitch: 45, // Inclinación tridimensional inicial
+                    bearing: -10 // Orientación/Rotación inicial
+                });
 
-        // 3. Crear marcadores HTML personalizados usando Lucide MapPin SVG
-        const newMarkers: { [id: string]: maplibregl.Marker } = {};
+                // Controles de navegación nativos (Zoom, Inclinación y Brújula)
+                map.addControl(new maplibregl.NavigationControl({ showCompass: true, showZoom: true }), "top-right");
 
-        locations.forEach((loc) => {
-            const el = document.createElement("div");
-            el.className = `custom-marker-${loc.id} cursor-pointer transition-transform duration-300 ease-out origin-bottom select-none`;
+                // Agregar capa 3D de edificios (fill-extrusion) de manera dinámica al cargarse el mapa
+                map.on("load", () => {
+                    if (!map || disposed) return;
+                    const style = map.getStyle();
+                    const sources = style.sources;
 
-            el.innerHTML = `
-                <div class="relative flex flex-col items-center group">
-                    <div class="absolute -inset-2 rounded-full bg-[#0b3a60]/10 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-[opacity,transform] duration-300"></div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-pin-svg transition-transform duration-300">
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                </div>
-            `;
+                    // Localizar el ID de la fuente de vector tiles activa en el basemap de CARTO
+                    const vectorSourceId = Object.keys(sources).find(
+                        (key) => sources[key].type === "vector"
+                    );
 
-            // Escuchar el evento clic en el marcador
-            el.addEventListener("click", (e) => {
-                e.stopPropagation();
-                handleSelectLocation(loc);
+                    if (vectorSourceId) {
+                        // Identificar la primera capa de etiquetas de texto para posicionar la extrusión debajo de ellas
+                        const layers = style.layers;
+                        let labelLayerId;
+                        for (let i = 0; i < layers.length; i++) {
+                            const layout = layers[i].layout as Record<string, unknown> | undefined;
+                            if (layers[i].type === "symbol" && layout && layout["text-field"]) {
+                                labelLayerId = layers[i].id;
+                                break;
+                            }
+                        }
+
+                        // Inyectar capa 3D fill-extrusion para levantar edificios urbanos
+                        map.addLayer(
+                            {
+                                id: "3d-buildings",
+                                source: vectorSourceId,
+                                "source-layer": "building", // Nombre estándar de OpenMapTiles para edificios
+                                type: "fill-extrusion",
+                                minzoom: 14,
+                                paint: {
+                                    // Color claro adaptado al diseño de piedra/stone del proyecto
+                                    "fill-extrusion-color": [
+                                        "interpolate",
+                                        ["linear"],
+                                        ["get", "render_height"],
+                                        0, "#e7e5e4", // stone-200
+                                        50, "#d6d3d1", // stone-300
+                                        100, "#a8a29e" // stone-400
+                                    ],
+                                    // Elevación fluida de edificios a medida que se realiza zoom
+                                    "fill-extrusion-height": [
+                                        "interpolate",
+                                        ["linear"],
+                                        ["zoom"],
+                                        14, 0,
+                                        14.5, ["get", "render_height"]
+                                    ],
+                                    "fill-extrusion-base": [
+                                        "interpolate",
+                                        ["linear"],
+                                        ["zoom"],
+                                        14, 0,
+                                        14.5, ["get", "render_base_height"]
+                                    ],
+                                    "fill-extrusion-opacity": 0.65
+                                }
+                            },
+                            labelLayerId
+                        );
+                    }
+                });
+
+                // Limpiar marcadores antiguos de la referencia
+                Object.values(markersRef.current).forEach((marker) => marker.remove());
+                markersRef.current = {};
+
+                // 3. Crear marcadores HTML personalizados usando Lucide MapPin SVG
+                const newMarkers: { [id: string]: maplibregl.Marker } = {};
+
+                mappableLocations.forEach((loc) => {
+                    const el = document.createElement("div");
+                    el.className = `custom-marker-${loc.id} cursor-pointer select-none`;
+
+                    el.innerHTML = `
+                        <div class="lucide-pin-wrapper relative flex flex-col items-center group transition-transform duration-300 ease-out origin-bottom">
+                            <div class="absolute -inset-2 rounded-full bg-[#0b3a60]/10 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-[opacity,transform] duration-300"></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-pin-svg transition-transform duration-300">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                    `;
+
+                    // Escuchar el evento clic en el marcador
+                    el.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        handleSelectLocation(loc);
+                    });
+
+                    // Añadir el marcador al mapa
+                    const marker = new maplibregl.Marker({ element: el, anchor: "bottom" })
+                        .setLngLat([loc.longitude!, loc.latitude!])
+                        .addTo(map!);
+
+                    newMarkers[loc.id] = marker;
+                });
+
+                markersRef.current = newMarkers;
+                mapRef.current = map;
+            } catch (mapErr) {
+                console.warn("No se pudo inicializar el mapa interactivo:", mapErr);
+                if (map) {
+                    map.remove();
+                    map = null;
+                }
+            }
+        };
+
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+            initMap();
+        } else {
+            resizeObserver = new ResizeObserver(() => {
+                if (container.clientWidth > 0 && container.clientHeight > 0) {
+                    resizeObserver?.disconnect();
+                    initMap();
+                }
             });
-
-            // Añadir el marcador al mapa
-            const marker = new maplibregl.Marker({ element: el, anchor: "bottom" })
-                .setLngLat([loc.longitude!, loc.latitude!])
-                .addTo(map);
-
-            newMarkers[loc.id] = marker;
-        });
-
-        markersRef.current = newMarkers;
-        mapRef.current = map;
+            resizeObserver.observe(container);
+        }
 
         // Cleanup al desmontar
         return () => {
+            disposed = true;
+            resizeObserver?.disconnect();
+            Object.values(markersRef.current).forEach((marker) => marker.remove());
+            markersRef.current = {};
             if (mapRef.current) {
                 mapRef.current.remove();
                 mapRef.current = null;
+            } else if (map) {
+                map.remove();
+                map = null;
             }
         };
-    }, [loading, locations]);
+    }, [loading, mappableLocations]);
 
     // 4. Actualizar visualmente los marcadores cuando cambia la selección
     useEffect(() => {
-        if (locations.length === 0 || Object.keys(markersRef.current).length === 0) return;
+        if (mappableLocations.length === 0 || Object.keys(markersRef.current).length === 0) return;
 
         Object.entries(markersRef.current).forEach(([id, marker]) => {
             const el = marker.getElement();
+            const wrapper = el.querySelector<HTMLElement>(".lucide-pin-wrapper");
             const svg = el.querySelector(".lucide-pin-svg");
             const isSelected = id === selectedId;
 
             if (isSelected) {
-                // Agrandar suavemente el pin activo (1.25x) y elevarlo un poco
-                el.style.transform = "scale(1.25) translateY(-2px)";
+                // Escalar SOLO el contenedor interno para no pisar el transform de posicionamiento de MapLibre
+                if (wrapper) {
+                    wrapper.style.transform = "scale(1.25) translateY(-2px)";
+                }
                 el.style.zIndex = "10";
                 
                 if (svg) {
@@ -220,8 +271,9 @@ export default function InteractiveMap() {
                     }
                 }
             } else {
-                // Retornar a escala natural y z-index neutral
-                el.style.transform = "scale(1) translateY(0)";
+                if (wrapper) {
+                    wrapper.style.transform = "scale(1) translateY(0)";
+                }
                 el.style.zIndex = "1";
                 
                 if (svg) {
@@ -239,16 +291,16 @@ export default function InteractiveMap() {
                 }
             }
         });
-    }, [selectedId, locations]);
+    }, [selectedId, mappableLocations]);
 
     // Función para manejar la selección de una sucursal y la transición de cámara
     const handleSelectLocation = (loc: LocationData) => {
         setSelectedId(loc.id);
         
-        if (mapRef.current && loc.longitude !== null && loc.latitude !== null) {
+        if (mapRef.current && isValidCoordinates(loc.latitude, loc.longitude)) {
             // Animación suave de planeo (flyTo) inclinando aún más la cámara para apreciar el relieve 3D
             mapRef.current.flyTo({
-                center: [loc.longitude, loc.latitude],
+                center: [loc.longitude!, loc.latitude!],
                 zoom: 16.5,
                 pitch: 55, // Inclinación en 3D acentuada al hacer zoom
                 bearing: -15, // Ligera rotación para apreciar las fachadas de los edificios
@@ -321,7 +373,7 @@ export default function InteractiveMap() {
                                                 />
                                             </div>
                                             <p
-                                                className={`text-xs sm:text-sm line-clamp-2 ${
+                                                className={`text-sm line-clamp-2 ${
                                                     isSelected ? "text-blue-100" : "text-stone-600"
                                                 }`}
                                             >
@@ -329,22 +381,9 @@ export default function InteractiveMap() {
                                             </p>
                                         </div>
 
-                                        {isSelected && (
-                                            <div className="flex flex-col gap-1 text-xs text-blue-100 pt-3 mt-3 lg:hidden">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Clock className="w-3.5 h-3.5" />
-                                                    <span>Lun a Sáb: 09:00 a 20:00 hs</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <Phone className="w-3.5 h-3.5" />
-                                                    <span>+54 9 11 2345-6789</span>
-                                                </div>
-                                            </div>
-                                        )}
-
                                         <div className="hidden lg:flex items-center justify-between pt-4 w-full">
                                             <span
-                                                className={`text-xs font-medium ${
+                                                className={`text-sm font-medium ${
                                                     isSelected ? "text-blue-100" : "text-stone-600"
                                                 }`}
                                             >
@@ -362,28 +401,27 @@ export default function InteractiveMap() {
                         </div>
 
                         {/* Contenedor del Mapa */}
-                        <div className="lg:col-span-8 relative h-[380px] sm:h-[450px] lg:h-full bg-white overflow-clip w-full">
-                            <div ref={mapContainerRef} className="w-full h-full" />
+                        <div className="lg:col-span-8 relative h-[380px] sm:h-[450px] lg:h-full min-h-[380px] bg-white overflow-clip w-full">
+                            {mappableLocations.length > 0 ? (
+                                <div ref={mapContainerRef} className="w-full h-full min-h-[380px]" />
+                            ) : (
+                                <div className="w-full h-full min-h-[380px] flex flex-col items-center justify-center p-8 text-center bg-stone-50">
+                                    <MapPin className="w-10 h-10 text-stone-400 mb-3" />
+                                    <p className="text-stone-700 text-sm max-w-sm">
+                                        Las sucursales cargadas no tienen coordenadas válidas para mostrar en el mapa.
+                                    </p>
+                                </div>
+                            )}
 
                             {activeLocation && (
-                                <div className="absolute bottom-6 left-6 bg-white p-6 z-30 max-w-sm space-y-3 hidden lg:block">
+                                <div className="absolute bottom-6 left-6 bg-white p-6 z-30 max-w-sm hidden lg:block">
                                     <div className="space-y-1">
                                         <h4 className="font-semibold text-stone-900 text-lg">
                                             {activeLocation.name}
                                         </h4>
-                                        <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                                        <p className="text-sm text-stone-600 leading-relaxed">
                                             {activeLocation.address}
                                         </p>
-                                    </div>
-                                    <div className="flex flex-col gap-1.5 text-xs text-stone-700 pt-1">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="w-3.5 h-3.5 text-[#0b3a60]" />
-                                            <span>Lunes a Sábados: 09:00 a 20:00 hs</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Phone className="w-3.5 h-3.5 text-[#0b3a60]" />
-                                            <span>+54 9 11 2345-6789</span>
-                                        </div>
                                     </div>
                                 </div>
                             )}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import Alert from "@/components/ui/alert";
-import { Card, CardContent } from "@/components/ui/card";
+import { parseAndValidateCoordinates } from "@/lib/coordinates";
 
 export default function NewLocationPage() {
     const router = useRouter();
@@ -20,8 +20,18 @@ export default function NewLocationPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setError("");
+
+        const { latitude, longitude, error: coordError } = parseAndValidateCoordinates(
+            formData.latitude,
+            formData.longitude
+        );
+        if (coordError) {
+            setError(coordError);
+            return;
+        }
+
+        setLoading(true);
 
         try {
             const res = await fetch("/api/locations", {
@@ -30,13 +40,14 @@ export default function NewLocationPage() {
                 body: JSON.stringify({
                     name: formData.name,
                     address: formData.address,
-                    latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-                    longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+                    latitude,
+                    longitude,
                 }),
             });
 
             if (!res.ok) {
-                throw new Error("Error al crear ubicación");
+                const payload = await res.json().catch(() => null);
+                throw new Error(payload?.error || "Error al crear ubicación");
             }
 
             router.refresh();
@@ -96,21 +107,21 @@ export default function NewLocationPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                         <Input
                             label="Latitud (opcional)"
-                            type="number"
-                            step="any"
+                            type="text"
+                            inputMode="decimal"
                             value={formData.latitude}
                             onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                             fullWidth
-                            placeholder="Ej: -34.6037"
+                            placeholder="Ej: -33.3436"
                         />
                         <Input
                             label="Longitud (opcional)"
-                            type="number"
-                            step="any"
+                            type="text"
+                            inputMode="decimal"
                             value={formData.longitude}
                             onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                             fullWidth
-                            placeholder="Ej: -58.3815"
+                            placeholder="Ej: -60.2067"
                         />
                     </div>
 

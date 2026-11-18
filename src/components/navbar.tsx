@@ -1,19 +1,55 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Home, Scissors, ShoppingBag, Calendar } from "lucide-react";
 
-const navLinks = [
+type LocationWithSlots = {
+    id: string;
+    _count?: {
+        timeSlots?: number;
+    };
+};
+
+const baseLinks = [
     { name: "Inicio", href: "/", icon: Home },
     { name: "Servicios", href: "/services", icon: Scissors },
     { name: "Productos", href: "/products", icon: ShoppingBag },
-    { name: "Turnos", href: "/shifts", icon: Calendar },
 ];
 
 export default function Navbar() {
     const pathname = usePathname();
+    const [hasBookingTimeSlots, setHasBookingTimeSlots] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+        const checkTimeSlots = async () => {
+            try {
+                const res = await fetch("/api/locations", { cache: "no-store" });
+                if (!res.ok) return;
+                const data: LocationWithSlots[] = await res.json();
+                if (active) {
+                    setHasBookingTimeSlots(
+                        Array.isArray(data) &&
+                            data.some((loc) => (loc._count?.timeSlots ?? 0) > 0)
+                    );
+                }
+            } catch {
+                // Keep booking CTAs hidden if availability cannot be verified
+            }
+        };
+
+        checkTimeSlots();
+        return () => {
+            active = false;
+        };
+    }, [pathname]);
+
+    const mobileLinks = hasBookingTimeSlots
+        ? [...baseLinks, { name: "Turnos", href: "/shifts", icon: Calendar }]
+        : baseLinks;
 
     return (
         <>
@@ -37,7 +73,7 @@ export default function Navbar() {
                     </Link>
 
                     <div className="hidden md:flex items-center gap-7">
-                        {navLinks.slice(0, 3).map((link) => {
+                        {baseLinks.map((link) => {
                             const isActive =
                                 link.href === "/"
                                     ? pathname === "/"
@@ -57,26 +93,37 @@ export default function Navbar() {
                                 </Link>
                             );
                         })}
-                        <Link
-                            href="/confirmed-shifts"
-                            aria-current={pathname === "/confirmed-shifts" ? "page" : undefined}
-                            className={`text-sm font-medium transition-colors ${
-                                pathname === "/confirmed-shifts"
-                                    ? "text-[#0b3a60] font-semibold"
-                                    : "text-stone-700 hover:text-stone-950"
-                            }`}
-                        >
-                            Agenda
-                        </Link>
+                        {hasBookingTimeSlots && (
+                            <Link
+                                href="/confirmed-shifts"
+                                aria-current={pathname === "/confirmed-shifts" ? "page" : undefined}
+                                className={`text-sm font-medium transition-colors ${
+                                    pathname === "/confirmed-shifts"
+                                        ? "text-[#0b3a60] font-semibold"
+                                        : "text-stone-700 hover:text-stone-950"
+                                }`}
+                            >
+                                Agenda
+                            </Link>
+                        )}
                     </div>
 
                     <div className="flex items-center">
-                        <Link
-                            href="/shifts"
-                            className="px-4 py-2 bg-[#0b3a60] text-white text-sm font-semibold hover:bg-[#082a46] transition-colors"
-                        >
-                            Reservar turno
-                        </Link>
+                        {hasBookingTimeSlots ? (
+                            <Link
+                                href="/shifts"
+                                className="px-4 py-2 bg-[#0b3a60] text-white text-sm font-semibold hover:bg-[#082a46] transition-colors"
+                            >
+                                Reservar turno
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/services"
+                                className="px-4 py-2 bg-[#0b3a60] text-white text-sm font-semibold hover:bg-[#082a46] transition-colors"
+                            >
+                                Ver servicios
+                            </Link>
+                        )}
                     </div>
                 </nav>
             </header>
@@ -85,8 +132,8 @@ export default function Navbar() {
                 aria-label="Navegación móvil"
                 className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-stone-100"
             >
-                <div className="grid grid-cols-4 h-16">
-                    {navLinks.map((page) => {
+                <div className={`grid ${hasBookingTimeSlots ? "grid-cols-4" : "grid-cols-3"} h-16`}>
+                    {mobileLinks.map((page) => {
                         const isActive =
                             page.href === "/"
                                 ? pathname === "/"

@@ -39,11 +39,19 @@ type Review = {
   createdAt: string;
 };
 
+type LocationSummary = {
+  id: string;
+  _count?: {
+    timeSlots?: number;
+  };
+};
+
 export default function Home() {
   const prefersReducedMotion = useReducedMotion();
 
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasBookingTimeSlots, setHasBookingTimeSlots] = useState(false);
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
@@ -84,8 +92,23 @@ export default function Home() {
       }
     };
 
+    const fetchLocations = async () => {
+      try {
+        const res = await fetch("/api/locations", { cache: "no-store" });
+        if (res.ok) {
+          const data: LocationSummary[] = await res.json();
+          setHasBookingTimeSlots(
+            Array.isArray(data) && data.some((loc) => (loc._count?.timeSlots ?? 0) > 0)
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+
     fetchServices();
     fetchReviews();
+    fetchLocations();
   }, []);
 
   const handleSubmitReview = async (e: React.FormEvent) => {
@@ -157,8 +180,9 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.08, ease: editorialEase }}
               className="text-base sm:text-lg text-stone-700 max-w-[44ch] leading-relaxed"
             >
-              Barbería tradicional en Buenos Aires. Atención individual con cita previa, toalla
-              caliente y terminación de precisión.
+              {hasBookingTimeSlots
+                ? "Barbería tradicional en Buenos Aires. Atención individual con cita previa, toalla caliente y terminación de precisión."
+                : "Barbería tradicional en Buenos Aires. Corte clásico a tijera, toalla caliente y terminación de precisión."}
             </motion.p>
 
             <motion.div
@@ -167,29 +191,51 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.16, ease: editorialEase }}
               className="flex flex-wrap items-center gap-4 pt-2"
             >
-              <Link
-                href="/shifts"
-                className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
-              >
-                Reservar turno
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#services-section"
-                className="inline-flex items-center px-6 py-3.5 bg-white text-stone-900 text-base font-semibold hover:bg-stone-50 transition-colors"
-              >
-                Ver servicios
-              </a>
+              {hasBookingTimeSlots ? (
+                <>
+                  <Link
+                    href="/shifts"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
+                  >
+                    Reservar turno
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <a
+                    href="#services-section"
+                    className="inline-flex items-center px-6 py-3.5 bg-white text-stone-900 text-base font-semibold hover:bg-stone-50 transition-colors"
+                  >
+                    Ver servicios
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a
+                    href="#services-section"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
+                  >
+                    Ver servicios y tarifas
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                  <a
+                    href="#locales-section"
+                    className="inline-flex items-center px-6 py-3.5 bg-white text-stone-900 text-base font-semibold hover:bg-stone-50 transition-colors"
+                  >
+                    Nuestros locales
+                  </a>
+                </>
+              )}
             </motion.div>
 
-            <motion.p
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.22, ease: editorialEase }}
-              className="text-sm text-stone-600 pt-1"
-            >
-              Lunes a sábados de 09:00 a 20:00 hs · Atención por reserva
-            </motion.p>
+            {hasBookingTimeSlots && (
+              <motion.p
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.22, ease: editorialEase }}
+                className="text-sm text-stone-600 pt-1"
+              >
+                Atención por reserva
+              </motion.p>
+            )}
           </div>
 
           <div className="lg:col-span-6 relative">
@@ -256,9 +302,13 @@ export default function Home() {
                 </p>
               </motion.div>
               <motion.div {...reveal(0.18)}>
-                <h3 className="text-base font-semibold text-white">Puntualidad garantizada</h3>
+                <h3 className="text-base font-semibold text-white">
+                  {hasBookingTimeSlots ? "Puntualidad garantizada" : "Atención dedicada"}
+                </h3>
                 <p className="text-base text-stone-300 mt-1 max-w-[38ch]">
-                  Turnos individuales por sede y horario para evitar esperas.
+                  {hasBookingTimeSlots
+                    ? "Turnos individuales por sede y horario para evitar esperas."
+                    : "Cada cliente recibe el tiempo necesario en el sillón."}
                 </p>
               </motion.div>
             </div>
@@ -307,19 +357,31 @@ export default function Home() {
               Cada servicio incluye diagnóstico previo, lavado y terminación profesional.
             </p>
             <div className="flex flex-wrap items-center gap-5 pt-2">
-              <Link
-                href="/shifts"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
-              >
-                Reservar turno
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/products"
-                className="text-base font-semibold text-[#0b3a60] underline underline-offset-4 hover:text-[#082a46]"
-              >
-                Ver productos
-              </Link>
+              {hasBookingTimeSlots ? (
+                <>
+                  <Link
+                    href="/shifts"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
+                  >
+                    Reservar turno
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href="/products"
+                    className="text-base font-semibold text-[#0b3a60] underline underline-offset-4 hover:text-[#082a46]"
+                  >
+                    Ver productos
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/products"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#0b3a60] text-white text-base font-semibold hover:bg-[#082a46] transition-colors"
+                >
+                  Ver productos
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              )}
             </div>
           </motion.div>
 
@@ -367,7 +429,7 @@ export default function Home() {
                         </span>
                       </td>
                       <td className="py-5 px-4 align-top text-right whitespace-nowrap">
-                        <span className="font-serif text-2xl font-normal text-[#0b3a60] tabular-nums">
+                        <span className="font-serif text-xl sm:text-2xl font-normal text-[#0b3a60] tabular-nums">
                           ${service.price.toLocaleString("es-AR")}
                         </span>
                       </td>
@@ -408,12 +470,14 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <Link
-              href="/confirmed-shifts"
-              className="text-base font-semibold text-[#0b3a60] underline underline-offset-4 hover:text-[#082a46] shrink-0"
-            >
-              Consultar agenda confirmada
-            </Link>
+            {hasBookingTimeSlots && (
+              <Link
+                href="/confirmed-shifts"
+                className="text-base font-semibold text-[#0b3a60] underline underline-offset-4 hover:text-[#082a46] shrink-0"
+              >
+                Consultar agenda confirmada
+              </Link>
+            )}
           </motion.div>
 
           <div className="grid gap-10 lg:grid-cols-12 items-start">
@@ -636,8 +700,7 @@ export default function Home() {
             </div>
 
             <p className="text-base text-stone-300 leading-relaxed max-w-[38ch]">
-              Corte clásico, afeitado a navaja y cuidado personal en Buenos Aires. Lunes a sábados
-              de 09:00 a 20:00 hs.
+              Corte clásico, afeitado a navaja y cuidado personal en Buenos Aires.
             </p>
 
             <nav aria-label="Enlaces del pie" className="flex flex-wrap gap-x-6 gap-y-2 text-base">
@@ -647,15 +710,19 @@ export default function Home() {
               <Link href="/products" className="text-white hover:underline underline-offset-4">
                 Productos
               </Link>
-              <Link
-                href="/confirmed-shifts"
-                className="text-white hover:underline underline-offset-4"
-              >
-                Agenda
-              </Link>
-              <Link href="/shifts" className="text-white hover:underline underline-offset-4">
-                Reservar turno
-              </Link>
+              {hasBookingTimeSlots && (
+                <>
+                  <Link
+                    href="/confirmed-shifts"
+                    className="text-white hover:underline underline-offset-4"
+                  >
+                    Agenda
+                  </Link>
+                  <Link href="/shifts" className="text-white hover:underline underline-offset-4">
+                    Reservar turno
+                  </Link>
+                </>
+              )}
             </nav>
           </motion.div>
 

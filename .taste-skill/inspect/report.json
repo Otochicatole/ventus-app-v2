@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000",
- "at": "2026-11-18T21:44:32.744Z",
+ "at": "2026-11-18T22:07:16.948Z",
  "allow": [
   "no-footage"
  ],
@@ -9,8 +9,9 @@
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 5,
+   "screens": 6,
    "filled": [
+    1,
     1,
     1,
     1,
@@ -18,10 +19,10 @@
     1
    ],
    "motion": {
-    "elements": 22,
+    "elements": 25,
     "css": 2,
     "transitions": 0,
-    "scripted": 20,
+    "scripted": 23,
     "videos": 0,
     "playingVideos": 0
    },
@@ -31,13 +32,13 @@
      "h": 900
     },
     "page": {
-     "height": 4364,
-     "screens": 4.8,
-     "words": 236,
+     "height": 4594,
+     "screens": 5.1,
+     "words": 216,
      "img": 7,
      "video": 0,
-     "canvas": 0,
-     "svg": 16,
+     "canvas": 1,
+     "svg": 17,
      "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
@@ -75,7 +76,7 @@
      "align": "left",
      "position": "left",
      "widthRatio": 0.41,
-     "top": 283,
+     "top": 322,
      "tag": "h1",
      "kind": "heading"
     },
@@ -104,7 +105,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.41,
-      "top": 283,
+      "top": 322,
       "tag": "h1",
       "kind": "heading"
      },
@@ -188,7 +189,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.4,
-      "top": 3022,
+      "top": 3252,
       "tag": "h2",
       "kind": "heading"
      },
@@ -209,7 +210,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.32,
-      "top": 3963,
+      "top": 4206,
       "tag": "div",
       "kind": "heading"
      }
@@ -227,17 +228,18 @@
      "families": [
       {
        "family": "ui-sans-serif",
-       "share": 0.87,
+       "share": 0.86,
        "mono": false
       },
       {
        "family": "Newsreader",
-       "share": 0.13,
+       "share": 0.14,
        "mono": false
       }
      ],
      "familyCount": 2,
      "sizes": [
+      13,
       14,
       16,
       18,
@@ -246,7 +248,7 @@
       48,
       75
      ],
-     "sizeCount": 7,
+     "sizeCount": 8,
      "notLoaded": [],
      "body": {
       "font": "ui-sans-serif",
@@ -271,7 +273,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.09,
+     "centerShare": 0.07,
      "smallText": 0
     },
     "eyebrows": [],
@@ -316,15 +318,15 @@
      "textColors": [
       {
        "color": "#d6d3d1",
-       "share": 0.31
-      },
-      {
-       "color": "#44403b",
-       "share": 0.19
+       "share": 0.3
       },
       {
        "color": "#57534d",
-       "share": 0.18
+       "share": 0.17
+      },
+      {
+       "color": "#44403b",
+       "share": 0.16
       },
       {
        "color": "#ffffff",
@@ -332,7 +334,7 @@
       },
       {
        "color": "#1c1917",
-       "share": 0.09
+       "share": 0.1
       }
      ],
      "button": {
@@ -356,9 +358,9 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Reservar turno",
-      "Reservar turno",
-      "Ver servicios"
+      "Ver servicios",
+      "Ver servicios y tarifas",
+      "Nuestros locales"
      ]
     },
     "surfaces": {
@@ -376,7 +378,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 5,
+     "squareMedia": 6,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -389,7 +391,7 @@
      }
     ],
     "nav": {
-     "links": 6,
+     "links": 5,
      "fixed": true,
      "height": 64,
      "floatingPill": false,
@@ -416,10 +418,10 @@
     1
    ],
    "motion": {
-    "elements": 22,
+    "elements": 25,
     "css": 2,
     "transitions": 0,
-    "scripted": 20,
+    "scripted": 23,
     "videos": 0,
     "playingVideos": 0
    },
@@ -429,13 +431,13 @@
      "h": 1024
     },
     "page": {
-     "height": 6154,
-     "screens": 6,
-     "words": 236,
+     "height": 6283,
+     "screens": 6.1,
+     "words": 211,
      "img": 7,
      "video": 0,
-     "canvas": 0,
-     "svg": 16,
+     "canvas": 1,
+     "svg": 17,
      "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
@@ -523,7 +525,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.5,
-      "top": 1430,
+      "top": 1353,
       "tag": "h2",
       "kind": "heading"
      },
@@ -544,7 +546,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 2737,
+      "top": 2660,
       "tag": "h2",
       "kind": "heading"
      },
@@ -565,7 +567,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.28,
-      "top": 3537,
+      "top": 3460,
       "tag": "h2",
       "kind": "heading"
      },
@@ -586,7 +588,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 4255,
+      "top": 4466,
       "tag": "h2",
       "kind": "heading"
      },
@@ -607,7 +609,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 5417,
+      "top": 5572,
       "tag": "div",
       "kind": "heading"
      }
@@ -625,17 +627,18 @@
      "families": [
       {
        "family": "ui-sans-serif",
-       "share": 0.87,
+       "share": 0.85,
        "mono": false
       },
       {
        "family": "Newsreader",
-       "share": 0.13,
+       "share": 0.15,
        "mono": false
       }
      ],
      "familyCount": 2,
      "sizes": [
+      13,
       14,
       16,
       18,
@@ -644,7 +647,7 @@
       40,
       48
      ],
-     "sizeCount": 7,
+     "sizeCount": 8,
      "notLoaded": [],
      "body": {
       "font": "ui-sans-serif",
@@ -669,7 +672,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.09,
+     "centerShare": 0.07,
      "smallText": 0
     },
     "eyebrows": [],
@@ -694,7 +697,7 @@
       },
       {
        "color": "#e7e5e4",
-       "top": 462,
+       "top": 385,
        "hsl": {
         "h": 20,
         "s": 0.06,
@@ -703,7 +706,7 @@
       },
       {
        "color": "#0c0a09",
-       "top": 1318,
+       "top": 1241,
        "hsl": {
         "h": 20,
         "s": 0.14,
@@ -712,7 +715,7 @@
       },
       {
        "color": "#ffffff",
-       "top": 2625,
+       "top": 2548,
        "hsl": {
         "h": 0,
         "s": 0,
@@ -721,7 +724,7 @@
       },
       {
        "color": "#1c1917",
-       "top": 5643,
+       "top": 5772,
        "hsl": {
         "h": 24,
         "s": 0.1,
@@ -736,11 +739,11 @@
       },
       {
        "color": "#44403b",
-       "share": 0.19
+       "share": 0.16
       },
       {
        "color": "#57534d",
-       "share": 0.18
+       "share": 0.16
       },
       {
        "color": "#ffffff",
@@ -748,7 +751,7 @@
       },
       {
        "color": "#1c1917",
-       "share": 0.09
+       "share": 0.1
       }
      ],
      "button": {
@@ -772,9 +775,9 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Reservar turno",
-      "Reservar turno",
-      "Ver servicios"
+      "Ver servicios",
+      "Ver servicios y tarifas",
+      "Nuestros locales"
      ]
     },
     "surfaces": {
@@ -792,7 +795,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 5,
+     "squareMedia": 6,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -801,11 +804,11 @@
     "heroMedia": [
      {
       "type": "img",
-      "ratio": 0.39
+      "ratio": 0.45
      }
     ],
     "nav": {
-     "links": 6,
+     "links": 5,
      "fixed": true,
      "height": 64,
      "floatingPill": false,
@@ -823,19 +826,19 @@
    "load": "load",
    "screens": 7,
    "filled": [
+    0.99,
+    0.99,
     1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1
+    0.99,
+    0.99,
+    0.99,
+    0.99
    ],
    "motion": {
-    "elements": 22,
+    "elements": 25,
     "css": 2,
     "transitions": 0,
-    "scripted": 20,
+    "scripted": 23,
     "videos": 0,
     "playingVideos": 0
    },
@@ -845,13 +848,13 @@
      "h": 844
     },
     "page": {
-     "height": 5284,
+     "height": 5312,
      "screens": 6.3,
-     "words": 236,
+     "words": 211,
      "img": 7,
      "video": 0,
-     "canvas": 0,
-     "svg": 16,
+     "canvas": 1,
+     "svg": 17,
      "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
@@ -938,7 +941,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.61,
-      "top": 1077,
+      "top": 1009,
       "tag": "h2",
       "kind": "heading"
      },
@@ -959,92 +962,8 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2017,
+      "top": 1949,
       "tag": "h2",
-      "kind": "heading"
-     },
-     {
-      "text": "$13.000",
-      "words": 1,
-      "chars": 7,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Newsreader",
-      "weight": 400,
-      "tracking": 0,
-      "leading": 1.33,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "right",
-      "position": "right",
-      "widthRatio": 0.31,
-      "top": 2285,
-      "tag": "td",
-      "kind": "heading"
-     },
-     {
-      "text": "$40.000",
-      "words": 1,
-      "chars": 7,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Newsreader",
-      "weight": 400,
-      "tracking": 0,
-      "leading": 1.33,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "right",
-      "position": "right",
-      "widthRatio": 0.31,
-      "top": 2357,
-      "tag": "td",
-      "kind": "heading"
-     },
-     {
-      "text": "$15.000",
-      "words": 1,
-      "chars": 7,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Newsreader",
-      "weight": 400,
-      "tracking": 0,
-      "leading": 1.33,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "right",
-      "position": "right",
-      "widthRatio": 0.31,
-      "top": 2453,
-      "tag": "td",
-      "kind": "heading"
-     },
-     {
-      "text": "$8.000",
-      "words": 1,
-      "chars": 6,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Newsreader",
-      "weight": 400,
-      "tracking": 0,
-      "leading": 1.33,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "right",
-      "position": "right",
-      "widthRatio": 0.31,
-      "top": 2549,
-      "tag": "td",
       "kind": "heading"
      },
      {
@@ -1064,7 +983,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2781,
+      "top": 2705,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1085,7 +1004,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 3451,
+      "top": 3593,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1106,7 +1025,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.73,
-      "top": 3664,
+      "top": 3750,
       "tag": "h3",
       "kind": "heading"
      },
@@ -1127,7 +1046,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 4218,
+      "top": 4304,
       "tag": "h3",
       "kind": "heading"
      },
@@ -1148,30 +1067,30 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 4602,
+      "top": 4688,
       "tag": "div",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 12,
+     "count": 8,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 0,
      "centered": 0,
-     "medianWords": 2,
+     "medianWords": 3,
      "mixedFontHeadings": 0
     },
     "type": {
      "families": [
       {
        "family": "ui-sans-serif",
-       "share": 0.87,
+       "share": 0.85,
        "mono": false
       },
       {
        "family": "Newsreader",
-       "share": 0.13,
+       "share": 0.15,
        "mono": false
       }
      ],
@@ -1181,11 +1100,12 @@
       14,
       16,
       18,
+      20,
       24,
       30,
       40
      ],
-     "sizeCount": 7,
+     "sizeCount": 8,
      "notLoaded": [],
      "body": {
       "font": "ui-sans-serif",
@@ -1210,7 +1130,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0,
-     "centerShare": 0.09,
+     "centerShare": 0.07,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1235,7 +1155,7 @@
       },
       {
        "color": "#e7e5e4",
-       "top": 540,
+       "top": 472,
        "hsl": {
         "h": 20,
         "s": 0.06,
@@ -1244,7 +1164,7 @@
       },
       {
        "color": "#0c0a09",
-       "top": 997,
+       "top": 929,
        "hsl": {
         "h": 20,
         "s": 0.14,
@@ -1253,7 +1173,7 @@
       },
       {
        "color": "#ffffff",
-       "top": 1937,
+       "top": 1869,
        "hsl": {
         "h": 0,
         "s": 0,
@@ -1268,11 +1188,11 @@
       },
       {
        "color": "#44403b",
-       "share": 0.19
+       "share": 0.16
       },
       {
        "color": "#57534d",
-       "share": 0.18
+       "share": 0.16
       },
       {
        "color": "#ffffff",
@@ -1280,7 +1200,7 @@
       },
       {
        "color": "#1c1917",
-       "share": 0.09
+       "share": 0.1
       }
      ],
      "button": {
@@ -1304,9 +1224,9 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "Reservar turno",
-      "Reservar turno",
-      "Ver servicios"
+      "Ver servicios",
+      "Ver servicios y tarifas",
+      "Nuestros locales"
      ]
     },
     "surfaces": {
@@ -1324,7 +1244,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 2,
+     "squareMedia": 3,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -1333,7 +1253,7 @@
     "heroMedia": [
      {
       "type": "img",
-      "ratio": 0.27
+      "ratio": 0.33
      }
     ],
     "nav": {

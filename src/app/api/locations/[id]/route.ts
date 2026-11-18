@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-guard";
+import { parseAndValidateCoordinates } from "@/lib/coordinates";
 
 export async function GET(
     request: Request,
@@ -40,7 +41,15 @@ export async function PUT(
 
         const { id } = await params;
         const body = await request.json();
-        const { name, address, latitude, longitude } = body;
+        const { name, address, latitude: rawLatitude, longitude: rawLongitude } = body;
+
+        const { latitude, longitude, error: coordError } = parseAndValidateCoordinates(
+            rawLatitude,
+            rawLongitude
+        );
+        if (coordError) {
+            return NextResponse.json({ error: coordError }, { status: 400 });
+        }
 
         const location = await prisma.location.update({
             where: { id },

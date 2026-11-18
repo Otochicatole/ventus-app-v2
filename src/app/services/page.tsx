@@ -13,17 +13,37 @@ type Service = {
     active: boolean;
 };
 
+type LocationSummary = {
+    id: string;
+    _count?: {
+        timeSlots?: number;
+    };
+};
+
 export default function ServicesPage() {
     const [services, setServices] = useState<Service[]>([]);
+    const [hasBookingTimeSlots, setHasBookingTimeSlots] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchServices = async () => {
+        const fetchServicesAndAvailability = async () => {
             try {
-                const res = await fetch("/api/services", { cache: "no-store" });
-                if (res.ok) {
-                    const data = await res.json();
+                const [servicesRes, locationsRes] = await Promise.all([
+                    fetch("/api/services", { cache: "no-store" }),
+                    fetch("/api/locations", { cache: "no-store" }),
+                ]);
+
+                if (servicesRes.ok) {
+                    const data = await servicesRes.json();
                     setServices(data.filter((service: Service) => service.active));
+                }
+
+                if (locationsRes.ok) {
+                    const locationsData: LocationSummary[] = await locationsRes.json();
+                    const hasAnySlots =
+                        Array.isArray(locationsData) &&
+                        locationsData.some((loc) => (loc._count?.timeSlots ?? 0) > 0);
+                    setHasBookingTimeSlots(hasAnySlots);
                 }
             } catch (error) {
                 console.error("Error fetching services:", error);
@@ -32,7 +52,7 @@ export default function ServicesPage() {
             }
         };
 
-        fetchServices();
+        fetchServicesAndAvailability();
     }, []);
 
     if (loading) {
@@ -58,13 +78,15 @@ export default function ServicesPage() {
                             Descubrí nuestra carta de cortes, afeitado clásico y styling profesional.
                         </p>
                     </div>
-                    <Link
-                        href="/shifts"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#0b3a60] text-white text-sm font-semibold hover:bg-[#082a46] transition-colors shrink-0 w-fit"
-                    >
-                        Reservar turno
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    {hasBookingTimeSlots && (
+                        <Link
+                            href="/shifts"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#0b3a60] text-white text-sm font-semibold hover:bg-[#082a46] transition-colors shrink-0 w-fit"
+                        >
+                            Reservar turno
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    )}
                 </header>
 
                 {services.length === 0 ? (
@@ -102,35 +124,39 @@ export default function ServicesPage() {
                                         <Clock className="w-4 h-4 text-[#0b3a60]" />
                                         {service.duration} minutos
                                     </span>
-                                    <Link
-                                        href="/shifts"
-                                        className="font-semibold text-[#0b3a60] hover:underline"
-                                    >
-                                        Reservar
-                                    </Link>
+                                    {hasBookingTimeSlots && (
+                                        <Link
+                                            href="/shifts"
+                                            className="font-semibold text-[#0b3a60] hover:underline"
+                                        >
+                                            Reservar
+                                        </Link>
+                                    )}
                                 </div>
                             </article>
                         ))}
                     </div>
                 )}
 
-                <section className="bg-[#0b3a60] text-white p-8 sm:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="space-y-2">
-                        <h2 className="text-2xl sm:text-3xl font-light tracking-tight">
-                            ¿Listo para tu próximo corte?
-                        </h2>
-                        <p className="text-blue-100 text-sm sm:text-base">
-                            Elegí sucursal, fecha y horario disponible en segundos.
-                        </p>
-                    </div>
-                    <Link
-                        href="/shifts"
-                        className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#0b3a60] text-sm font-semibold hover:bg-stone-100 transition-colors shrink-0 w-fit"
-                    >
-                        Reservar turno
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </section>
+                {hasBookingTimeSlots && (
+                    <section className="bg-[#0b3a60] text-white p-8 sm:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="space-y-2">
+                            <h2 className="text-2xl sm:text-3xl font-light tracking-tight">
+                                ¿Listo para tu próximo corte?
+                            </h2>
+                            <p className="text-blue-100 text-sm sm:text-base">
+                                Elegí sucursal, fecha y horario disponible en segundos.
+                            </p>
+                        </div>
+                        <Link
+                            href="/shifts"
+                            className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#0b3a60] text-sm font-semibold hover:bg-stone-100 transition-colors shrink-0 w-fit"
+                        >
+                            Reservar turno
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </section>
+                )}
             </div>
         </div>
     );
