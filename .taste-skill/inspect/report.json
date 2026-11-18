@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:3000",
- "at": "2026-11-18T22:07:16.948Z",
+ "at": "2026-11-18T22:34:02.092Z",
  "allow": [
   "no-footage"
  ],
@@ -398,7 +398,8 @@
      "blur": false
     },
     "fontsLoaded": [
-     "newsreader"
+     "newsreader",
+     "newsreader fallback"
     ]
    },
    "consoleErrors": []

@@ -95,11 +95,19 @@ export default function InteractiveMap() {
                     center: [defaultLng, defaultLat],
                     zoom: mappableLocations.length === 1 ? 15.2 : 14.2,
                     pitch: 45, // Inclinación tridimensional inicial
+                    maxPitch: 75,
                     bearing: -10 // Orientación/Rotación inicial
                 });
 
                 // Controles de navegación nativos (Zoom, Inclinación y Brújula)
-                map.addControl(new maplibregl.NavigationControl({ showCompass: true, showZoom: true }), "top-right");
+                map.addControl(
+                    new maplibregl.NavigationControl({
+                        showCompass: true,
+                        showZoom: true,
+                        visualizePitch: true,
+                    }),
+                    "top-right"
+                );
 
                 // Agregar capa 3D de edificios (fill-extrusion) de manera dinámica al cargarse el mapa
                 map.on("load", () => {
@@ -124,44 +132,95 @@ export default function InteractiveMap() {
                             }
                         }
 
-                        // Inyectar capa 3D fill-extrusion para levantar edificios urbanos
-                        map.addLayer(
-                            {
-                                id: "3d-buildings",
-                                source: vectorSourceId,
-                                "source-layer": "building", // Nombre estándar de OpenMapTiles para edificios
-                                type: "fill-extrusion",
-                                minzoom: 14,
-                                paint: {
-                                    // Color claro adaptado al diseño de piedra/stone del proyecto
-                                    "fill-extrusion-color": [
-                                        "interpolate",
-                                        ["linear"],
-                                        ["get", "render_height"],
-                                        0, "#e7e5e4", // stone-200
-                                        50, "#d6d3d1", // stone-300
-                                        100, "#a8a29e" // stone-400
-                                    ],
-                                    // Elevación fluida de edificios a medida que se realiza zoom
-                                    "fill-extrusion-height": [
-                                        "interpolate",
-                                        ["linear"],
-                                        ["zoom"],
-                                        14, 0,
-                                        14.5, ["get", "render_height"]
-                                    ],
-                                    "fill-extrusion-base": [
-                                        "interpolate",
-                                        ["linear"],
-                                        ["zoom"],
-                                        14, 0,
-                                        14.5, ["get", "render_base_height"]
-                                    ],
-                                    "fill-extrusion-opacity": 0.65
-                                }
-                            },
-                            labelLayerId
+                        const existingBuildingLayer = style.layers.find(
+                            (layer) =>
+                                "source-layer" in layer &&
+                                (layer["source-layer"] === "buildings" || layer["source-layer"] === "building")
                         );
+                        const buildingSourceLayer =
+                            existingBuildingLayer &&
+                            "source-layer" in existingBuildingLayer &&
+                            typeof existingBuildingLayer["source-layer"] === "string"
+                                ? existingBuildingLayer["source-layer"]
+                                : "buildings";
+
+                        if (map.getLayer("building")) {
+                            map.setLayoutProperty("building", "visibility", "none");
+                        }
+                        if (map.getLayer("building-top")) {
+                            map.setLayoutProperty("building-top", "visibility", "none");
+                        }
+
+                        map.setLight({
+                            anchor: "viewport",
+                            color: "#ffffff",
+                            intensity: 0.5,
+                            position: [1.5, 200, 35],
+                        });
+
+                        // Inyectar capa 3D fill-extrusion para levantar edificios urbanos
+                        if (!map.getLayer("3d-buildings")) {
+                            map.addLayer(
+                                {
+                                    id: "3d-buildings",
+                                    source: vectorSourceId,
+                                    "source-layer": buildingSourceLayer,
+                                    type: "fill-extrusion",
+                                    minzoom: 13.5,
+                                    filter: [
+                                        "all",
+                                        ["==", ["geometry-type"], "Polygon"],
+                                        [">=", ["coalesce", ["get", "layer"], 0], 0],
+                                    ],
+                                    paint: {
+                                        "fill-extrusion-color": [
+                                            "interpolate",
+                                            ["linear"],
+                                            [
+                                                "case",
+                                                [">", ["coalesce", ["get", "height"], 0], 0],
+                                                ["get", "height"],
+                                                [">", ["coalesce", ["get", "render_height"], 0], 0],
+                                                ["get", "render_height"],
+                                                10,
+                                            ],
+                                            0, "#d6d3d1",
+                                            15, "#a8a29e",
+                                            40, "#78716c",
+                                        ],
+                                        "fill-extrusion-height": [
+                                            "interpolate",
+                                            ["linear"],
+                                            ["zoom"],
+                                            13.5, 0,
+                                            14.2, [
+                                                "case",
+                                                [">", ["coalesce", ["get", "height"], 0], 0],
+                                                ["get", "height"],
+                                                [">", ["coalesce", ["get", "render_height"], 0], 0],
+                                                ["get", "render_height"],
+                                                10,
+                                            ],
+                                        ],
+                                        "fill-extrusion-base": [
+                                            "interpolate",
+                                            ["linear"],
+                                            ["zoom"],
+                                            13.5, 0,
+                                            14.2, [
+                                                "coalesce",
+                                                ["get", "min_height"],
+                                                ["get", "render_base_height"],
+                                                0,
+                                            ],
+                                        ],
+                                        "fill-extrusion-opacity": 1,
+                                        "fill-extrusion-vertical-gradient": true,
+                                    },
+                                },
+                                labelLayerId
+                            );
+                        }
                     }
                 });
 
