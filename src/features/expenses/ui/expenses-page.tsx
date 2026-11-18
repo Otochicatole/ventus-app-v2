@@ -7,7 +7,6 @@ import { useExpenseForm } from "../hooks/use-expense-form";
 import { useFixedExpenseForm } from "../hooks/use-fixed-expense-form";
 import { useExpenseDelete } from "../hooks/use-expense-delete";
 import { BudgetHero } from "./budget-hero";
-import { SummaryCards } from "./summary-cards";
 import { FixedExpensesTable } from "./fixed-expenses-table";
 import { ExpensesTable } from "./expenses-table";
 import { ExpenseDialog } from "./expense-dialog";
@@ -64,8 +63,6 @@ export default function ExpensesPage() {
             />
 
             {activeMessage && <Alert severity={activeMessage.type}>{activeMessage.text}</Alert>}
-
-            <SummaryCards summary={data.summary} />
 
             <section className="grid gap-6">
                 <FixedExpensesTable

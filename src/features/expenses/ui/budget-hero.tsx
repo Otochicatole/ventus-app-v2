@@ -2,6 +2,7 @@ import { CalendarRange, PiggyBank, Wallet } from "lucide-react";
 import type { BudgetPeriod } from "../domain/finance";
 import type { SummaryResponse } from "../domain/expenses.types";
 import { formatCurrency } from "./formatters";
+import { SummaryCards } from "./summary-cards";
 
 const PERIOD_OPTIONS: Array<{ value: BudgetPeriod; label: string }> = [
     { value: "week", label: "Semana" },
@@ -32,9 +33,11 @@ export function BudgetHero({
     onEndDateChange,
     onCustomPreset,
 }: BudgetHeroProps) {
+    const budget = summary?.budget ?? 0;
+
     return (
-        <section className="overflow-hidden rounded-3xl border border-stone-200 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_35%),linear-gradient(135deg,#fffdf7,#f5efe3_55%,#eef9f3)] shadow-sm sm:rounded-4xl">
-            <div className="grid gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+        <section className="overflow-clip rounded-3xl border border-stone-200 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_35%),linear-gradient(135deg,#fffdf7,#f5efe3_55%,#eef9f3)] shadow-sm sm:rounded-4xl">
+            <div className="flex flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
                 <div className="space-y-4 sm:space-y-5">
                     <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-3 py-1.5 text-xs font-medium text-emerald-700 backdrop-blur sm:px-4 sm:py-2 sm:text-sm">
                         <PiggyBank className="h-4 w-4" />
@@ -103,34 +106,39 @@ export function BudgetHero({
                     )}
                 </div>
 
-                <div className="rounded-2xl border border-stone-200 bg-stone-950 p-5 text-white shadow-[0_24px_80px_rgba(28,25,23,0.24)] sm:rounded-[1.75rem] sm:p-6">
+                <div className="rounded-2xl border border-stone-800 bg-stone-950 p-5 text-white shadow-[0_24px_80px_rgba(28,25,23,0.24)] sm:rounded-[1.75rem] sm:p-6">
                     <p className="text-xs uppercase tracking-[0.16em] text-emerald-300 sm:text-sm sm:tracking-[0.24em]">
                         {summary?.range.label}
                     </p>
-                    <div className="mt-4 flex items-center justify-between gap-3 sm:mt-6 sm:gap-4">
+                    <div className="mt-4 flex flex-col gap-4 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
                             <p className="text-sm text-stone-300">Presupuesto disponible</p>
-                            <p className="mt-1 truncate text-3xl font-bold tracking-tight sm:mt-2 sm:text-4xl">
-                                {formatCurrency(summary?.budget ?? 0)}
+                            <p
+                                className={`mt-1 truncate text-3xl font-bold tracking-tight tabular-nums sm:mt-2 sm:text-4xl ${
+                                    budget >= 0 ? "text-white" : "text-rose-300"
+                                }`}
+                            >
+                                {formatCurrency(budget)}
+                            </p>
+                            <p className="mt-1 text-xs text-stone-300">
+                                Ingresos menos gastos totales del período
                             </p>
                         </div>
-                        <div className="shrink-0 rounded-2xl bg-white/10 p-3 text-emerald-300 sm:p-4">
-                            <Wallet className="h-6 w-6 sm:h-8 sm:w-8" />
+                        <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-4">
+                            <div className="min-w-0 rounded-xl border border-white/10 bg-white/5 px-4 py-3 sm:rounded-2xl">
+                                <p className="text-xs text-rose-300">Gastos totales</p>
+                                <p className="mt-1 truncate text-lg font-semibold text-white tabular-nums sm:text-xl">
+                                    {formatCurrency(summary?.totalExpenses ?? 0)}
+                                </p>
+                            </div>
+                            <div className="shrink-0 rounded-2xl bg-white/10 p-3 text-emerald-300 sm:p-4">
+                                <Wallet className="h-6 w-6 sm:h-8 sm:w-8" />
+                            </div>
                         </div>
                     </div>
-                    <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-stone-300 sm:mt-6 sm:gap-3">
-                        <div className="rounded-xl bg-white/5 p-3 sm:rounded-2xl sm:p-4">
-                            <p>Ingresos</p>
-                            <p className="mt-1 text-lg font-semibold text-white sm:mt-2 sm:text-xl">
-                                {formatCurrency(summary?.income ?? 0)}
-                            </p>
-                        </div>
-                        <div className="rounded-xl bg-white/5 p-3 sm:rounded-2xl sm:p-4">
-                            <p>Gastos</p>
-                            <p className="mt-1 text-lg font-semibold text-white sm:mt-2 sm:text-xl">
-                                {formatCurrency(summary?.totalExpenses ?? 0)}
-                            </p>
-                        </div>
+
+                    <div className="mt-5 border-t border-white/10 pt-5 sm:mt-6 sm:pt-6">
+                        <SummaryCards summary={summary} />
                     </div>
                 </div>
             </div>

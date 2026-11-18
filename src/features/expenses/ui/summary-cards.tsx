@@ -1,5 +1,4 @@
-import { HandCoins, Landmark, ReceiptText, Wallet } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { HandCoins, Landmark, ReceiptText, ShoppingBag } from "lucide-react";
 import type { SummaryResponse } from "../domain/expenses.types";
 import { formatCurrency } from "./formatters";
 
@@ -8,67 +7,66 @@ type SummaryCardsProps = {
 };
 
 export function SummaryCards({ summary }: SummaryCardsProps) {
+    const paymentsCount = summary?.paymentsCount ?? 0;
+    const productsSoldCount = summary?.productsSoldCount ?? 0;
+    const fixedOccurrencesCount = summary?.fixedExpenseOccurrencesCount ?? 0;
+    const normalExpensesCount = summary?.normalExpensesCount ?? 0;
+
+    const cards = [
+        {
+            label: "Ingresos",
+            value: formatCurrency(summary?.income ?? 0),
+            subtitle: `${paymentsCount} ${paymentsCount === 1 ? "cobro" : "cobros"} dentro del período`,
+            icon: Landmark,
+            accentClass: "text-emerald-300",
+        },
+        {
+            label: "Productos vendidos",
+            value: formatCurrency(summary?.productsSoldTotal ?? 0),
+            subtitle: `${productsSoldCount} ${productsSoldCount === 1 ? "producto vendido" : "productos vendidos"}`,
+            icon: ShoppingBag,
+            accentClass: "text-teal-300",
+        },
+        {
+            label: "Gastos fijos",
+            value: formatCurrency(summary?.fixedExpensesTotal ?? 0),
+            subtitle: `${fixedOccurrencesCount} ${fixedOccurrencesCount === 1 ? "impacto automático" : "impactos automáticos"}`,
+            icon: ReceiptText,
+            accentClass: "text-amber-300",
+        },
+        {
+            label: "Gastos del día",
+            value: formatCurrency(summary?.normalExpenses ?? 0),
+            subtitle: `${normalExpensesCount} ${normalExpensesCount === 1 ? "registro cargado" : "registros cargados"}`,
+            icon: HandCoins,
+            accentClass: "text-rose-300",
+        },
+    ];
+
     return (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <Card className="border-emerald-200 bg-emerald-50/70">
-                <CardContent className="space-y-3 p-5">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm text-emerald-900">Ganancias</span>
-                        <Landmark className="h-5 w-5 text-emerald-700" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {cards.map((card) => {
+                const Icon = card.icon;
+                return (
+                    <div
+                        key={card.label}
+                        className="flex min-w-0 flex-col justify-between gap-2.5 rounded-xl border border-white/10 bg-white/5 p-4 sm:rounded-2xl sm:p-5"
+                    >
+                        <div className="flex items-center justify-between gap-2">
+                            <span className={`text-sm font-medium ${card.accentClass}`}>
+                                {card.label}
+                            </span>
+                            <Icon className={`h-4 w-4 shrink-0 ${card.accentClass}`} />
+                        </div>
+                        <p className="truncate text-2xl font-bold text-white tabular-nums sm:text-3xl">
+                            {card.value}
+                        </p>
+                        <p className={`text-xs sm:text-sm ${card.accentClass}`}>
+                            {card.subtitle}
+                        </p>
                     </div>
-                    <p className="text-3xl font-bold text-emerald-950">
-                        {formatCurrency(summary?.income ?? 0)}
-                    </p>
-                    <p className="text-sm text-emerald-800">
-                        {summary?.paymentsCount ?? 0} cobros dentro del período
-                    </p>
-                </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 bg-amber-50/80">
-                <CardContent className="space-y-3 p-5">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm text-amber-900">Gastos fijos</span>
-                        <ReceiptText className="h-5 w-5 text-amber-700" />
-                    </div>
-                    <p className="text-3xl font-bold text-amber-950">
-                        {formatCurrency(summary?.fixedExpensesTotal ?? 0)}
-                    </p>
-                    <p className="text-sm text-amber-800">
-                        {summary?.fixedExpenseOccurrencesCount ?? 0} impactos automáticos
-                    </p>
-                </CardContent>
-            </Card>
-
-            <Card className="border-rose-200 bg-rose-50/80">
-                <CardContent className="space-y-3 p-5">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm text-rose-900">Gastos del día</span>
-                        <HandCoins className="h-5 w-5 text-rose-700" />
-                    </div>
-                    <p className="text-3xl font-bold text-rose-950">
-                        {formatCurrency(summary?.normalExpenses ?? 0)}
-                    </p>
-                    <p className="text-sm text-rose-800">
-                        {summary?.normalExpensesCount ?? 0} registros cargados
-                    </p>
-                </CardContent>
-            </Card>
-
-            <Card className="border-stone-200 bg-white">
-                <CardContent className="space-y-3 p-5">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm text-stone-600">Presupuesto neto</span>
-                        <Wallet className="h-5 w-5 text-stone-700" />
-                    </div>
-                    <p className={`text-3xl font-bold ${(summary?.budget ?? 0) >= 0 ? "text-stone-950" : "text-red-600"}`}>
-                        {formatCurrency(summary?.budget ?? 0)}
-                    </p>
-                    <p className="text-sm text-stone-500">
-                        Ganancias menos gastos totales del período
-                    </p>
-                </CardContent>
-            </Card>
-        </section>
+                );
+            })}
+        </div>
     );
 }

@@ -36,55 +36,97 @@ export async function GET(request: Request) {
             );
         }
 
-        const [incomeAggregate, expenseAggregate, paymentsCount, expensesCount, fixedExpenses] =
-            await Promise.all([
-                prisma.clientPaidService.aggregate({
-                    where: {
-                        paidAt: {
-                            gte: range.start,
-                            lt: range.end,
-                        },
+        const [
+            incomeAggregate,
+            expenseAggregate,
+            paymentsCount,
+            expensesCount,
+            fixedExpenses,
+            paidServicesWithProducts,
+            catalogProducts,
+        ] = await Promise.all([
+            prisma.clientPaidService.aggregate({
+                where: {
+                    paidAt: {
+                        gte: range.start,
+                        lt: range.end,
                     },
-                    _sum: {
-                        payment: true,
+                },
+                _sum: {
+                    payment: true,
+                },
+            }),
+            prisma.expense.aggregate({
+                where: {
+                    spentAt: {
+                        gte: range.start,
+                        lt: range.end,
                     },
-                }),
-                prisma.expense.aggregate({
-                    where: {
-                        spentAt: {
-                            gte: range.start,
-                            lt: range.end,
-                        },
+                },
+                _sum: {
+                    amount: true,
+                },
+            }),
+            prisma.clientPaidService.count({
+                where: {
+                    paidAt: {
+                        gte: range.start,
+                        lt: range.end,
                     },
-                    _sum: {
-                        amount: true,
+                },
+            }),
+            prisma.expense.count({
+                where: {
+                    spentAt: {
+                        gte: range.start,
+                        lt: range.end,
                     },
-                }),
-                prisma.clientPaidService.count({
-                    where: {
-                        paidAt: {
-                            gte: range.start,
-                            lt: range.end,
-                        },
+                },
+            }),
+            prisma.fixedExpense.findMany({
+                where: {
+                    startsAt: {
+                        lt: range.end,
                     },
-                }),
-                prisma.expense.count({
-                    where: {
-                        spentAt: {
-                            gte: range.start,
-                            lt: range.end,
-                        },
+                },
+                orderBy: [{ name: "asc" }, { startsAt: "asc" }],
+            }),
+            prisma.clientPaidService.findMany({
+                where: {
+                    paidAt: {
+                        gte: range.start,
+                        lt: range.end,
                     },
-                }),
-                prisma.fixedExpense.findMany({
-                    where: {
-                        startsAt: {
-                            lt: range.end,
-                        },
-                    },
-                    orderBy: [{ name: "asc" }, { startsAt: "asc" }],
-                }),
-            ]);
+                },
+                select: {
+                    productsBought: true,
+                },
+            }),
+            prisma.product.findMany({
+                select: {
+                    name: true,
+                    price: true,
+                },
+            }),
+        ]);
+
+        const productPriceByName = new Map<string, number>();
+        for (const product of catalogProducts) {
+            productPriceByName.set(product.name, product.price);
+            productPriceByName.set(product.name.trim().toLowerCase(), product.price);
+        }
+
+        let productsSoldCount = 0;
+        let productsSoldTotal = 0;
+        for (const record of paidServicesWithProducts) {
+            for (const productName of record.productsBought) {
+                productsSoldCount += 1;
+                productsSoldTotal +=
+                    productPriceByName.get(productName) ??
+                    productPriceByName.get(productName.trim().toLowerCase()) ??
+                    0;
+            }
+        }
 
         const fixedOccurrences = getFixedExpenseOccurrences(fixedExpenses, range);
         const fixedExpenseBreakdown = fixedExpenses.map((fixedExpense) => {
@@ -126,6 +168,8 @@ export async function GET(request: Request) {
             fixedExpenseOccurrencesCount: fixedOccurrences.length,
             totalExpenses,
             budget: income - totalExpenses,
+            productsSoldCount,
+            productsSoldTotal,
             fixedExpenseBreakdown,
         });
     } catch (error) {

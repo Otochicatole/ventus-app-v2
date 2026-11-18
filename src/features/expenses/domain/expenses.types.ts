@@ -43,6 +43,8 @@ export type SummaryResponse = {
     fixedExpenseOccurrencesCount: number;
     totalExpenses: number;
     budget: number;
+    productsSoldCount: number;
+    productsSoldTotal: number;
     fixedExpenseBreakdown: FixedExpenseBreakdown[];
 };
 
