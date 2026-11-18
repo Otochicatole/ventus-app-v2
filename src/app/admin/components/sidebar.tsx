@@ -26,13 +26,18 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
     {
-        title: "Operaciones",
+        title: "General",
         items: [
             {
                 label: "Dashboard",
                 href: "/admin/cms",
                 icon: LayoutDashboard,
             },
+        ],
+    },
+    {
+        title: "Finanzas",
+        items: [
             {
                 label: "Cobros",
                 href: "/admin/cms/payments",
@@ -43,6 +48,11 @@ const navGroups: NavGroup[] = [
                 href: "/admin/cms/expenses",
                 icon: Wallet,
             },
+        ],
+    },
+    {
+        title: "Turnos",
+        items: [
             {
                 label: "Turnos",
                 href: "/admin/cms/shifts",
@@ -106,37 +116,47 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 isOpen ? "translate-x-0 shadow-xl md:shadow-none" : "-translate-x-full"
             }`}
         >
-            <div className="p-3.5 space-y-6">
-                {navGroups.map((group, groupIdx) => (
-                    <div key={groupIdx} className="space-y-1">
-                        <span className="px-3 text-[10px] font-bold tracking-widest uppercase text-stone-400 select-none">
-                            {group.title}
-                        </span>
-                        <nav className="space-y-0.5 pt-1">
-                            {group.items.map((item) => {
-                                const isActive = pathname === item.href;
-                                const Icon = item.icon;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        onClick={onClose}
-                                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 cursor-pointer text-xs sm:text-sm font-medium ${
-                                            isActive
-                                                ? "bg-[#0b3a60] text-white shadow-xs font-semibold"
-                                                : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
-                                        }`}
-                                    >
-                                        <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-                                            isActive ? "text-white" : "text-stone-400 group-hover:text-stone-700"
-                                        }`} />
-                                        <span>{item.label}</span>
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
-                ))}
+            <div className="p-3.5 space-y-5">
+                {navGroups.map((group, groupIdx) => {
+                    const headingId = `sidebar-group-${groupIdx}`;
+                    return (
+                        <div key={group.title} className="space-y-1">
+                            <p
+                                id={headingId}
+                                className="px-3 text-[10px] font-bold tracking-widest uppercase text-stone-500 select-none"
+                            >
+                                {group.title}
+                            </p>
+                            <nav aria-labelledby={headingId} className="space-y-0.5 pt-1">
+                                {group.items.map((item) => {
+                                    const isActive =
+                                        item.href === "/admin/cms"
+                                            ? pathname === item.href
+                                            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                                    const Icon = item.icon;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={onClose}
+                                            aria-current={isActive ? "page" : undefined}
+                                            className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 cursor-pointer text-xs sm:text-sm font-medium ${
+                                                isActive
+                                                    ? "bg-[#0b3a60] text-white shadow-xs font-semibold"
+                                                    : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                                            }`}
+                                        >
+                                            <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                                                isActive ? "text-white" : "text-stone-400 group-hover:text-stone-700"
+                                            }`} />
+                                            <span>{item.label}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </nav>
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="p-4 border-t border-stone-100 bg-stone-50/50">

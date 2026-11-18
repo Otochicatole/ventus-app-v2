@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth-guard";
+import { getFixedExpenseOccurrences } from "@/features/expenses/domain/finance";
 
 function getRange(period: string): { start: Date; end: Date; label: string } {
     const now = new Date();
@@ -70,11 +71,17 @@ export async function GET(request: Request) {
         const period = searchParams.get("period") ?? "month";
         const { start, end, label } = getRange(period);
 
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date(todayStart);
+        todayEnd.setHours(23, 59, 59, 999);
+
         const [
             // Summary totals
             totalShifts,
             confirmedShifts,
             pendingShifts,
+            todayShifts,
             totalLocations,
             totalServices,
             totalProducts,
@@ -83,7 +90,12 @@ export async function GET(request: Request) {
 
             // Financial
             incomeAgg,
+            paymentsCount,
             expenseAgg,
+            expensesCount,
+            fixedExpenses,
+            paidServicesWithProducts,
+            catalogProducts,
 
             // Time series: shifts per day in range
             shiftsPerDay,
@@ -99,6 +111,7 @@ export async function GET(request: Request) {
             prisma.shift.count({ where: { date: { gte: start, lte: end } } }),
             prisma.shift.count({ where: { confirmed: true, date: { gte: start, lte: end } } }),
             prisma.shift.count({ where: { confirmed: false, date: { gte: start, lte: end } } }),
+            prisma.shift.count({ where: { date: { gte: todayStart, lte: todayEnd } } }),
             prisma.location.count(),
             prisma.service.count({ where: { active: true } }),
             prisma.product.count({ where: { active: true } }),
@@ -110,9 +123,25 @@ export async function GET(request: Request) {
                 where: { paidAt: { gte: start, lte: end } },
                 _sum: { payment: true },
             }),
+            prisma.clientPaidService.count({
+                where: { paidAt: { gte: start, lte: end } },
+            }),
             prisma.expense.aggregate({
                 where: { spentAt: { gte: start, lte: end } },
                 _sum: { amount: true },
+            }),
+            prisma.expense.count({
+                where: { spentAt: { gte: start, lte: end } },
+            }),
+            prisma.fixedExpense.findMany({
+                where: { startsAt: { lte: end } },
+            }),
+            prisma.clientPaidService.findMany({
+                where: { paidAt: { gte: start, lte: end } },
+                select: { productsBought: true },
+            }),
+            prisma.product.findMany({
+                select: { name: true, price: true },
             }),
 
             // Shifts grouped by date
@@ -184,8 +213,33 @@ export async function GET(request: Request) {
             }))
             .sort((a, b) => b.turnos - a.turnos);
 
+        const fixedOccurrences = getFixedExpenseOccurrences(fixedExpenses, {
+            start,
+            end: new Date(end.getTime() + 1),
+        });
+        const fixedExpensesTotal = fixedOccurrences.reduce((sum, item) => sum + item.amount, 0);
+
+        const productPriceByName = new Map<string, number>();
+        for (const product of catalogProducts) {
+            productPriceByName.set(product.name, product.price);
+            productPriceByName.set(product.name.trim().toLowerCase(), product.price);
+        }
+
+        let productsSoldCount = 0;
+        let productsSoldTotal = 0;
+        for (const record of paidServicesWithProducts) {
+            for (const productName of record.productsBought) {
+                productsSoldCount += 1;
+                productsSoldTotal +=
+                    productPriceByName.get(productName) ??
+                    productPriceByName.get(productName.trim().toLowerCase()) ??
+                    0;
+            }
+        }
+
         const income = incomeAgg._sum.payment ?? 0;
-        const expenses = expenseAgg._sum.amount ?? 0;
+        const normalExpenses = expenseAgg._sum.amount ?? 0;
+        const expenses = normalExpenses + fixedExpensesTotal;
 
         return NextResponse.json({
             period: { label, start: start.toISOString(), end: end.toISOString() },
@@ -193,13 +247,21 @@ export async function GET(request: Request) {
                 totalShifts,
                 confirmedShifts,
                 pendingShifts,
+                todayShifts,
                 totalLocations,
                 totalServices,
                 totalProducts,
                 totalReviews,
                 avgRating: Math.round((avgRating._avg.rating ?? 0) * 10) / 10,
                 income,
+                paymentsCount,
                 expenses,
+                normalExpenses,
+                expensesCount,
+                fixedExpensesTotal,
+                fixedOccurrencesCount: fixedOccurrences.length,
+                productsSoldCount,
+                productsSoldTotal,
                 profit: income - expenses,
             },
             shiftsChart,
