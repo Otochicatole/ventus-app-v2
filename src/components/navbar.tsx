@@ -112,8 +112,8 @@ export default function Navbar() {
                                     }`}
                                 />
                                 <span
-                                    className={`text-xs font-medium transition-colors ${
-                                        isActive ? "text-[#0b3a60] font-semibold" : "text-stone-600"
+                                    className={`text-[13px] font-medium transition-colors ${
+                                        isActive ? "text-[#0b3a60] font-semibold" : "text-stone-700"
                                     }`}
                                 >
                                     {page.name}

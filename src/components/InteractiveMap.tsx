@@ -267,10 +267,10 @@ export default function InteractiveMap() {
                 
                 {/* Encabezado del Módulo */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-stone-900">
+                    <h2 className="font-serif text-3xl sm:text-5xl font-light tracking-tight text-stone-900">
                         Nuestros locales
                     </h2>
-                    <p className="text-stone-600 max-w-md leading-relaxed text-sm sm:text-base">
+                    <p className="text-stone-600 max-w-md leading-relaxed text-base">
                         Encontrá la sucursal de Ventus más cercana para tu próximo turno.
                     </p>
                 </div>

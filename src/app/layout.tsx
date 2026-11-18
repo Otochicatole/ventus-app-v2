@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import { Newsreader } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/theme-provider";
 import LayoutWrapper from "@/components/layout-wrapper";
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ventus Barbería - Tu Estilo, Nuestra Pasión",
@@ -19,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" className={newsreader.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ThemeProvider>
           <LayoutWrapper>{children}</LayoutWrapper>

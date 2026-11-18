@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-serif: var(--font-newsreader), Georgia, serif;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -34,6 +38,11 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
+}
+
+.font-editorial {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-optical-sizing: auto;
 }
 
 @utility scrollbar-none {
